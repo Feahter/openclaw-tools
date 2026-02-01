@@ -1,0 +1,100 @@
+{
+  "timestamp": "2026-02-01T15:47:53.044171",
+  "summary": {
+    "完全本地化": 8,
+    "部分本地化": 6,
+    "需要云端": 1
+  },
+  "capabilities": {
+    "消息能力": {
+      "本地化": true,
+      "方案": "OpenClaw channel 集成",
+      "依赖": "OpenClaw gateway",
+      "说明": "支持 Slack、Telegram、WhatsApp 等"
+    },
+    "文件操作": {
+      "本地化": true,
+      "方案": "Python pathlib / os 模块",
+      "依赖": "无",
+      "说明": "读写、移动、搜索文件"
+    },
+    "命令执行": {
+      "本地化": true,
+      "方案": "subprocess / shell",
+      "依赖": "无",
+      "说明": "执行任意 shell 命令"
+    },
+    "Web 搜索": {
+      "本地化": false,
+      "方案": "Brave API / Perplexity API",
+      "依赖": "云端 API",
+      "说明": "需要网络搜索服务"
+    },
+    "Web Fetch": {
+      "本地化": "部分",
+      "方案": "curl / requests",
+      "依赖": "无",
+      "说明": "可以本地 HTTP 请求，Readability 需要云端"
+    },
+    "图片分析": {
+      "本地化": "可行",
+      "方案": "Ollama (llava/bakllava) 或 本地 LLM",
+      "依赖": "Ollama + 视觉模型",
+      "说明": "需安装 ollama pull llava"
+    },
+    "TTS 语音合成": {
+      "本地化": true,
+      "方案": "macOS say / Edge TTS / Coqui TTS",
+      "依赖": "macOS 或 Python packages",
+      "说明": "macOS say 无需安装，其他需 pip install"
+    },
+    "STT 语音转文字": {
+      "本地化": "可行",
+      "方案": "Whisper 本地模型",
+      "依赖": "openai-whisper",
+      "说明": "需 pip install whisper"
+    },
+    "定时任务": {
+      "本地化": true,
+      "方案": "Cron / Python schedule",
+      "依赖": "无",
+      "说明": "心跳机制就是典型例子"
+    },
+    "浏览器控制": {
+      "本地化": "部分",
+      "方案": "Playwright / CDP",
+      "依赖": "Chrome/Chromium",
+      "说明": "需要浏览器扩展"
+    },
+    "Canvas 画布": {
+      "本地化": true,
+      "方案": "Node canvas / HTML5 Canvas",
+      "依赖": "Node.js + canvas",
+      "说明": "生成图片、图表"
+    },
+    "会话管理": {
+      "本地化": true,
+      "方案": "OpenClaw sessions",
+      "依赖": "OpenClaw gateway",
+      "说明": "管理对话历史"
+    },
+    "记忆功能": {
+      "本地化": "可行",
+      "方案": "SQLite / LanceDB",
+      "依赖": "可选向量数据库",
+      "说明": "长期记忆和语义搜索"
+    },
+    "工具/Skill 管理": {
+      "本地化": true,
+      "方案": "OpenClaw skills",
+      "依赖": "无",
+      "说明": "加载和管理技能"
+    },
+    "节点控制": {
+      "本地化": "部分",
+      "方案": "OpenClaw nodes",
+      "依赖": "配对的节点设备",
+      "说明": "控制其他设备"
+    }
+  }
+}

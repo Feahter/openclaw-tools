@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 OpenClaw 工具箱</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+               background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #eee; 
+               min-height: 100vh; padding: 40px 20px; }
+        h1 { color: #00d9ff; margin-bottom: 10px; font-size: 2em; text-align: center; }
+        .subtitle { color: #888; text-align: center; margin-bottom: 40px; font-size: 1.1em; }
+        
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+                      gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .tool-card { background: rgba(22, 33, 62, 0.8); backdrop-filter: blur(10px); 
+                     border-radius: 16px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); 
+                     transition: all 0.3s; cursor: pointer; text-decoration: none; color: inherit; }
+        .tool-card:hover { transform: translateY(-5px); border-color: #00d9ff; 
+                          box-shadow: 0 10px 40px rgba(0,217,255,0.2); }
+        .tool-icon { font-size: 3em; margin-bottom: 15px; }
+        .tool-title { font-size: 1.3em; font-weight: 600; color: #fff; margin-bottom: 10px; }
+        .tool-desc { color: #888; font-size: 0.9em; line-height: 1.6; margin-bottom: 15px; }
+        .tool-link { display: inline-flex; align-items: center; gap: 5px; 
+                     background: linear-gradient(135deg, #00c853, #00e676); color: #fff; 
+                     padding: 8px 16px; border-radius: 8px; font-size: 0.85em; }
+        .tool-link:hover { transform: scale(1.05); }
+        
+        .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
+        .status-dot.ok { background: #00c853; box-shadow: 0 0 10px #00c853; }
+        .status-dot.err { background: #ff5252; }
+        
+        .footer { text-align: center; margin-top: 50px; color: #666; font-size: 0.9em; }
+        .footer a { color: #00d9ff; text-decoration: none; }
+        
+        /* 快捷操作区 */
+        .quick-actions { max-width: 1200px; margin: 0 auto 40px; display: flex; 
+                         gap: 15px; flex-wrap: wrap; justify-content: center; }
+        .quick-btn { background: rgba(15,52,96,0.6); border: 1px solid rgba(255,255,255,0.1); 
+                     color: #fff; padding: 12px 20px; border-radius: 10px; cursor: pointer; 
+                     font-size: 0.9em; transition: all 0.2s; }
+        .quick-btn:hover { background: rgba(15,52,96,0.9); border-color: #00d9ff; }
+        
+        @media (max-width: 768px) {
+            .tools-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 1.5em; }
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 OpenClaw 工具箱</h1>
+    <div class="subtitle">集成开发与管理工具集合</div>
+    
+    <!-- 快捷操作 -->
+    <div class="quick-actions">
+        <button class="quick-btn" onclick="openAll()">🚀 启动全部</button>
+        <button class="quick-btn" onclick="checkAll()">🔍 检查状态</button>
+        <button class="quick-btn" onclick="openFolder()">📁 打开目录</button>
+    </div>
+    
+    <!-- 工具卡片 -->
+    <div class="tools-grid">
+        <!-- 模型管理 -->
+        <a href="http://localhost:8768" class="tool-card" target="_blank">
+            <div class="tool-icon">🤖</div>
+            <div class="tool-title">📦 模型管理</div>
+            <div class="tool-desc">Ollama 本地模型管理、API Keys 管理、用量统计</div>
+            <div class="tool-link">http://localhost:8768 <span class="status-dot" id="status-8766">...</span></div>
+        </a>
+        
+        <!-- 任务看板 -->
+        <a href="http://localhost:8769" class="tool-card" target="_blank">
+            <div class="tool-icon">📋</div>
+            <div class="tool-title">📋 任务看板</div>
+            <div class="tool-desc">主动任务追踪、进度管理、四列看板视图</div>
+            <div class="tool-link">http://localhost:8769 <span class="status-dot" id="status-8767">...</span></div>
+        </a>
+        
+        <!-- API Key 管理 -->
+        <a href="#" class="tool-card" onclick="runCli('api-key-manager.py'); return false;">
+            <div class="tool-icon">🔑</div>
+            <div class="tool-title">🔑 API Key 管理</div>
+            <div class="tool-desc">命令行管理多 Provider API Keys，支持添加/列出/测试</div>
+            <div class="tool-link">CLI 工具 python3 api-key-manager.py</div>
+        </a>
+        
+        <!-- 自动切换 -->
+        <a href="#" class="tool-card" onclick="runCli('api-auto-switch.py'); return false;">
+            <div class="tool-icon">🔄</div>
+            <div class="tool-title">🔄 自动切换</div>
+            <div class="tool-desc">API 余额不足时自动切换到备用 Key</div>
+            <div class="tool-link">CLI 工具 python3 api-auto-switch.py monitor &</div>
+        </a>
+        
+        <!-- API 扫描 -->
+        <a href="#" class="tool-card" onclick="runCli('api-reserve-scanner.py'); return false;">
+            <div class="tool-icon">🔍</div>
+            <div class="tool-title">🔍 API 扫描</div>
+            <div class="tool-desc">扫描并收集可用的免费/廉价 API</div>
+            <div class="tool-link">CLI 工具 python3 api-reserve-scanner.py</div>
+        </a>
+    </div>
+    
+    <div class="footer">
+        <p>工具目录: <code>/Users/fuzhuo/.openclaw/workspace/tools/</code></p>
+        <p>按 <kbd>Ctrl+C</kbd> 停止服务</p>
+    </div>
+    
+    <script>
+        const tools = [
+            { port: 8766, name: '模型管理' },
+            { port: 8767, name: '任务看板' }
+        ];
+        
+        async function checkStatus(port, id) {
+            try {
+                const res = await fetch(`http://localhost:${port}/api/status`, { timeout: 2000 });
+                document.getElementById(id).className = 'status-dot ok';
+            } catch (e) {
+                document.getElementById(id).className = 'status-dot err';
+            }
+        }
+        
+        function checkAll() {
+            tools.forEach(t => checkStatus(t.port, `status-${t.port}`));
+        }
+        
+        function runCli(script) {
+            const term = window.open('', '_blank', 'width=600,height=400');
+            term.document.write(`
+                <html><head><title>${script}</title></head>
+                <body style="background:#1a1a2e;color:#fff;padding:20px;font-family:monospace;">
+                    <h3>正在启动: ${script}</h3>
+                    <pre>cd /Users/fuzhuo/.openclaw/workspace/tools/
+python3 ${script}
+
+按 Ctrl+C 停止
+                    </pre>
+                </body></html>
+            `);
+        }
+        
+        function openAll() {
+            tools.forEach(t => window.open(`http://localhost:${t.port}`, '_blank'));
+        }
+        
+        function openFolder() {
+            window.open('file:///Users/fuzhuo/.openclaw/workspace/tools/');
+        }
+        
+        // 初始检查
+        checkAll();
+        // 每 10 秒刷新状态
+        setInterval(checkAll, 10000);
+    </script>
+</body>
+</html>
