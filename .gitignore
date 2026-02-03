@@ -20,5 +20,9 @@ logs/
 ~/.openclaw/heartbeat*.json
 ~/.openclaw/agent*.json
 
+# 个人记忆 (绝不上传)
+memory/
+MEMORY.md
+
 # Node.js
 node_modules/
