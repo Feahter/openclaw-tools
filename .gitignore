@@ -1,4 +1,24 @@
-*.pyc
-__pycache__/
-.DS_Store
+# 敏感文件
 *.log
+logs/
+*.json
+!package.json
+!skills-open-source/manifest.json
+!.git-tags.json
+
+# 临时文件
+*.tmp
+*.bak
+*~
+.DS_Store
+
+# 敏感配置
+~/.api-keys/
+~/.openclaw/*-state.json
+~/.openclaw/task-board*.json
+~/.openclaw/message-board*.json
+~/.openclaw/heartbeat*.json
+~/.openclaw/agent*.json
+
+# Node.js
+node_modules/
