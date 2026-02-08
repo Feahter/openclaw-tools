@@ -1,28 +1,33 @@
-# 敏感文件
-*.log
-logs/
-*.json
-!package.json
-!skills-open-source/manifest.json
-!.git-tags.json
+# Skills 开源目录（追踪）
+skills-repo/
+!skills-repo/
 
-# 临时文件
-*.tmp
-*.bak
-*~
-.DS_Store
-
-# 敏感配置
+# 敏感配置（排除）
 ~/.api-keys/
 ~/.openclaw/*-state.json
 ~/.openclaw/task-board*.json
 ~/.openclaw/message-board*.json
 ~/.openclaw/heartbeat*.json
 ~/.openclaw/agent*.json
+~/.openclaw/credentials/
+~/.openclaw/subagents/
 
-# 个人记忆 (绝不上传)
+# 个人数据（排除）
 memory/
 MEMORY.md
+data/
+cache/
+tmp/
 
-# Node.js
+# 系统文件
+*.log
+*.tmp
+*.bak
+*~
+.DS_Store
 node_modules/
+
+# Skills 中的敏感文件
+skills/**/.clawdhub/
+skills/**/credentials.json
+skills/**/config.local.json
