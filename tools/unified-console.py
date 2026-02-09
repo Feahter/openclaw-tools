@@ -1,17 +1,34 @@
 #!/usr/bin/env python3
 """
 OpenClaw 统一管理面板
-整合所有工具 + 快速任务管理
+整合所有工具 + 快速任务管理 + Web搜索
 """
 
 import json
 import subprocess
 import os
+import sys
+import time
 from pathlib import Path
 from datetime import datetime
 import http.server
 import socketserver
 import webbrowser
+import threading
+
+# 导入Web Search工具
+try:
+    import importlib.util
+    tool_path = Path(__file__).parent / "web-search-tool.py"
+    spec = importlib.util.spec_from_file_location("web_search_tool", str(tool_path.resolve()))
+    web_search_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(web_search_module)
+    WebSearchTool = web_search_module.WebSearchTool
+    RateLimitError = web_search_module.RateLimitError
+    WEB_SEARCH_AVAILABLE = True
+except Exception as e:
+    WEB_SEARCH_AVAILABLE = False
+    print(f"⚠ Web Search 不可用: {e}")
 
 # 配置
 PORT = 8765
@@ -205,6 +222,24 @@ HTML = """<!DOCTYPE html>
                     <a href="http://localhost:8780" target="_blank" class="quick-link">🚀 并发任务</a>
                 </div>
             </div>
+            
+            <!-- 搜索区域 -->
+            <div class="section">
+                <h2>🔍 Web搜索</h2>
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                    <input type="text" id="search-input" placeholder="输入搜索关键词..." 
+                           style="flex: 1; padding: 10px 14px; border-radius: 8px; border: 1px solid #333; 
+                                  background: rgba(255,255,255,0.08); color: #fff; font-size: 0.9em;"
+                           onkeypress="if(event.key==='Enter') doSearch()">
+                    <button class="btn small blue" onclick="doSearch()">🔍 搜索</button>
+                </div>
+                <div style="display: flex; gap: 8px; margin-bottom: 12px; font-size: 0.8em;">
+                    <label style="color: #888; display: flex; align-items: center; gap: 4px;">
+                        <input type="checkbox" id="search-recent"> 只搜索最近结果
+                    </label>
+                </div>
+                <div id="search-results" style="max-height: 400px; overflow-y: auto;"></div>
+            </div>
         </div>
         
         <div class="section">
@@ -320,6 +355,51 @@ HTML = """<!DOCTYPE html>
         return div.innerHTML;
     }
     
+    // Web搜索功能
+    async function doSearch() {
+        const input = document.getElementById('search-input');
+        const recentCheckbox = document.getElementById('search-recent');
+        const query = input.value.trim();
+        
+        if (!query) {
+            alert('请输入搜索关键词');
+            return;
+        }
+        
+        const container = document.getElementById('search-results');
+        container.innerHTML = '<div style="color:#00d9ff;text-align:center;padding:20px;">🔍 搜索中...</div>';
+        
+        try {
+            const recent = recentCheckbox.checked;
+            const params = new URLSearchParams({ q: query, recent: recent });
+            const res = await fetch('/api/search?' + params);
+            const data = await res.json();
+            
+            if (data.error) {
+                container.innerHTML = '<div style="color:#e94560;padding:15px;">⚠ ' + data.error + '</div>';
+                return;
+            }
+            
+            if (!data.results || data.results.length === 0) {
+                container.innerHTML = '<div style="color:#888;padding:15px;">未找到结果</div>';
+                return;
+            }
+            
+            container.innerHTML = '<div style="margin-bottom:10px;color:#00c853;font-size:0.85em;">✓ 找到 ' + data.count + ' 条结果</div>' +
+                data.results.map(r => `
+                    <div style="background:rgba(15,52,96,0.4);border-radius:8px;padding:12px;margin-bottom:10px;border-left:3px solid #00d9ff;">
+                        <div style="font-size:0.95em;color:#fff;margin-bottom:6px;">${escapeHtml(r.title)}</div>
+                        <a href="${r.url}" target="_blank" style="font-size:0.8em;color:#00d9ff;word-break:break-all;">${escapeHtml(r.url)}</a>
+                        ${r.description ? '<div style="font-size:0.8em;color:#888;margin-top:6px;line-height:1.5;">' + escapeHtml(r.description.substring(0,150)) + '</div>' : ''}
+                        ${r.age ? '<div style="font-size:0.75em;color:#666;margin-top:4px;">⏰ ' + r.age + '</div>' : ''}
+                    </div>
+                `).join('');
+        } catch (e) {
+            console.error('搜索失败:', e);
+            container.innerHTML = '<div style="color:#e94560;padding:15px;">✗ 搜索失败: ' + e.message + '</div>';
+        }
+    }
+    
     function openBoard() {
         window.open('http://localhost:8769', '_blank');
     }
@@ -358,6 +438,61 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps(get_tasks(), ensure_ascii=False).encode())
+        elif self.path.startswith('/api/search'):
+            # Web搜索API
+            if not WEB_SEARCH_AVAILABLE:
+                self.send_response(503)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": "Web Search 不可用"}).encode())
+                return
+            
+            try:
+                from urllib.parse import urlparse, parse_qs
+                # 分离路径和查询参数
+                path_only = self.path.split('?')[0]
+                query_string = self.path.split('?')[1] if '?' in self.path else ''
+                params = parse_qs(query_string)
+                query = params.get('q', [''])[0]
+                recent = params.get('recent', ['false'])[0].lower() == 'true'
+                
+                tool = web_search_module.WebSearchTool()
+                results = tool.search_simple(query, recent=recent)
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({
+                    "query": query,
+                    "recent": recent,
+                    "count": len(results),
+                    "results": results
+                }, ensure_ascii=False).encode())
+            except web_search_module.RateLimitError as e:
+                self.send_response(429)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": str(e)}).encode())
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": str(e)}).encode())
+        elif self.path == '/api/search/status':
+            # 搜索状态API
+            if not WEB_SEARCH_AVAILABLE:
+                self.send_response(503)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": "Web Search 不可用"}).encode())
+                return
+            
+            tool = web_search_module.WebSearchTool()
+            status = tool.status()
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(status).encode())
         else:
             self.send_error(404)
     

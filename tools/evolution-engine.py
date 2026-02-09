@@ -82,7 +82,16 @@ class EvolutionEngine:
         return pattern
 
     def identify_improvement(self, area: str, current_state: str, target_state: str, priority: str = "mid"):
-        """识别改进空间"""
+        """识别改进空间 - 带去重逻辑"""
+        
+        # 检查是否已存在相同的改进项（按 area + current_state + target_state 去重）
+        for existing in self.improvements:
+            if (existing.get("area") == area and 
+                existing.get("current_state") == current_state and 
+                existing.get("target_state") == target_state):
+                print(f"⚠️ 改进项已存在，跳过: {area}")
+                return existing
+        
         improvement = {
             "timestamp": datetime.now().isoformat(),
             "area": area,
@@ -118,6 +127,7 @@ class EvolutionEngine:
 
         self.improvements.append(improvement)
         self.save_evolution_data()
+        print(f"✅ 新增改进项: {area}")
 
         return improvement
 
@@ -231,7 +241,7 @@ class EvolutionEngine:
             metrics={"timestamp": datetime.now().isoformat()}
         )
 
-        # 2. 识别改进空间
+        # 2. 识别改进空间 (去重逻辑已在identify_improvement中实现)
         self.identify_improvement(
             area="资源获取",
             current_state="手动监控API余额",
@@ -244,13 +254,22 @@ class EvolutionEngine:
 
         # 4. 计算资源复利
         resources = self.calculate_resource_compounding()
+        
+        # 5. 统计改进项状态
+        pending_count = sum(1 for imp in self.improvements if imp.get("status") == "pending")
+        abandoned_count = sum(1 for imp in self.improvements if imp.get("status") == "abandoned")
+        completed_count = sum(1 for imp in self.improvements if imp.get("status") == "completed")
+        total_count = len(self.improvements)
 
-        # 5. 记录里程碑
+        # 6. 记录里程碑
         self.evolution_log_data["milestones"].append({
             "timestamp": datetime.now().isoformat(),
             "type": "evolution_cycle",
             "success_patterns_count": len(self.success_patterns),
-            "improvements_count": len(self.improvements)
+            "improvements_count": total_count,
+            "improvements_pending": pending_count,
+            "improvements_abandoned": abandoned_count,
+            "improvements_completed": completed_count
         })
 
         self.save_evolution_data()
@@ -258,11 +277,16 @@ class EvolutionEngine:
         print("\n" + "=" * 60)
         print("✅ 进化周期完成!")
         print(f"📊 成功模式: {len(self.success_patterns)}")
-        print(f"🔧 待改进: {len(self.improvements)}")
+        print(f"🔧 改进项统计: 总计{total_count} | 待处理{pending_count} | 已废弃{abandoned_count} | 已完成{completed_count}")
 
         return {
             "success_patterns": len(self.success_patterns),
-            "improvements": len(self.improvements),
+            "improvements": {
+                "total": total_count,
+                "pending": pending_count,
+                "abandoned": abandoned_count,
+                "completed": completed_count
+            },
             "skills_evolution": skills_evolution,
             "resources": resources
         }

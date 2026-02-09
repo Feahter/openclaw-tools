@@ -2,15 +2,45 @@
 """
 OpenClaw 服务控制台 - 一站式服务管理与状态监控
 支持：查看状态、重启服务、健康检查、批量操作
+
+错误处理增强版：
+- 网络异常自动重试 (最多 3 次)
+- 端口占用检测和优雅失败
+- API 调用超时处理
+- 错误日志记录
+- 健康检查机制
 """
 
 import os
 import sys
 import json
 import subprocess
+import time
+import logging
+import socket
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
+
+# 配置日志
+LOG_DIR = Path.home() / ".openclaw" / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+LOG_FILE = LOG_DIR / "service-console.log"
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(LOG_FILE),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# 重试配置
+MAX_RETRIES = 3
+RETRY_DELAY = 2  # 秒
+SOCKET_TIMEOUT = 10  # 秒
 
 # 服务配置
 SERVICES = {
@@ -78,6 +108,171 @@ def color(text: str, color_name: str) -> str:
     return f"{COLORS.get(color_name, COLORS['reset'])}{text}{COLORS['reset']}"
 
 
+# ==================== 错误处理增强 ====================
+
+def retry_on_failure(max_retries: int = MAX_RETRIES, delay: int = RETRY_DELAY):
+    """重试装饰器 - 网络异常自动重试"""
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            last_exception = None
+            for attempt in range(1, max_retries + 1):
+                try:
+                    result = func(*args, **kwargs)
+                    if result is not None:
+                        return result
+                except Exception as e:
+                    last_exception = e
+                    logger.warning(f"第 {attempt}/{max_retries} 次尝试失败: {e}")
+                    if attempt < max_retries:
+                        time.sleep(delay)
+            logger.error(f"重试 {max_retries} 次后仍失败: {last_exception}")
+            raise last_exception
+        return wrapper
+    return decorator
+
+
+def is_port_in_use(port: int, timeout: int = SOCKET_TIMEOUT) -> bool:
+    """检查端口是否被占用"""
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(timeout)
+            return s.connect_ex(('localhost', port)) == 0
+    except Exception as e:
+        logger.error(f"端口检测失败 (port={port}): {e}")
+        return False
+
+
+def check_port_available(port: int) -> Tuple[bool, str]:
+    """检查端口可用性"""
+    if is_port_in_use(port):
+        return False, f"端口 {port} 已被占用"
+    return True, f"端口 {port} 可用"
+
+
+def safe_subprocess_run(cmd: List[str], timeout: int = 30, retries: int = MAX_RETRIES) -> Optional[subprocess.CompletedProcess]:
+    """安全的子进程执行 - 带超时和重试"""
+    last_error = None
+    for attempt in range(1, retries + 1):
+        try:
+            result = subprocess.run(
+                cmd, 
+                capture_output=True, 
+                text=True, 
+                timeout=timeout
+            )
+            return result
+        except subprocess.TimeoutExpired:
+            error_msg = f"命令超时: {' '.join(cmd)}"
+            logger.warning(f"{error_msg} (尝试 {attempt}/{retries})")
+            last_error = error_msg
+            if attempt < retries:
+                time.sleep(RETRY_DELAY)
+        except Exception as e:
+            error_msg = f"命令执行失败: {e}"
+            logger.error(error_msg)
+            last_error = e
+            if attempt < retries:
+                time.sleep(RETRY_DELAY)
+    logger.error(f"重试 {retries} 次后仍失败: {last_error}")
+    return None
+
+
+def log_error(error_type: str, error_msg: str, context: Dict = None):
+    """记录错误日志"""
+    error_info = {
+        "type": error_type,
+        "message": error_msg,
+        "timestamp": datetime.now().isoformat(),
+        "context": context or {}
+    }
+    logger.error(f"[{error_type}] {error_msg}")
+    if context:
+        logger.debug(f"错误上下文: {json.dumps(context, ensure_ascii=False)}")
+    return error_info
+
+
+# ==================== 健康检查增强 ====================
+
+def health_check_detailed() -> Dict:
+    """详细健康检查 - 增强版"""
+    print(color("\n🏥 执行详细健康检查...", "blue"))
+    results = {
+        "timestamp": datetime.now().isoformat(),
+        "checks": {},
+        "summary": {"healthy": 0, "unhealthy": 0, "errors": []}
+    }
+
+    for service_id, config in SERVICES.items():
+        check_result = {
+            "name": config["name"],
+            "status": "unknown",
+            "healthy": False,
+            "error": None,
+            "response_time_ms": 0
+        }
+        
+        start_time = time.time()
+        try:
+            healthy = config["check"]()
+            check_result["healthy"] = healthy
+            check_result["status"] = get_service_status(service_id, config)[0]
+            check_result["response_time_ms"] = int((time.time() - start_time) * 1000)
+            
+            if healthy:
+                results["summary"]["healthy"] += 1
+            else:
+                results["summary"]["unhealthy"] += 1
+                
+        except Exception as e:
+            check_result["status"] = "error"
+            check_result["error"] = str(e)
+            results["summary"]["errors"].append({
+                "service": service_id,
+                "error": str(e)
+            })
+            results["summary"]["unhealthy"] += 1
+            log_error("HEALTH_CHECK", str(e), {"service": service_id})
+        
+        results["checks"][service_id] = check_result
+
+    # 输出结果
+    healthy_count = results["summary"]["healthy"]
+    total = len(SERVICES)
+    status_color = "green" if healthy_count == total else "yellow" if healthy_count > 0 else "red"
+    print(color(f"\n📊 健康检查结果: {healthy_count}/{total} 健康", status_color))
+    
+    if results["summary"]["errors"]:
+        print(color(f"\n⚠️  发现 {len(results['summary']['errors'])} 个错误:", "red"))
+        for error in results["summary"]["errors"]:
+            print(f"  • {error['service']}: {error['error']}")
+    
+    return results
+
+
+def check_service_health(service_id: str) -> Dict:
+    """检查单个服务健康状态"""
+    if service_id not in SERVICES:
+        return {"error": f"未知服务: {service_id}"}
+    
+    config = SERVICES[service_id]
+    try:
+        healthy = config["check"]()
+        return {
+            "service": service_id,
+            "name": config["name"],
+            "healthy": healthy,
+            "status": get_service_status(service_id, config)[0]
+        }
+    except Exception as e:
+        log_error("SERVICE_HEALTH", str(e), {"service": service_id})
+        return {
+            "service": service_id,
+            "name": config["name"],
+            "healthy": False,
+            "error": str(e)
+        }
+
+
 def print_header():
     """打印标题"""
     print("\n" + "=" * 60)
@@ -88,7 +283,7 @@ def print_header():
 
 
 def get_service_status(service_id: str, config: Dict) -> Tuple[str, str]:
-    """获取服务状态"""
+    """获取服务状态 - 增强版"""
     try:
         status = config["status"]()
         status_str = str(status).lower()
@@ -100,7 +295,8 @@ def get_service_status(service_id: str, config: Dict) -> Tuple[str, str]:
             return "paused", "🟡"
         else:
             return "unknown", "⚪"
-    except Exception:
+    except Exception as e:
+        log_error("GET_STATUS", str(e), {"service": service_id})
         return "error", "❓"
 
 
@@ -149,8 +345,8 @@ def print_services(services: List[Dict]):
           color(f"{len(error)} 异常", "red"))
 
 
-def restart_service(service_id: str) -> bool:
-    """重启单个服务"""
+def restart_service(service_id: str, retries: int = MAX_RETRIES) -> bool:
+    """重启单个服务 - 增强版"""
     if service_id not in SERVICES:
         print(color(f"❌ 未知服务: {service_id}", "red"))
         return False
@@ -158,21 +354,36 @@ def restart_service(service_id: str) -> bool:
     config = SERVICES[service_id]
     print(color(f"\n🔄 重启服务: {config['name']}...", "yellow"))
 
-    try:
-        result = config["restart"]()
-        if result and result.returncode == 0:
-            print(color(f"✅ 重启成功: {config['name']}", "green"))
-            return True
-        else:
-            print(color(f"⚠️  重启完成: {config['name']}", "yellow"))
-            return True
-    except Exception as e:
-        print(color(f"❌ 重启失败: {config['name']} - {e}", "red"))
-        return False
+    last_error = None
+    for attempt in range(1, retries + 1):
+        try:
+            result = config["restart"]()
+            if result is None:
+                print(color(f"✅ 重启成功: {config['name']}", "green"))
+                return True
+            elif result.returncode == 0:
+                print(color(f"✅ 重启成功: {config['name']}", "green"))
+                return True
+            else:
+                logger.warning(f"重启返回非零状态码: {result.returncode}")
+                if attempt < retries:
+                    print(color(f"⚠️  重试 ({attempt}/{retries})...", "yellow"))
+                    time.sleep(RETRY_DELAY)
+                    continue
+        except Exception as e:
+            last_error = e
+            log_error("RESTART_SERVICE", str(e), {"service": service_id, "attempt": attempt})
+            if attempt < retries:
+                print(color(f"⚠️  重试 ({attempt}/{retries})...", "yellow"))
+                time.sleep(RETRY_DELAY)
+                continue
+    
+    print(color(f"❌ 重启失败: {config['name']} - {last_error}", "red"))
+    return False
 
 
-def start_service(service_id: str) -> bool:
-    """启动服务"""
+def start_service(service_id: str, retries: int = MAX_RETRIES) -> bool:
+    """启动服务 - 增强版"""
     if service_id not in SERVICES:
         print(color(f"❌ 未知服务: {service_id}", "red"))
         return False
@@ -180,24 +391,36 @@ def start_service(service_id: str) -> bool:
     config = SERVICES[service_id]
     print(color(f"\n▶️  启动服务: {config['name']}...", "blue"))
 
-    try:
-        result = config["start"]()
-        if result is None:
-            print(color(f"ℹ️  服务不支持手动启动: {config['name']}", "cyan"))
-            return True
-        if result.returncode == 0:
-            print(color(f"✅ 启动成功: {config['name']}", "green"))
-            return True
-        else:
-            print(color(f"⚠️  启动完成: {config['name']}", "yellow"))
-            return True
-    except Exception as e:
-        print(color(f"❌ 启动失败: {config['name']} - {e}", "red"))
-        return False
+    last_error = None
+    for attempt in range(1, retries + 1):
+        try:
+            result = config["start"]()
+            if result is None:
+                print(color(f"ℹ️  服务不支持手动启动: {config['name']}", "cyan"))
+                return True
+            if result.returncode == 0:
+                print(color(f"✅ 启动成功: {config['name']}", "green"))
+                return True
+            else:
+                logger.warning(f"启动返回非零状态码: {result.returncode}")
+                if attempt < retries:
+                    print(color(f"⚠️  重试 ({attempt}/{retries})...", "yellow"))
+                    time.sleep(RETRY_DELAY)
+                    continue
+        except Exception as e:
+            last_error = e
+            log_error("START_SERVICE", str(e), {"service": service_id, "attempt": attempt})
+            if attempt < retries:
+                print(color(f"⚠️  重试 ({attempt}/{retries})...", "yellow"))
+                time.sleep(RETRY_DELAY)
+                continue
+    
+    print(color(f"❌ 启动失败: {config['name']} - {last_error}", "red"))
+    return False
 
 
-def stop_service(service_id: str) -> bool:
-    """停止服务"""
+def stop_service(service_id: str, retries: int = MAX_RETRIES) -> bool:
+    """停止服务 - 增强版"""
     if service_id not in SERVICES:
         print(color(f"❌ 未知服务: {service_id}", "red"))
         return False
@@ -205,20 +428,32 @@ def stop_service(service_id: str) -> bool:
     config = SERVICES[service_id]
     print(color(f"\n⏹️  停止服务: {config['name']}...", "yellow"))
 
-    try:
-        result = config["stop"]()
-        if result is None:
-            print(color(f"ℹ️  服务不支持手动停止: {config['name']}", "cyan"))
-            return True
-        if result.returncode == 0:
-            print(color(f"✅ 停止成功: {config['name']}", "green"))
-            return True
-        else:
-            print(color(f"⚠️  停止完成: {config['name']}", "yellow"))
-            return True
-    except Exception as e:
-        print(color(f"❌ 停止失败: {config['name']} - {e}", "red"))
-        return False
+    last_error = None
+    for attempt in range(1, retries + 1):
+        try:
+            result = config["stop"]()
+            if result is None:
+                print(color(f"ℹ️  服务不支持手动停止: {config['name']}", "cyan"))
+                return True
+            if result.returncode == 0:
+                print(color(f"✅ 停止成功: {config['name']}", "green"))
+                return True
+            else:
+                logger.warning(f"停止返回非零状态码: {result.returncode}")
+                if attempt < retries:
+                    print(color(f"⚠️  重试 ({attempt}/{retries})...", "yellow"))
+                    time.sleep(RETRY_DELAY)
+                    continue
+        except Exception as e:
+            last_error = e
+            log_error("STOP_SERVICE", str(e), {"service": service_id, "attempt": attempt})
+            if attempt < retries:
+                print(color(f"⚠️  重试 ({attempt}/{retries})...", "yellow"))
+                time.sleep(RETRY_DELAY)
+                continue
+    
+    print(color(f"❌ 停止失败: {config['name']} - {last_error}", "red"))
+    return False
 
 
 def restart_all():
@@ -230,31 +465,8 @@ def restart_all():
 
 
 def health_check() -> Dict:
-    """健康检查"""
-    print(color("\n🏥 执行健康检查...", "blue"))
-    results = {}
-
-    for service_id, config in SERVICES.items():
-        try:
-            healthy = config["check"]()
-            results[service_id] = {
-                "name": config["name"],
-                "healthy": healthy,
-                "status": get_service_status(service_id, config)[0],
-            }
-        except Exception as e:
-            results[service_id] = {
-                "name": config["name"],
-                "healthy": False,
-                "error": str(e),
-            }
-
-    healthy_count = sum(1 for r in results.values() if r.get("healthy", True))
-    total = len(results)
-
-    print(color(f"\n📊 健康检查结果: {healthy_count}/{total} 健康", "bold"))
-
-    return results
+    """健康检查 - 使用增强版"""
+    return health_check_detailed()
 
 
 def print_help():
@@ -298,7 +510,7 @@ def generate_status_report() -> str:
 
 
 def install_all_tools():
-    """安装所有核心工具到 PATH"""
+    """安装所有核心工具到 PATH - 增强版"""
     print(color("\n📦 安装所有核心工具...", "blue"))
 
     tools = [
@@ -318,6 +530,7 @@ def install_all_tools():
     tools_dir = Path("/Users/fuzhuo/.openclaw/workspace/tools")
     success = 0
     failed = 0
+    errors = []
 
     for tool in tools:
         source = tools_dir / tool
@@ -331,47 +544,60 @@ def install_all_tools():
                 print(f"  ✅ {tool}")
                 success += 1
             except Exception as e:
-                print(f"  ❌ {tool}: {e}")
+                error_msg = f"{tool}: {e}"
+                print(f"  ❌ {error_msg}")
+                errors.append(error_msg)
                 failed += 1
+                log_error("INSTALL_TOOL", str(e), {"tool": tool})
         else:
             print(f"  ⚠️  {tool} 不存在")
             failed += 1
 
     print(color(f"\n📊 安装完成: {success} 成功, {failed} 失败", "bold"))
+    
+    if errors:
+        log_error("INSTALL_BATCH", "安装过程中出现错误", {"errors": errors})
 
 
 def push_to_github():
-    """推送到 GitHub"""
+    """推送到 GitHub - 增强版"""
     print(color("\n📤 推送到 GitHub...", "blue"))
 
     workspace = Path("/Users/fuzhuo/.openclaw/workspace")
 
-    # 检查 git 状态
-    result = subprocess.run(["git", "status", "--short"], cwd=workspace, capture_output=True, text=True)
+    # 检查 git 状态 - 带重试
+    result = safe_subprocess_run(["git", "status", "--short"], timeout=10, retries=MAX_RETRIES)
 
-    if result.returncode != 0:
-        print(color(f"❌ Git 错误: {result.stderr}", "red"))
+    if result is None or result.returncode != 0:
+        print(color(f"❌ Git 错误: {result.stderr if result else '无法执行命令'}", "red"))
         return False
 
     # 添加更改
     print("  📝 暂存更改...")
-    subprocess.run(["git", "add", "-A"], cwd=workspace, capture_output=True)
+    result = safe_subprocess_run(["git", "add", "-A"], timeout=10, retries=MAX_RETRIES)
+    if result is None:
+        print(color("  ⚠️  暂存失败，继续尝试提交...", "yellow"))
 
     # 提交
     commit_msg = f"feat: 更新工具集 - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
     print(f"  📝 提交: {commit_msg}")
-    result = subprocess.run(["git", "commit", "-m", commit_msg], cwd=workspace, capture_output=True, text=True)
+    result = safe_subprocess_run(["git", "commit", "-m", commit_msg], timeout=10, retries=MAX_RETRIES)
 
-    if "nothing to commit" in result.stderr or "nothing to commit" in result.stdout:
+    if result is None:
+        print(color("  ⚠️  提交失败", "yellow"))
+    elif "nothing to commit" in (result.stderr or "") or "nothing to commit" in (result.stdout or ""):
         print(color("  ℹ️  没有需要提交的更改", "cyan"))
     else:
         print(color("  ✅ 提交成功", "green"))
 
-    # 推送
+    # 推送 - 带重试
     print("  📤 推送到远程...")
-    result = subprocess.run(["git", "push"], cwd=workspace, capture_output=True, text=True)
+    result = safe_subprocess_run(["git", "push"], timeout=30, retries=MAX_RETRIES)
 
-    if result.returncode == 0:
+    if result is None:
+        print(color("  ⚠️  推送失败", "red"))
+        return False
+    elif result.returncode == 0:
         print(color("  ✅ 推送成功", "green"))
         return True
     else:

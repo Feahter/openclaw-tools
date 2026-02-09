@@ -1,0 +1,30 @@
+{
+  "@context": "https://www.w3.org/ns/activitystreams",
+  "@type": "Workflow",
+  "name": "OpenClaw Voice Assistant",
+  "description": "通过 Siri 与 OpenClaw 语音对话",
+  "actions": [
+    {
+      "@type": "ListenAction",
+      "name": "听取用户语音",
+      "using": "听写文本"
+    },
+    {
+      "@type": "SendAction",
+      "name": "发送给 OpenClaw",
+      "to": {
+        "@type": "SoftwareApplication",
+        "name": "OpenClaw"
+      },
+      "actionOption": "{{听写文本}}"
+    },
+    {
+      "@type": "ReceiveAction",
+      "name": "等待回复"
+    },
+    {
+      "@type": "SpeakAction",
+      "name": "朗读回复"
+    }
+  ]
+}

@@ -189,27 +189,49 @@ print(json.dumps(result))
         return results
     
     def run_parallel_from_template(self, template_type, count, common_params=None):
-        """从模板批量创建并行任务"""
-        task_ids = []
-        for i in range(count):
-            task_id = self.create_task(
-                name=f"{TASK_TEMPLATES[template_type]['name']} #{i+1}",
+        """从模板批量创建并行任务
+        
+        优化点:
+        - 预分配列表容量避免动态扩容
+        - 使用列表推导式批量创建
+        """
+        # 优化: 预分配列表容量，批量创建任务
+        base_name = TASK_TEMPLATES[template_type]['name']
+        base_desc = TASK_TEMPLATES[template_type]['description']
+        
+        task_ids = [
+            self.create_task(
+                name=f"{base_name} #{i+1}",
                 task_type=template_type,
-                description=f"{TASK_TEMPLATES[template_type]['description']} #{i+1}",
-                params={**common_params, "index": i} if common_params else {"index": i}
+                description=f"{base_desc} #{i+1}",
+                params={**(common_params or {}), "index": i}
             )
-            task_ids.append(task_id)
+            for i in range(count)
+        ]
         
         # 并发执行
         self.run_concurrent(task_ids)
         return task_ids
     
     def get_status(self):
-        """获取状态"""
-        pending = sum(1 for t in self.tasks.values() if t["status"] == "pending")
-        running = sum(1 for t in self.tasks.values() if t["status"] == "running")
-        completed = sum(1 for t in self.tasks.values() if t["status"] == "completed")
-        failed = sum(1 for t in self.tasks.values() if t["status"] == "failed")
+        """获取状态
+        
+        优化点:
+        - 单次遍历统计所有状态
+        - 避免多次遍历字典
+        """
+        # 优化: 单次遍历统计所有状态
+        pending = running = completed = failed = 0
+        for task in self.tasks.values():
+            status = task["status"]
+            if status == "pending":
+                pending += 1
+            elif status == "running":
+                running += 1
+            elif status == "completed":
+                completed += 1
+            elif status == "failed":
+                failed += 1
         
         return {
             "total": len(self.tasks),

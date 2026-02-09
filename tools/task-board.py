@@ -17,7 +17,7 @@ import socketserver
 import webbrowser
 
 # 配置
-BOARD_DIR = Path.home() / ".openclaw"
+BOARD_DIR = Path(__file__).parent.parent / "data"
 BOARD_FILE = BOARD_DIR / "task-board.json"
 PORT = 8769
 

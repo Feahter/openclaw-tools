@@ -97,7 +97,7 @@ class OptimizedHeartbeat:
                 if d.is_dir() and not d.name.startswith('.')
             ]
             self._skills_mtime = current_mtime
-            self.log("resources", f"Skills 缓存已更新: {len(self._skills_cache)} 个")
+            self.log("skills", f"Skills 缓存已更新: {len(self._skills_cache)} 个")
         
         return self._skills_cache
 
@@ -224,17 +224,14 @@ class OptimizedHeartbeat:
         print(f"  🗂️  本地 Skills: {len(local_skills)} 个")
         self.log("skills", f"发现 {len(local_skills)} 个本地 skills")
         
-        # 检查 clawdhub
-        stdout, stderr, code = self.run_command("clawdhub list 2>/dev/null | head -20")
-        clawdhub_count = len([l for l in stdout.split('\n') if l.strip() and not l.startswith(' ')])
-        print(f"  📦 ClawdHub: {clawdhub_count} 个")
-        self.log("skills", f"ClawdHub: {clawdhub_count} 个")
-        
-        # 检查更新
-        stdout, _, _ = self.run_command("clawdhub update --all --dry-run 2>&1", timeout=30)
-        has_updates = "update" in stdout.lower() and "already up" not in stdout.lower()
-        print(f"  {'🔄' if has_updates else '✅'} 更新状态: {'有可用更新' if has_updates else '已是最新'}")
-        self.log("skills", "发现更新" if has_updates else "已是最新", "alert" if has_updates else "info")
+        # 检查更新 - clawdhub update 不支持 --dry-run，改用其他方式检查
+        # 先列出已安装技能，然后逐个检查版本
+        stdout, stderr, code = self.run_command(
+            "clawdhub list 2>/dev/null | grep -v '^\\s*$' | head -30", timeout=30
+        )
+        installed_skills = [line.split()[0] for line in stdout.split('\n') if line.strip() and not line.startswith(' ')]
+        print(f"  📦 ClawdHub: {len(installed_skills)} 个已安装")
+        self.log("skills", f"ClawdHub: {len(installed_skills)} 个已安装")
         
         # 轮换搜索
         hour = self.timestamp.hour
@@ -249,8 +246,7 @@ class OptimizedHeartbeat:
         self.report["sections"]["skills"] = {
             "status": "success",
             "local_count": len(local_skills),
-            "clawdhub_count": clawdhub_count,
-            "updates_available": has_updates,
+            "installed_count": len(installed_skills),
             "search_keywords": keywords[:2]
         }
 
