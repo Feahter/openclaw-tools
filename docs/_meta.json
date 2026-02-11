@@ -1,0 +1,28 @@
+{
+  "name": "data-lake",
+  "description": "浏览器端 SQLite + ETL 数据基座 - 统一数据存储、多格式导入导出、离线数据处理引擎",
+  "version": "1.0.0",
+  "author": "POC-Builder",
+  "category": "data-processing",
+  "tags": [
+    "data-lake",
+    "sqlite",
+    "etl",
+    "offline",
+    "browser",
+    "indexeddb"
+  ],
+  "capabilities": [
+    "数据导入导出 (CSV/JSON/SQLite)",
+    "统一数据模型",
+    "ETL 管道引擎",
+    "SQL 查询",
+    "IndexedDB 持久化"
+  ],
+  "scripts": [],
+  "created": "2025-02-11",
+  "updated": "2025-02-11",
+  "source_url": "https://github.com/Feahter/openclaw-tools/tree/main/data-lake-poc",
+  "stars": 0,
+  "score": 0
+}
