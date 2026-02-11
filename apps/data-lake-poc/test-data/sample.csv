@@ -1,0 +1,11 @@
+id,name,amount,date
+1,region,status,Alice,1000,North,active,2024-01-15
+2,Bob,2500,South,active,2024-01-16
+3,Carol,500,East,inactive,2024-01-17
+4,David,3000,West,active,2024-01-18
+5,Eve,1500,North,pending,2024-01-19
+6,Frank,800,South,active,2024-01-20
+7,Grace,4200,East,active,2024-01-21
+8,Henry,600,West,inactive,2024-01-22
+9,Ivy,1800,North,active,2024-01-23
+10,Jack,3200,South,pending,2024-01-24

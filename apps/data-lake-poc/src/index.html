@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Lake POC - 浏览器端数据基座</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    :root {
+      --bg-primary: #0f0f23;
+      --bg-secondary: #1a1a3e;
+      --bg-tertiary: #252550;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --border: #334155;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --error: #ef4444;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    
+    header h1 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    header .stats {
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+    }
+    
+    .sidebar {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 16px;
+      height: fit-content;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
+    
+    .sidebar h2 {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 16px;
+    }
+    
+    .upload-zone:hover {
+      border-color: var(--accent);
+      background: var(--bg-tertiary);
+    }
+    
+    .upload-zone input {
+      display: none;
+    }
+    
+    .upload-zone .icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    
+    .dataset-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .dataset-item {
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .dataset-item:hover {
+      background: var(--accent);
+    }
+    
+    .dataset-item.active {
+      background: var(--accent);
+    }
+    
+    .dataset-item .name {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    
+    .dataset-item .meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .panel {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .panel-header h3 {
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    .data-preview {
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    th {
+      background: var(--bg-tertiary);
+      font-weight: 500;
+      color: var(--text-secondary);
+      position: sticky;
+      top: 0;
+    }
+    
+    tr:hover td {
+      background: var(--bg-tertiary);
+    }
+    
+    .query-box {
+      width: 100%;
+      min-height: 100px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      color: var(--text-primary);
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 14px;
+      resize: vertical;
+    }
+    
+    .query-box:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    .btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .btn:hover {
+      background: var(--accent-hover);
+    }
+    
+    .btn-secondary {
+      background: var(--bg-tertiary);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+    
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .schema-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      font-size: 12px;
+      margin-right: 4px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+    }
+    
+    .empty-state .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 20px;
+      display: none;
+      animation: slideIn 0.2s ease;
+    }
+    
+    .toast.show {
+      display: block;
+    }
+    
+    .toast.success {
+      border-color: var(--success);
+    }
+    
+    .toast.error {
+      border-color: var(--error);
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .sidebar {
+        max-height: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🗄️ Data Lake POC</h1>
+      <div class="stats" id="global-stats">
+        <span>数据集: <strong id="stat-datasets">0</strong></span>
+        <span>总行数: <strong id="stat-rows">0</strong></span>
+      </div>
+    </header>
+    
+    <div class="grid">
+      <aside class="sidebar">
+        <h2>导入数据</h2>
+        <div class="upload-zone" id="upload-zone">
+          <input type="file" id="file-upload" multiple accept=".csv,.json,.sqlite,.db">
+          <div class="icon">📁</div>
+          <div>拖拽或点击上传</div>
+          <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
+            支持 CSV, JSON, SQLite
+          </div>
+        </div>
+        
+        <h2>数据集</h2>
+        <div class="dataset-list" id="dataset-list">
+          <div class="empty-state">
+            <div>暂无数据</div>
+            <div style="font-size: 12px; margin-top: 8px;">上传文件开始使用</div>
+          </div>
+        </div>
+      </aside>
+      
+      <main class="main-content">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>数据预览</h3>
+            <div class="actions" id="dataset-actions" style="display: none;">
+              <button class="btn btn-secondary" onclick="app.exportData('csv')">导出 CSV</button>
+              <button class="btn btn-secondary" onclick="app.exportData('json')">导出 JSON</button>
+              <button class="btn" onclick="app.clearData()">清空</button>
+            </div>
+          </div>
+          <div id="data-preview">
+            <div class="empty-state">
+              <div class="icon">📊</div>
+              <div>选择或上传数据集查看预览</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Schema 信息</h3>
+          </div>
+          <div id="schema-info">
+            <div class="empty-state" style="padding: 20px;">
+              <div>选择数据集查看 Schema</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="panel">
+          <div class="panel-header">
+            <h3>SQL 查询</h3>
+            <button class="btn" onclick="app.runQuery()">执行</button>
+          </div>
+          <textarea class="query-box" id="query-input" placeholder="输入 SQL 查询...&#10;示例: SELECT * FROM dataset LIMIT 10"></textarea>
+          <div id="query-result" style="margin-top: 16px;"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+  
+  <div class="toast" id="toast"></div>
+  
+  <script type="module" src="./src/ui.js"></script>
+</body>
+</html>

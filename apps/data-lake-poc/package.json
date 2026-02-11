@@ -1,0 +1,21 @@
+{
+  "name": "data-lake-poc",
+  "version": "1.0.0",
+  "description": "浏览器端 SQLite + ETL 数据基座 POC",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "dev": "python3 -m http.server 8080",
+    "build": "echo 'Build complete'",
+    "test": "node test/run.js"
+  },
+  "keywords": [
+    "data-lake",
+    "sqlite",
+    "etl",
+    "offline",
+    "browser"
+  ],
+  "author": "",
+  "license": "MIT"
+}
