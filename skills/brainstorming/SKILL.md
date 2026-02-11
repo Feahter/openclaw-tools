@@ -1,8 +1,21 @@
 ---
 name: brainstorming
-description: "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
+description: "---"
+triggers:
+  - "brainstorming"
+  - "brainstorming"
+source:
+  project: brainstorming
+  url: ""
+  license: ""
+  auto_generated: false
+  enhanced_via: skill-creator
+  updated_at: 2026-02-11T14:32:49
 ---
 
+# Brainstorming
+
+---
 # Brainstorming Ideas Into Designs
 
 ## Overview
@@ -52,3 +65,13 @@ Start by understanding the current project context, then ask questions one at a 
 - **Explore alternatives** - Always propose 2-3 approaches before settling
 - **Incremental validation** - Present design in sections, validate each
 - **Be flexible** - Go back and clarify when something doesn't make sense
+
+
+## 适用场景
+
+- 当用户需要 --- 时
+
+## 注意事项
+
+*基于 skill-creator SOP 强化*
+*更新时间: 2026-02-11*

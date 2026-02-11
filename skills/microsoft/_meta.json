@@ -1,0 +1,17 @@
+{
+  "name": "microsoft",
+  "description": "Playwright is a framework for Web Testing and Automation. It allows testing Chromium, Firefox and WebKit with a single API. ",
+  "version": "1.0.0",
+  "author": "AQA-Auto",
+  "category": "auto-generated",
+  "tags": [
+    "auto-generated",
+    "typescript"
+  ],
+  "capabilities": [],
+  "scripts": [],
+  "created": "2026-02-11",
+  "updated": "2026-02-11",
+  "source_url": "https://github.com/microsoft/playwright",
+  "stars": 82436
+}

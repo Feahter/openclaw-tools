@@ -1,0 +1,17 @@
+{
+  "name": "TanStack",
+  "description": "\ud83e\udd16 Powerful asynchronous state management, server-state utilities and data fetching for the web. TS/JS, React Query, Solid Query, Svelte Query and Vue Query.",
+  "version": "1.0.0",
+  "author": "AQA-Auto",
+  "category": "auto-generated",
+  "tags": [
+    "auto-generated",
+    "typescript"
+  ],
+  "capabilities": [],
+  "scripts": [],
+  "created": "2026-02-11",
+  "updated": "2026-02-11",
+  "source_url": "https://github.com/TanStack/query",
+  "stars": 48467
+}

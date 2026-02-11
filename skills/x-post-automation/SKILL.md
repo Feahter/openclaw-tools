@@ -1,8 +1,21 @@
 ---
-name: x-automation
-description: Automates the process of identifying trends on X (Twitter), generating opinionated/engaging content, and posting it. Use when asked to post to X, run X automation, or check trends for content creation.
+name: x-post-automation
+description: "---"
+triggers:
+  - "x-post-automation"
+  - "x post automation"
+source:
+  project: x-post-automation
+  url: ""
+  license: ""
+  auto_generated: false
+  enhanced_via: skill-creator
+  updated_at: 2026-02-11T14:32:49
 ---
 
+# X Post Automation
+
+---
 # X (Twitter) Automation Skill
 
 This skill provides a structured workflow for generating and posting high-engagement content on X.
@@ -42,3 +55,13 @@ This skill provides a structured workflow for generating and posting high-engage
 -   **Concise**: Keep it punchy.
 -   **Opinionated**: Don't just report facts; give a "hot take".
 -   **Engaging**: Use questions or strong statements to prompt replies.
+
+
+## 适用场景
+
+- 当用户需要 --- 时
+
+## 注意事项
+
+*基于 skill-creator SOP 强化*
+*更新时间: 2026-02-11*

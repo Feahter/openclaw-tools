@@ -1,5 +1,21 @@
-# tapestry
+---
+name: tapestry
+description: "知识图谱构建技能，用于文档关联和知识网络管理"
+triggers:
+  - "tapestry"
+  - "tapestry"
+source:
+  project: tapestry
+  url: ""
+  license: ""
+  auto_generated: false
+  enhanced_via: skill-creator
+  updated_at: 2026-02-11T14:32:49
+---
 
+# Tapestry
+
+知识图谱构建技能，用于文档关联和知识网络管理
 ## description
 知识图谱构建技能，用于文档关联和知识网络管理
 
@@ -44,3 +60,13 @@ OpenClaw
 
 ## version
 1.0.0
+
+
+## 适用场景
+
+- 当用户需要 知识图谱构建技能，用于文档关联和知识网络管理 时
+
+## 注意事项
+
+*基于 skill-creator SOP 强化*
+*更新时间: 2026-02-11*

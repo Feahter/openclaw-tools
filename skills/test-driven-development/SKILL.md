@@ -1,10 +1,21 @@
 ---
 name: test-driven-development
-description: Unified TDD skill with three input modes — from spec, from task, or from description. Enforces test-first development using repository patterns, with proptest guidance and backpressure integration.
-type: anthropic-skill
-version: "1.0"
+description: "---"
+triggers:
+  - "test-driven-development"
+  - "test driven development"
+source:
+  project: test-driven-development
+  url: ""
+  license: ""
+  auto_generated: false
+  enhanced_via: skill-creator
+  updated_at: 2026-02-11T14:32:49
 ---
 
+# Test Driven Development
+
+---
 # Test-Driven Development
 
 ## Overview
@@ -132,3 +143,13 @@ Run `cargo tarpaulin --out Html --output-dir coverage --skip-clean` when feasibl
 - Copying tests from other crates without adapting to local patterns
 - Adding proptest when a simple example test suffices
 - Emitting completion events without coverage evidence
+
+
+## 适用场景
+
+- 当用户需要 --- 时
+
+## 注意事项
+
+*基于 skill-creator SOP 强化*
+*更新时间: 2026-02-11*

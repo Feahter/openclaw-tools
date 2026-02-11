@@ -1,0 +1,17 @@
+{
+  "name": "llmware-ai",
+  "description": "Unified framework for building enterprise RAG pipelines with small, specialized models",
+  "version": "1.0.0",
+  "author": "AQA-Auto",
+  "category": "auto-generated",
+  "tags": [
+    "auto-generated",
+    "python"
+  ],
+  "capabilities": [],
+  "scripts": [],
+  "created": "2026-02-11",
+  "updated": "2026-02-11",
+  "source_url": "https://github.com/llmware-ai/llmware",
+  "stars": 14852
+}

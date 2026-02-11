@@ -1,7 +1,29 @@
 ---
-description: "Use when the user wants to analyze, parse, or summarize application logs. Extracts error patterns, frequency counts, and actionable insights from log files."
+name: app-log-analyzer
+description: "---"
+triggers:
+  - "app-log-analyzer"
+  - "app log analyzer"
+source:
+  project: app-log-analyzer
+  url: ""
+  license: ""
+  auto_generated: false
+  enhanced_via: skill-creator
+  updated_at: 2026-02-11T14:32:49
 ---
 
+# App Log Analyzer
+
+---
+
+## 核心功能
+
+- Error/warning frequency and distribution
+- Top error messages (grouped by pattern)
+- Timeline of issues
+- Actionable summary
+- *Get the log source**: Ask for log file path, or accept piped input. Common locations:
 # Log Analyzer
 
 Parse and summarize application logs to find errors, patterns, and anomalies.
@@ -87,3 +109,13 @@ grep -iE '(error|exception|fatal)' logfile | tail -50
 - No API keys required — uses grep, awk, sort, uniq, jq
 - Works with any text-based log format
 - For real-time monitoring, suggest `tail -f logfile | grep -i error`
+
+
+## 适用场景
+
+- 当用户需要 --- 时
+
+## 注意事项
+
+*基于 skill-creator SOP 强化*
+*更新时间: 2026-02-11*

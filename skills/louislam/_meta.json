@@ -1,0 +1,17 @@
+{
+  "name": "louislam",
+  "description": "A fancy self-hosted monitoring tool",
+  "version": "1.0.0",
+  "author": "AQA-Auto",
+  "category": "auto-generated",
+  "tags": [
+    "auto-generated",
+    "javascript"
+  ],
+  "capabilities": [],
+  "scripts": [],
+  "created": "2026-02-11",
+  "updated": "2026-02-11",
+  "source_url": "https://github.com/louislam/uptime-kuma",
+  "stars": 82670
+}

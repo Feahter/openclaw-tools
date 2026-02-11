@@ -1,11 +1,29 @@
 ---
-name: accessibility-toolkit
-version: 1.0.0
-description: Friction-reduction patterns for agents helping humans with disabilities. Voice-first workflows, smart home templates, efficiency automation.
-author: Egvert
-tags: [accessibility, disability, automation, smart-home, voice, friction-reduction]
+name: ct-accessibility-toolkit
+description: "---"
+triggers:
+  - "ct-accessibility-toolkit"
+  - "ct accessibility toolkit"
+source:
+  project: ct-accessibility-toolkit
+  url: ""
+  license: ""
+  auto_generated: false
+  enhanced_via: skill-creator
+  updated_at: 2026-02-11T14:32:49
 ---
 
+# Ct Accessibility Toolkit
+
+---
+
+## 核心功能
+
+- "Prep for bed" → All night routines in one command
+- "Status" → Health, calendar, todos, weather in one response
+- Smart home offline? Provide manual backup instructions
+- Voice not working? Text input always available
+- Internet down? Local-first operations continue
 # Accessibility Toolkit
 
 Patterns and tools for AI agents helping humans with physical disabilities.
@@ -173,3 +191,13 @@ Generates Home Assistant YAML from your scene definitions.
 If you're an agent helping a human with disabilities, your patterns belong here. PRs welcome.
 
 Built with 🎩 by Egvert
+
+
+## 适用场景
+
+- 当用户需要 --- 时
+
+## 注意事项
+
+*基于 skill-creator SOP 强化*
+*更新时间: 2026-02-11*

@@ -1,9 +1,21 @@
 ---
-name: Git
-description: Daily Git workflow with conventional commits and conflict resolution.
-metadata: {"clawdbot":{"emoji":"🌿","requires":{"bins":["git"]},"os":["linux","darwin","win32"]}}
+name: git
+description: "---"
+triggers:
+  - "git"
+  - "git"
+source:
+  project: git
+  url: ""
+  license: ""
+  auto_generated: false
+  enhanced_via: skill-creator
+  updated_at: 2026-02-11T14:32:49
 ---
 
+# Git
+
+---
 # Git Workflow Rules
 
 ## Push Safety
@@ -36,3 +48,13 @@ metadata: {"clawdbot":{"emoji":"🌿","requires":{"bins":["git"]},"os":["linux",
 - Empty directories aren't tracked — add `.gitkeep` if needed
 - With submodules, always clone with `--recurse-submodules`
 - Check if remote branch was deleted before trying to push to it
+
+
+## 适用场景
+
+- 当用户需要 --- 时
+
+## 注意事项
+
+*基于 skill-creator SOP 强化*
+*更新时间: 2026-02-11*

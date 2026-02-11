@@ -1,0 +1,17 @@
+{
+  "name": "gatsbyjs",
+  "description": "The best React-based framework with performance, scalability and security built in.",
+  "version": "1.0.0",
+  "author": "AQA-Auto",
+  "category": "auto-generated",
+  "tags": [
+    "auto-generated",
+    "javascript"
+  ],
+  "capabilities": [],
+  "scripts": [],
+  "created": "2026-02-11",
+  "updated": "2026-02-11",
+  "source_url": "https://github.com/gatsbyjs/gatsby",
+  "stars": 55964
+}

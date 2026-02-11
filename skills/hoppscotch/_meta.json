@@ -1,0 +1,19 @@
+{
+  "name": "hoppscotch",
+  "description": "Auto-generated skill for hoppscotch",
+  "version": "1.0.0",
+  "author": "AQA-Auto",
+  "category": "auto-generated",
+  "tags": [
+    "auto-generated"
+  ],
+  "capabilities": [
+    "\u5f85\u8865\u5145"
+  ],
+  "scripts": [],
+  "created": "2026-02-11",
+  "updated": "2026-02-11",
+  "source_url": "https://github.com/hoppscotch/hoppscotch",
+  "stars": 77838,
+  "enhanced": true
+}

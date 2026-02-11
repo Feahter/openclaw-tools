@@ -1,14 +1,21 @@
 ---
 name: agent-autonomy-kit
-version: 1.0.0
-description: Stop waiting for prompts. Keep working.
-homepage: https://github.com/itskai-dev/agent-autonomy-kit
-metadata:
-  openclaw:
-    emoji: "🚀"
-    category: productivity
+description: "---"
+triggers:
+  - "agent-autonomy-kit"
+  - "agent autonomy kit"
+source:
+  project: agent-autonomy-kit
+  url: ""
+  license: ""
+  auto_generated: false
+  enhanced_via: skill-creator
+  updated_at: 2026-02-11T14:32:49
 ---
 
+# Agent Autonomy Kit
+
+---
 # Agent Autonomy Kit
 
 Transform your agent from reactive to proactive.
@@ -27,3 +34,13 @@ Transform your agent from reactive to proactive.
 - **Continuous Operation** — Work until limits hit
 
 See README.md for full documentation.
+
+
+## 适用场景
+
+- 当用户需要 --- 时
+
+## 注意事项
+
+*基于 skill-creator SOP 强化*
+*更新时间: 2026-02-11*

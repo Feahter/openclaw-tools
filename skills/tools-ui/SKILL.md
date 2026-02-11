@@ -1,14 +1,21 @@
 ---
 name: tools-ui
-description: |
-  Tool lifecycle UI components for React/Next.js from ui.inference.sh.
-  Display tool calls: pending, progress, approval required, results.
-  Capabilities: tool status, progress indicators, approval flows, results display.
-  Use for: showing agent tool calls, human-in-the-loop approvals, tool output.
-  Triggers: tool ui, tool calls, tool status, tool approval, tool results,
-  agent tools, mcp tools ui, function calling ui, tool lifecycle, tool pending
+description: "---"
+triggers:
+  - "tools-ui"
+  - "tools ui"
+source:
+  project: tools-ui
+  url: ""
+  license: ""
+  auto_generated: false
+  enhanced_via: skill-creator
+  updated_at: 2026-02-11T14:32:49
 ---
 
+# Tools Ui
+
+---
 # Tool UI Components
 
 Tool lifecycle components from [ui.inference.sh](https://ui.inference.sh).
@@ -172,3 +179,13 @@ npx skills add inference-sh/agent-skills@widgets-ui
 - [Tool Approval Gates](https://inference.sh/blog/tools/approval-gates) - Implementing approvals
 
 Component docs: [ui.inference.sh/blocks/tools](https://ui.inference.sh/blocks/tools)
+
+
+## 适用场景
+
+- 当用户需要 --- 时
+
+## 注意事项
+
+*基于 skill-creator SOP 强化*
+*更新时间: 2026-02-11*

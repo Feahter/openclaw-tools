@@ -1,7 +1,21 @@
-# rag-search
+---
+name: rag-search
+description: "Minimal RAG search skill for backend retrieval."
+triggers:
+  - "rag-search"
+  - "rag search"
+source:
+  project: rag-search
+  url: ""
+  license: ""
+  auto_generated: false
+  enhanced_via: skill-creator
+  updated_at: 2026-02-11T14:32:49
+---
+
+# Rag Search
 
 Minimal RAG search skill for backend retrieval.
-
 ## ⚠️ Important
 
 **This skill is intended to be used as a backend retrieval component and should not be invoked directly by end users.**
@@ -38,3 +52,13 @@ Returns structured search results with:
   ]
 }
 ```
+
+
+## 适用场景
+
+- 当用户需要 minimal rag search skill for backend retrieval 时
+
+## 注意事项
+
+*基于 skill-creator SOP 强化*
+*更新时间: 2026-02-11*
