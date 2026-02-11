@@ -1,0 +1,17 @@
+{
+  "name": "brainstorming",
+  "description": "创意头脑风暴、需求分析、设计协作",
+  "version": "1.0.0",
+  "author": "OpenClaw",
+  "category": "collaboration",
+  "tags": ["brainstorm", "design", "requirements"],
+  "capabilities": [
+    "理解需求 - 上下文分析",
+    "探索方案 - 多方案对比",
+    "渐进设计 - 分段展示确认",
+    "文档输出 - 写入设计文档"
+  ],
+  "type": "conversation",
+  "created": "2026-02-04",
+  "updated": "2026-02-10"
+}

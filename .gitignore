@@ -31,3 +31,16 @@ node_modules/
 skills/**/.clawdhub/
 skills/**/credentials.json
 skills/**/config.local.json
+
+# 启动和个人文件（排除）
+BOOTSTRAP.md
+IDENTITY.md
+USER.md
+
+# 临时文件
+__pycache__/
+*.pyc
+*.pyo
+EOF
+backup_*/
+.test */

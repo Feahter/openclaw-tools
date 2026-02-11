@@ -1,0 +1,22 @@
+{
+  "name": "skill-manager",
+  "description": "GitHub Skills 生命周期管理器",
+  "version": "1.0.0",
+  "author": "OpenClaw",
+  "category": "management",
+  "tags": ["skill", "github", "lifecycle"],
+  "capabilities": [
+    "审计 - 扫描本地 Skills",
+    "检查 - 对比 GitHub commit hash",
+    "报告 - 生成状态报告",
+    "更新 - 升级 Skill",
+    "清单 - 列出/删除 Skills"
+  ],
+  "scripts": [
+    "list_skills.py",
+    "delete_skill.py",
+    "scan_and_check.py"
+  ],
+  "created": "2026-02-03",
+  "updated": "2026-02-10"
+}

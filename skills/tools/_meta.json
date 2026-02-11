@@ -1,0 +1,19 @@
+{
+  "name": "tools",
+  "description": "Unified developer tools for JavaScript, TypeScript, and the web",
+  "version": "1.0.0",
+  "author": "AQA-Auto",
+  "category": "auto-generated",
+  "tags": [
+    "auto-generated",
+    "rust"
+  ],
+  "capabilities": [
+    "\u5f85\u8865\u5145"
+  ],
+  "scripts": [],
+  "created": "2026-02-11",
+  "updated": "2026-02-11",
+  "source_url": "https://github.com/rome/tools",
+  "stars": 23514
+}

@@ -1,0 +1,19 @@
+{
+  "name": "apollo-client",
+  "description": "The industry-leading GraphQL client for TypeScript, JavaScript, React, Vue, Angular, and more. Apollo Client delivers powerful caching, intuitive APIs, and comprehensive developer tools to accelerate ",
+  "version": "1.0.0",
+  "author": "AQA-Auto",
+  "category": "auto-generated",
+  "tags": [
+    "auto-generated",
+    "typescript"
+  ],
+  "capabilities": [
+    "\u5f85\u8865\u5145"
+  ],
+  "scripts": [],
+  "created": "2026-02-11",
+  "updated": "2026-02-11",
+  "source_url": "https://github.com/apollographql/apollo-client",
+  "stars": 19726
+}

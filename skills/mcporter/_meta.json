@@ -1,0 +1,19 @@
+{
+  "name": "mcporter",
+  "description": "直接调用 MCP 服务器工具",
+  "version": "1.0.0",
+  "author": "OpenClaw",
+  "category": "integration",
+  "tags": ["mcp", "cli", "tool"],
+  "capabilities": [
+    "列出服务器 - mcporter list",
+    "调用工具 - mcporter call",
+    "认证配置 - mcporter auth",
+    "CLI 生成 - mcporter generate-cli",
+    "类型生成 - mcporter emit-ts"
+  ],
+  "requirements": ["node", "mcporter"],
+  "homepage": "http://mcporter.dev",
+  "created": "2026-02-03",
+  "updated": "2026-02-10"
+}

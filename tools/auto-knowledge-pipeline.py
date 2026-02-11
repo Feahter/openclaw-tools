@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 """
-自动知识获取管道 - 心跳任务执行脚本
-每小时自动搜索、评估、生成Skills，无需人工干预
+自动知识获取管道 - 研究模式
+只搜索、研究、记录笔记。不自动生成 Skills。
 """
 
-import asyncio
 import json
 import random
-import re
-import sys
-from datetime import datetime, timedelta
+import urllib.parse
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -17,21 +15,23 @@ from typing import Dict, List, Optional
 WORKSPACE = Path.home() / ".openclaw/workspace"
 CONFIG_PATH = WORKSPACE / "config/auto-knowledge.yaml"
 STATE_PATH = WORKSPACE / "data/auto-knowledge-state.json"
-SKILLS_DIR = WORKSPACE / "skills"
 LOG_DIR = WORKSPACE / "data/logs/auto-knowledge"
 NOTES_DIR = WORKSPACE / "memory/auto-knowledge-notes"
+SUGGESTIONS_FILE = WORKSPACE / "data/sqm/skill-suggestions.json"
+
+# 质量阈值（提高门槛）
+MIN_SCORE = 2.5  # 降低阈值，让更多项目进入待创建列表
+MIN_STARS = 500   # 原来是 100
 
 def log(message: str, level: str = "INFO"):
     """记录日志"""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    log_line = f"[{timestamp}] {level}: {message}"
-    print(log_line)
+    print(f"[{timestamp}] {level}: {message}")
     
-    # 写入日志文件
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     log_file = LOG_DIR / f"{datetime.now().strftime('%Y-%m-%d')}.log"
     with open(log_file, "a") as f:
-        f.write(log_line + "\n")
+        f.write(f"[{timestamp}] {level}: {message}\n")
 
 def load_state() -> dict:
     """加载状态文件"""
@@ -45,20 +45,10 @@ def load_state() -> dict:
         "daily_stats": {
             "date": datetime.now().strftime("%Y-%m-%d"),
             "searches": 0,
-            "skills_generated": 0,
+            "high_score_projects": 0,
             "notes_created": 0,
-            "rejected": 0
-        },
-        "keyword_pool": [
-            {"category": "开发工具", "terms": ["cli tool", "developer tools", "git workflow"]},
-            {"category": "数据处理", "terms": ["data processing", "etl pipeline", "data validation"]},
-            {"category": "API集成", "terms": ["api client", "rest api", "graphql"]},
-            {"category": "自动化", "terms": ["automation", "workflow", "scheduler"]},
-            {"category": "AI应用", "terms": ["llm tools", "ai automation", "rag pipeline"]},
-            {"category": "文档处理", "terms": ["pdf processing", "markdown tools"]},
-            {"category": "系统监控", "terms": ["monitoring", "log analysis", "health check"]},
-            {"category": "安全工具", "terms": ["security scanner", "secrets management"]}
-        ]
+            "skipped": 0
+        }
     }
 
 def save_state(state: dict):
@@ -68,336 +58,309 @@ def save_state(state: dict):
         json.dump(state, f, indent=2)
 
 def select_next_keyword(state: dict) -> str:
-    """选择下一个搜索关键词（轮换）"""
-    pool = state.get("keyword_pool", [])
-    if not pool:
-        return "automation tools"
+    """选择下一个搜索关键词"""
+    pool = [
+        {"category": "开发工具", "terms": ["cli tool", "developer tools", "git workflow"]},
+        {"category": "数据处理", "terms": ["data processing", "etl pipeline", "data validation"]},
+        {"category": "API集成", "terms": ["api client", "rest api", "graphql"]},
+        {"category": "自动化", "terms": ["automation", "workflow", "scheduler"]},
+        {"category": "AI应用", "terms": ["llm tools", "ai automation", "rag pipeline"]},
+        {"category": "文档处理", "terms": ["pdf processing", "markdown tools"]},
+        {"category": "系统监控", "terms": ["monitoring", "log analysis", "health check"]},
+        {"category": "安全工具", "terms": ["security scanner", "secrets management"]}
+    ]
     
     idx = state.get("current_rotation_index", 0)
     category = pool[idx % len(pool)]
     term = random.choice(category["terms"])
-    
-    # 更新索引
     state["current_rotation_index"] = (idx + 1) % len(pool)
     
     return term
 
 def has_recent_search(state: dict, keyword: str, hours: int = 24) -> bool:
     """检查关键词是否在近期搜索过"""
-    cutoff = datetime.now() - timedelta(hours=hours)
+    cutoff = datetime.now().timestamp() - (hours * 3600)
     for entry in state.get("search_history", []):
         if entry.get("keyword") == keyword:
-            entry_time = datetime.fromisoformat(entry.get("timestamp", "2000-01-01"))
-            if entry_time > cutoff:
-                return True
+            try:
+                entry_time = datetime.fromisoformat(entry.get("timestamp", "2000-01-01")).timestamp()
+                if entry_time > cutoff:
+                    return True
+            except:
+                pass
     return False
 
-async def search_github(keyword: str, min_stars: int = 100) -> List[Dict]:
-    """搜索GitHub项目（使用web_fetch）"""
-    import urllib.parse
-    
-    query = urllib.parse.quote(f"{keyword} stars:>{min_stars}")
-    url = f"https://github.com/search?q={query}&type=repositories&s=stars&o=desc"
-    
-    log(f"搜索GitHub: {keyword}")
-    
-    # 这里实际应该调用 web_fetch，但在心跳脚本中我们通过系统调用
-    # 简化版本：返回模拟数据用于测试
-    # 实际部署时应该调用 openclaw 的 web_fetch 工具
-    
-    # 返回示例结构
-    return [
-        {
-            "name": f"example-{keyword.replace(' ', '-')}",
-            "url": f"https://github.com/example/{keyword.replace(' ', '-')}",
-            "stars": random.randint(500, 15000),
-            "last_update": (datetime.now() - timedelta(days=random.randint(1, 180))).isoformat(),
-            "license": random.choice(["MIT", "Apache-2.0", "GPL", ""]),
-            "description": f"A tool for {keyword}"
-        }
-    ]
-
-def calculate_project_score(project: dict) -> tuple:
-    """计算项目质量分数"""
-    scores = {}
-    
-    # Stars (25%)
+def calculate_project_score(project: dict) -> float:
+    """计算项目质量分数 (0-5)"""
     stars = project.get("stars", 0)
-    if stars >= 10000: scores["stars"] = 5.0
-    elif stars >= 5000: scores["stars"] = 4.5
-    elif stars >= 2000: scores["stars"] = 4.0
-    elif stars >= 1000: scores["stars"] = 3.5
-    elif stars >= 500: scores["stars"] = 3.0
-    elif stars >= 100: scores["stars"] = 2.0
-    else: scores["stars"] = 1.0
+    score = 0
     
-    # Activity (25%)
-    last_update = datetime.fromisoformat(project.get("last_update", "2000-01-01"))
-    days_ago = (datetime.now() - last_update).days
-    if days_ago <= 7: scores["activity"] = 5.0
-    elif days_ago <= 30: scores["activity"] = 4.5
-    elif days_ago <= 90: scores["activity"] = 4.0
-    elif days_ago <= 180: scores["activity"] = 3.0
-    elif days_ago <= 365: scores["activity"] = 2.0
-    else: scores["activity"] = 1.0
-    
-    # Documentation (20%) - 简化估计
-    scores["documentation"] = 3.5  # 默认中等
-    
-    # Community (15%) - 简化估计
-    scores["community"] = 3.5  # 默认中等
-    
-    # License (15%)
-    license = project.get("license", "").lower()
-    if license in ["mit", "apache-2.0", "bsd"]: scores["license"] = 5.0
-    elif license in ["gpl", "lgpl"]: scores["license"] = 3.0
-    elif license: scores["license"] = 2.0
-    else: scores["license"] = 1.0
-    
-    # 加权计算
-    weights = {"stars": 0.25, "activity": 0.25, "documentation": 0.20, 
-               "community": 0.15, "license": 0.15}
-    final_score = sum(scores[k] * weights[k] for k in weights)
-    
-    return round(final_score, 2), scores
-
-def auto_select_project(projects: List[Dict], min_score: float = 3.5) -> Dict:
-    """自动选择最佳项目"""
-    qualified = [p for p in projects if p.get("score", 0) >= min_score]
-    
-    if not qualified:
-        max_score = max((p.get("score", 0) for p in projects), default=0)
-        return {
-            "action": "reject",
-            "reason": "no_qualified_projects",
-            "max_score": max_score
-        }
-    
-    qualified.sort(key=lambda x: x.get("score", 0), reverse=True)
-    best = qualified[0]
-    
-    if best["score"] >= 4.0:
-        return {
-            "action": "select",
-            "project": best,
-            "confidence": "high",
-            "reason": f"高分项目 ({best['score']}/5)"
-        }
-    elif len(qualified) >= 2:
-        second = qualified[1]
-        if best["score"] - second["score"] >= 0.5:
-            return {
-                "action": "select",
-                "project": best,
-                "confidence": "medium",
-                "reason": f"明显优于备选"
-            }
-        else:
-            selected = best if best["stars"] >= second["stars"] else second
-            return {
-                "action": "select",
-                "project": selected,
-                "confidence": "medium",
-                "reason": "社区规模更大"
-            }
+    # Stars 评分 (40%)
+    if stars >= 10000:
+        score += 2.0
+    elif stars >= 5000:
+        score += 1.8
+    elif stars >= 2000:
+        score += 1.5
+    elif stars >= 1000:
+        score += 1.2
+    elif stars >= 500:
+        score += 1.0
     else:
-        return {
-            "action": "select",
-            "project": best,
-            "confidence": "low",
-            "reason": "唯一合格选项"
-        }
-
-def generate_skill_name(project_name: str) -> str:
-    """生成skill名称 - 从项目名提取"""
-    # 从项目名提取，如 "example-data-processing" → "data-processing"
-    name = project_name.lower()
-    # 移除 "example-" 前缀
-    if name.startswith("example-"):
-        name = name[8:]
-    # 只保留字母和连字符
-    name = re.sub(r'[^a-z0-9-]', '-', name)
-    name = re.sub(r'-+', '-', name).strip('-')
-    return name or "auto-generated-skill"
-
-def generate_skill_content(project: dict, methodology: dict) -> str:
-    """生成SKILL.md内容"""
-    skill_name = generate_skill_name(project.get("name", "auto-skill"))
-    timestamp = datetime.now().isoformat()
+        score += 0.5
     
-    # 从项目名生成描述
-    project_name = project.get("name", "auto-skill")
-    description = project_name.replace("-", " ").replace("_", " ").title()
+    # 活跃度评分 (30%)
+    # 假设有 updated_at 字段
+    updated_at = project.get("updated_at", "")
+    if updated_at:
+        try:
+            from dateutil import parser
+            days_ago = (datetime.now() - parser.parse(updated_at)).days
+            if days_ago <= 7:
+                score += 1.5
+            elif days_ago <= 30:
+                score += 1.2
+            elif days_ago <= 90:
+                score += 0.9
+            else:
+                score += 0.3
+        except:
+            score += 0.5
+    else:
+        score += 0.5
     
-    content = f"""---
-name: {skill_name}
-description: {description} - {project.get('license', 'Open Source')}
-triggers:
-  - "{skill_name}"
-  - "{project_name}"
-source:
-  project: {project.get("name")}
-  url: {project.get("url")}
-  license: {project.get("license", "Unknown")}
-  auto_generated: true
-  generated_at: {timestamp}
-  score: {project.get("score", 0)}
----
-
-# {description}
-
-自动生成的Skill，基于 [{project.get("name")}]({project.get("url")}) 的方法论。
-
-## 核心方法
-
-1. 分析需求
-2. 提取关键参数
-3. 执行核心逻辑
-4. 验证输出
-
-## 使用场景
-
-- {description} 相关任务
-
-## 质量标准
-
-- 输入清晰明确
-- 输出可验证
-- 过程可追溯
-
-## 注意事项
-
-*本Skill由 auto-knowledge-acquisition 系统自动生成*
-*来源: {project.get('url')}*
-*生成时间: {timestamp}*
-*项目评分: {project.get('score', 0)}/5*
-"""
-    return content
-
-def record_history(state: dict, keyword: str, result: dict):
-    """记录搜索历史"""
-    entry = {
-        "timestamp": datetime.now().isoformat(),
-        "keyword": keyword,
-        "result": result
-    }
-    state["search_history"].append(entry)
+    # 许可证友好度 (15%)
+    license = project.get("license", "").lower()
+    if license in ["mit", "apache-2.0", "bsd", "unlicense"]:
+        score += 0.75
+    elif license in ["gpl", "lgpl", "agpl"]:
+        score += 0.3
+    else:
+        score += 0.3
     
-    # 只保留最近100条
-    if len(state["search_history"]) > 100:
-        state["search_history"] = state["search_history"][-100:]
+    # 是否 example 项目 (15%) - 扣分项
+    name = project.get("name", "").lower()
+    if "example" in name or "demo" in name or "test" in name:
+        score -= 0.5
+    
+    return max(0, min(5, score))
 
-def update_daily_stats(state: dict, action: str):
-    """更新每日统计"""
-    today = datetime.now().strftime("%Y-%m-%d")
-    stats = state.get("daily_stats", {})
-    
-    if stats.get("date") != today:
-        stats = {"date": today, "searches": 0, "skills_generated": 0, 
-                "notes_created": 0, "rejected": 0}
-    
-    stats["searches"] = stats.get("searches", 0) + 1
-    
-    if action == "skill":
-        stats["skills_generated"] = stats.get("skills_generated", 0) + 1
-    elif action == "note":
-        stats["notes_created"] = stats.get("notes_created", 0) + 1
-    elif action == "reject":
-        stats["rejected"] = stats.get("rejected", 0) + 1
-    
-    state["daily_stats"] = stats
-
-async def main():
-    """主执行流程"""
-    log("=" * 50)
-    log("启动自动知识获取管道")
+def search_github(keyword: str) -> List[Dict]:
+    """搜索GitHub项目（使用 GitHub API）"""
+    projects = []
     
     try:
-        # 1. 加载状态
-        state = load_state()
+        import subprocess
+        import json
         
-        # 2. 选择关键词
-        keyword = select_next_keyword(state)
+        # 使用 curl 调用 GitHub API
+        query = urllib.parse.quote(f"{keyword} stars:>{MIN_STARS}")
+        url = f'https://api.github.com/search/repositories?q={query}&sort=stars&per_page=10'
         
-        # 检查是否近期搜索过
-        if has_recent_search(state, keyword):
-            log(f"关键词 '{keyword}' 24小时内已搜索，跳过", "SKIP")
-            return
+        cmd = f'curl -s "{url}"'
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=30)
         
-        log(f"当前关键词: {keyword}")
-        
-        # 3. 搜索项目（模拟）
-        projects = await search_github(keyword)
-        log(f"找到 {len(projects)} 个项目")
-        
-        if not projects:
-            record_history(state, keyword, {"action": "skip", "reason": "no_results"})
-            update_daily_stats(state, "reject")
-            save_state(state)
-            return
-        
-        # 4. 评分
-        for project in projects:
-            score, details = calculate_project_score(project)
-            project["score"] = score
-            project["score_details"] = details
-            log(f"项目评分: {project['name']} = {score}/5")
-        
-        # 5. 自动选择
-        decision = auto_select_project(projects)
-        log(f"决策: {decision['action']} - {decision.get('reason', '')}")
-        
-        if decision["action"] == "reject":
-            record_history(state, keyword, decision)
-            update_daily_stats(state, "reject")
-            save_state(state)
-            return
-        
-        # 6. 生成Skill（简化版，实际应深入研究）
-        project = decision["project"]
-        
-        # 检查是否已存在同名Skill
-        skill_name = generate_skill_name(project.get("name", ""))
-        skill_path = SKILLS_DIR / skill_name / "SKILL.md"
-        
-        if skill_path.exists():
-            log(f"Skill '{skill_name}' 已存在，跳过", "SKIP")
-            record_history(state, keyword, {"action": "skip", "reason": "already_exists"})
-            save_state(state)
-            return
-        
-        # 生成内容
-        skill_content = generate_skill_content(project, {})
+        if result.returncode == 0:
+            data = json.loads(result.stdout)
+            items = data.get("items", [])
+            
+            for p in items:
+                projects.append({
+                    "name": p.get("name", ""),
+                    "url": p.get("html_url", ""),
+                    "stars": p.get("stargazers_count", 0),
+                    "description": p.get("description", ""),
+                    "updated_at": p.get("updated_at", ""),
+                    "license": p.get("license", {}).get("spdx_id", "") if p.get("license") else ""
+                })
+    except Exception as e:
+        log(f"搜索失败: {e}", "ERROR")
+    
+    return projects
+
+def generate_note_content(project: dict, score: float) -> str:
+    """生成学习笔记内容"""
+    name = project.get("name", "unknown").replace("-", " ").replace("_", " ").title()
+    timestamp = datetime.now().strftime("%Y-%m-%d")
+    
+    content = f"""---
+title: "{name}"
+source_url: "{project.get('url', '')}"
+stars: {project.get('stars', 0)}
+score: {score:.2f}/5.0
+researched_at: {timestamp}
+tags: ["research", "auto-knowledge"]
+---
+
+# {name}
+
+## 项目信息
+
+- **URL**: [{project.get('url', 'N/A')}]({project.get('url', 'N/A')})
+- **Stars**: {project.get('stars', 0)}
+- **License**: {project.get('license', 'Unknown')}
+- **评分**: {score:.2f}/5.0
+
+## 研究摘要
+
+### 核心功能
+
+（此处记录项目核心功能）
+
+### 使用场景
+
+（此处记录适用场景）
+
+### 优缺点
+
+**优点**:
+- 
+
+**缺点**:
+- 
+
+## 创建建议
+
+"""
+    
+    # 根据评分添加建议
+    if score >= 4.5:
+        content += "## ⭐⭐⭐ 强烈建议创建 Skill\n\n这是一个高质量项目，建议使用 `skill-from-github` 创建完整 Skill。\n"
+    elif score >= 4.0:
+        content += "## ⭐⭐ 建议创建 Skill\n\n项目质量不错，可以考虑创建 Skill。\n"
+    else:
+        content += "## ⭐ 可选\n\n项目一般，仅作为学习参考。\n"
+    
+    content += f"""
+---
+
+*研究时间: {timestamp}*
+*来源: auto-knowledge-acquisition*
+"""
+    
+    return content
+
+def add_suggestion(project: dict, score: float):
+    """添加创建建议"""
+    suggestions = []
+    if SUGGESTIONS_FILE.exists():
+        try:
+            with open(SUGGESTIONS_FILE) as f:
+                suggestions = json.load(f)
+        except:
+            suggestions = []
+    
+    # 检查是否已存在
+    for s in suggestions:
+        if s.get("url") == project.get("url"):
+            return  # 已存在
+    
+    if score >= MIN_SCORE:
+        suggestions.append({
+            "name": project.get("name", ""),
+            "url": project.get("url", ""),
+            "stars": project.get("stars", 0),
+            "score": score,
+            "added_at": datetime.now().isoformat(),
+            "reason": "高分项目，建议创建 Skill"
+        })
         
         # 保存
-        skill_path.parent.mkdir(parents=True, exist_ok=True)
-        skill_path.write_text(skill_content)
-        log(f"✅ 生成Skill: {skill_path}")
+        SUGGESTIONS_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with open(SUGGESTIONS_FILE, "w") as f:
+            json.dump(suggestions, f, indent=2)
         
-        # 记录
-        record_history(state, keyword, {
-            "action": "generated_skill",
-            "project": project["name"],
-            "score": project["score"],
-            "skill_name": skill_name
-        })
-        update_daily_stats(state, "skill")
-        
-        # 7. 保存状态
+        log(f"📝 添加建议: {project.get('name')} (分数: {score:.2f})")
+    else:
+        log(f"  ⏭️ 分数不足，跳过: {project.get('name')} ({score:.2f})")
+
+def main():
+    """主执行流程"""
+    log("=" * 50)
+    log("启动自动知识获取管道（研究模式）")
+    
+    state = load_state()
+    
+    # 1. 选择关键词
+    keyword = select_next_keyword(state)
+    log(f"搜索关键词: {keyword}")
+    
+    # 检查近期搜索
+    if has_recent_search(state, keyword):
+        log(f"跳过: {keyword} 在24小时内已搜索", "WARNING")
+        if "skipped" not in state["daily_stats"]:
+            state["daily_stats"]["skipped"] = 0
+        state["daily_stats"]["skipped"] += 1
         save_state(state)
+        return
+    
+    # 2. 搜索 GitHub
+    log("搜索 GitHub...")
+    projects = search_github(keyword)
+    log(f"找到 {len(projects)} 个项目")
+    
+    if not projects:
+        log("无结果，跳过")
+        return
+    
+    # 3. 评分并选择
+    high_score_count = 0
+    
+    for project in projects[:5]:  # 只处理前5个
+        score = calculate_project_score(project)
+        project["score"] = score
         
-        # 8. 打印统计
-        stats = state["daily_stats"]
-        log(f"今日统计: 搜索{stats['searches']}次, 生成{stats['skills_generated']}个Skill, "
-            f"笔记{stats['notes_created']}个, 跳过{stats['rejected']}次")
+        log(f"  {project.get('name', 'N/A')}: {score:.2f}/5.0 ({project.get('stars', 0)} ⭐)")
         
-    except Exception as e:
-        log(f"执行出错: {e}", "ERROR")
-        import traceback
-        log(traceback.format_exc(), "ERROR")
+        # 高分项目
+        if score >= MIN_SCORE:
+            high_score_count += 1
+            
+            # 4. 保存笔记
+            note_content = generate_note_content(project, score)
+            note_name = f"{project.get('name', 'unknown')}.md"
+            note_path = NOTES_DIR / f"{datetime.now().strftime('%Y-%m-%d')}"
+            note_path.mkdir(parents=True, exist_ok=True)
+            note_path = note_path / note_name
+            
+            with open(note_path, "w") as f:
+                f.write(note_content)
+            
+            log(f"  ✅ 保存笔记: {note_path.name}")
+            
+            # 5. 添加创建建议
+            add_suggestion(project, score)
+            
+            state["daily_stats"]["notes_created"] += 1
+    
+    # 记录历史
+    state["search_history"].append({
+        "timestamp": datetime.now().isoformat(),
+        "keyword": keyword,
+        "projects_found": len(projects),
+        "high_score": high_score_count
+    })
+    
+    # 更新统计
+    state["daily_stats"]["searches"] += 1
+    state["daily_stats"]["high_score_projects"] += high_score_count
+    
+    save_state(state)
+    
+    # 6. 打印统计
+    stats = state["daily_stats"]
+    log(f"今日统计: 搜索{stats['searches']}次, 高分{stats['high_score_projects']}个, "
+        f"笔记{stats['notes_created']}个")
     
     log("完成")
-    log("=" * 50)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "--test":
+        # 测试模式
+        print("测试模式运行...")
+        state = load_state()
+        keyword = select_next_keyword(state)
+        print(f"选择的关键词: {keyword}")
+    else:
+        main()

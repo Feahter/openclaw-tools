@@ -484,6 +484,144 @@ class OptimizedHeartbeat:
         }
 
     # ═══════════════════════════════════════════════════════════
+    # 模块 5: Skills 质量管理 (SQM)
+    # ═══════════════════════════════════════════════════════════
+    def run_skill_quality_manager(self):
+        """执行 Skills 质量管理"""
+        print("\n🎯 模块5: Skills 质量管理 (SQM)")
+        print("-" * 50)
+        
+        sqm_script = TOOLS_DIR / "skill-quality-manager.py"
+        
+        if not sqm_script.exists():
+            print("  ⚠️  SQM 脚本不存在，跳过")
+            self.log("sqm", "脚本不存在", "warning")
+            self.report["sections"]["sqm"] = {"status": "skipped"}
+            return
+        
+        # 检查上次运行时间
+        sqm_data_dir = DATA_DIR / "sqm"
+        last_run = None
+        if sqm_data_dir.exists():
+            reports = sorted(sqm_data_dir.glob("report-*.json"))
+            if reports:
+                last_run = reports[-1].stat().st_mtime
+                last_date = datetime.fromtimestamp(last_run).strftime('%Y-%m-%d %H:%M')
+                print(f"  ℹ️ 上次运行: {last_date}")
+        
+        # 执行 SQM (dry-run 模式，只评分不替换)
+        print("  🔍 执行 Skills 评分...")
+        
+        stdout, stderr, code = self.run_command(
+            f"cd {WORKSPACE} && python {sqm_script} --dry-run",
+            timeout=120
+        )
+        
+        if code == 0:
+            # 解析结果
+            replaced_count = 0
+            critical_count = 0
+            excellent_count = 0
+            
+            for line in stdout.split('\n'):
+                if '已替换:' in line:
+                    try:
+                        replaced_count = int(line.split(':')[1].strip().split()[0])
+                    except:
+                        pass
+                elif '分类结果:' in line:
+                    # 格式: 分类结果: 白名单=23, 保持=79, 待改进=0, 替换=0
+                    try:
+                        parts = line.split(':')[1]
+                        for part in parts.split(','):
+                            if '白名单=' in part:
+                                excellent_count = int(part.split('=')[1].strip())
+                            elif '替换=' in part:
+                                critical_count = int(part.split('=')[1].strip())
+                    except:
+                        pass
+            
+            self.report["sections"]["sqm"] = {
+                "status": "success",
+                "excellent_count": excellent_count,
+                "critical_count": critical_count,
+                "replaced_count": replaced_count
+            }
+            
+            print(f"  ✅ 评分完成")
+            print(f"     ⭐ 白名单: {excellent_count} 个")
+            if critical_count > 0:
+                print(f"     🔴 待改进: {critical_count} 个")
+        else:
+            print(f"  ❌ SQM 执行失败: {stderr[:100]}")
+            self.log("sqm", f"失败: {stderr[:100]}", "error")
+            self.report["sections"]["sqm"] = {"status": "error"}
+
+    # ═══════════════════════════════════════════════════════════
+    # 模块 6: AQA 自动决策器
+    # ═══════════════════════════════════════════════════════════
+    def run_aqa_auto_decider(self):
+        """运行 AQA 自动决策器，自动创建 Skills"""
+        print("\n🤖 模块6: AQA 自动决策器")
+        print("-" * 50)
+        
+        decider_script = TOOLS_DIR / "aqa-auto-decider.py"
+        
+        if not decider_script.exists():
+            print("  ⚠️  决策器脚本不存在，跳过")
+            self.log("aqa_decider", "脚本不存在", "warning")
+            self.report["sections"]["aqa_decider"] = {"status": "skipped"}
+            return
+        
+        # 检查是否有待处理建议
+        suggestions_file = DATA_DIR / "sqm" / "skill-suggestions.json"
+        if not suggestions_file.exists():
+            print("  ℹ️  无待处理建议，跳过")
+            self.report["sections"]["aqa_decider"] = {"status": "no_action"}
+            return
+        
+        # 运行决策器
+        print("  🔍 运行自动决策...")
+        
+        stdout, stderr, code = self.run_command(
+            f"cd {WORKSPACE} && python {decider_script}",
+            timeout=180
+        )
+        
+        if code == 0:
+            # 解析结果
+            created_count = 0
+            skipped_count = 0
+            
+            for line in stdout.split('\n'):
+                if '创建' in line and '个' in line:
+                    try:
+                        created_count = int(line.split('创建')[1].split('个')[0].strip())
+                    except:
+                        pass
+                elif '跳过' in line and '个' in line:
+                    try:
+                        skipped_count = int(line.split('跳过')[1].split('个')[0].strip())
+                    except:
+                        pass
+            
+            self.report["sections"]["aqa_decider"] = {
+                "status": "success",
+                "created_count": created_count,
+                "skipped_count": skipped_count
+            }
+            
+            print(f"  ✅ 决策完成")
+            if created_count > 0:
+                print(f"     📦 创建: {created_count} 个 Skills")
+            if skipped_count > 0:
+                print(f"     ⏭️  跳过: {skipped_count} 个")
+        else:
+            print(f"  ❌ 决策失败: {stderr[:100]}")
+            self.log("aqa_decider", f"失败: {stderr[:100]}", "error")
+            self.report["sections"]["aqa_decider"] = {"status": "error"}
+
+    # ═══════════════════════════════════════════════════════════
     # 主运行循环
     # ═══════════════════════════════════════════════════════════
     def run(self):
@@ -495,10 +633,12 @@ class OptimizedHeartbeat:
         start_time = time.time()
         
         modules = [
-            ("resources", self.run_resource_optimization),
+            # ("resources", self.run_resource_optimization),  # 暂时禁用，意义不大
             ("skills", self.run_skills_maintenance),
             ("knowledge", self.run_auto_knowledge_acquisition),
             ("evolution", self.run_evolution_analysis),
+            ("sqm", self.run_skill_quality_manager),  # Skills 质量管理
+            ("aqa_decider", self.run_aqa_auto_decider),  # AQA 自动决策器
         ]
         
         for name, func in modules:
@@ -517,8 +657,22 @@ class OptimizedHeartbeat:
         print(f"{'='*60}")
         
         for section, data in self.report["sections"].items():
+            if section == "resources":
+                continue  # 已禁用
             icon = "✅" if data.get("status") in ["success", "no_action"] else "❌"
-            print(f"  {icon} {section.capitalize()}: {data.get('status', 'unknown')}")
+            
+            # SQM 显示详情
+            if section == "sqm" and data.get("status") == "success":
+                excellent = data.get("excellent_count", 0)
+                critical = data.get("critical_count", 0)
+                print(f"  {icon} SQM: 评分完成 (⭐ {excellent} 个白名单, 🔴 {critical} 个待改进)")
+            # AQA 决策器显示详情
+            elif section == "aqa_decider" and data.get("status") == "success":
+                created = data.get("created_count", 0)
+                skipped = data.get("skipped_count", 0)
+                print(f"  {icon} AQA: 自动决策 (📦 {created} 个, ⏭️ {skipped} 个)")
+            else:
+                print(f"  {icon} {section.capitalize()}: {data.get('status', 'unknown')}")
         
         elapsed = time.time() - start_time
         print(f"\n⏱️  执行时间: {elapsed:.2f}s")

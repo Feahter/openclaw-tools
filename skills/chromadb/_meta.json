@@ -1,0 +1,22 @@
+{
+  "name": "chromadb",
+  "description": "ChromaDB 向量数据库技能，用于 RAG",
+  "version": "1.0.0",
+  "author": "OpenClaw",
+  "category": "database",
+  "tags": ["vector-db", "rag", "embeddings"],
+  "capabilities": [
+    "集合管理",
+    "文档操作",
+    "相似性检索"
+  ],
+  "requirements": [
+    "chromadb",
+    "sentence-transformers"
+  ],
+  "scripts": [
+    "chromadb-ops.py"
+  ],
+  "created": "2026-02-04",
+  "updated": "2026-02-04"
+}

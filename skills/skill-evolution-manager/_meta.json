@@ -1,0 +1,20 @@
+{
+  "name": "skill-evolution-manager",
+  "description": "基于对话反馈持续改进 Skills",
+  "version": "1.0.0",
+  "author": "OpenClaw",
+  "category": "management",
+  "tags": ["skill", "evolution", "feedback"],
+  "capabilities": [
+    "复盘诊断 - 分析 Skills 表现",
+    "经验提取 - 反馈转结构化数据",
+    "智能缝合 - 写入 SKILL.md"
+  ],
+  "scripts": [
+    "align_all.py",
+    "merge_evolution.py",
+    "smart_stitch.py"
+  ],
+  "created": "2026-02-03",
+  "updated": "2026-02-10"
+}
