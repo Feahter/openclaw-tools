@@ -624,22 +624,29 @@ class OptimizedHeartbeat:
     # ═══════════════════════════════════════════════════════════
     # 主运行循环
     # ═══════════════════════════════════════════════════════════
-    def run(self):
-        """运行完整心跳周期"""
+    def run(self, max_retries: int = 2):
+        """运行完整心跳周期
+        
+        Args:
+            max_retries: 最大重试次数
+        """
         print(f"\n{'='*60}")
         print(f"🫀 统一心跳任务 (优化版) - {self.timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"{'='*60}")
         
         start_time = time.time()
         
+        # 模块列表 - 核心模块，失败可重试
         modules = [
-            # ("resources", self.run_resource_optimization),  # 暂时禁用，意义不大
             ("skills", self.run_skills_maintenance),
             ("knowledge", self.run_auto_knowledge_acquisition),
             ("evolution", self.run_evolution_analysis),
-            ("sqm", self.run_skill_quality_manager),  # Skills 质量管理
-            ("aqa_decider", self.run_aqa_auto_decider),  # AQA 自动决策器
+            ("sqm", self.run_skill_quality_manager),
+            ("aqa_decider", self.run_aqa_auto_decider),
         ]
+        
+        # 第一轮执行
+        failed_modules = []
         
         for name, func in modules:
             try:
@@ -647,6 +654,33 @@ class OptimizedHeartbeat:
             except Exception as e:
                 self.log(name, f"错误: {str(e)}", "error")
                 print(f"  ❌ {name} 模块出错: {e}")
+                failed_modules.append((name, func))
+        
+        # 重试失败的模块 (最多 max_retries - 1 次)
+        retry_count = 1
+        while failed_modules and retry_count < max_retries:
+            print(f"\n🔄 重试第 {retry_count + 1} 轮 ({len(failed_modules)} 个模块)...")
+            still_failed = []
+            for name, func in failed_modules:
+                try:
+                    print(f"  重试 {name}...")
+                    func()
+                    print(f"  ✅ {name} 重试成功")
+                except Exception as e:
+                    self.log(name, f"重试错误: {str(e)}", "error")
+                    print(f"  ❌ {name} 重试失败: {e}")
+                    still_failed.append((name, func))
+            failed_modules = still_failed
+            retry_count += 1
+        
+        # 记录最终失败状态
+        if failed_modules:
+            self.report["sections"]["_retry_status"] = {
+                "status": "partial_failure",
+                "failed_modules": [name for name, _ in failed_modules],
+                "total_retries": retry_count
+            }
+            print(f"\n⚠️  {len(failed_modules)} 个模块最终失败: {[name for name, _ in failed_modules]}")
         
         # 保存报告 - 优化: 确保始终写入
         success = self.save_report()

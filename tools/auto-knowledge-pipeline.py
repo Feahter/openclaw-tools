@@ -256,11 +256,15 @@ def add_suggestion(project: dict, score: float):
             return  # 已存在
     
     if score >= MIN_SCORE:
+        # 根据评分自动决定加载模式
+        load_mode = "default" if score >= 4.0 else "on-demand"
+        
         suggestions.append({
             "name": project.get("name", ""),
             "url": project.get("url", ""),
             "stars": project.get("stars", 0),
             "score": score,
+            "load_mode": load_mode,
             "added_at": datetime.now().isoformat(),
             "reason": "高分项目，建议创建 Skill"
         })
@@ -270,7 +274,7 @@ def add_suggestion(project: dict, score: float):
         with open(SUGGESTIONS_FILE, "w") as f:
             json.dump(suggestions, f, indent=2)
         
-        log(f"📝 添加建议: {project.get('name')} (分数: {score:.2f})")
+        log(f"📝 添加建议: {project.get('name')} (分数: {score:.2f}, 模式: {load_mode})")
     else:
         log(f"  ⏭️ 分数不足，跳过: {project.get('name')} ({score:.2f})")
 

@@ -55,12 +55,18 @@ def create_skill(project: dict) -> bool:
     if not description:
         description = f"Auto-generated skill for {name}"
     
+    # 根据评分自动决定加载模式
+    # score >= 4.0: default (默认加载)
+    # score < 4.0: on-demand (按需加载)
+    load_mode = "default" if score >= 4.0 else "on-demand"
+    
     skill_md = f"""---
 name: {name}
 description: "{description}"
 triggers:
   - "{name}"
   - "{name.replace('-', ' ').replace('_', ' ')}"
+load_mode: {load_mode}
 source:
   project: {name}
   url: {url}
@@ -78,6 +84,10 @@ Auto-generated skill from GitHub project.
 - **Stars**: {stars}
 - **Score**: {score}
 - **URL**: {url}
+
+## 加载模式
+
+- **{load_mode}** - {'默认加载' if load_mode == 'default' else '按需加载'}
 
 ## 使用方式
 
@@ -99,6 +109,7 @@ Auto-generated skill from GitHub project.
         "author": "AQA-Auto",
         "category": "auto-generated",
         "tags": ["auto-generated"],
+        "load_mode": load_mode,
         "capabilities": ["待补充"],
         "scripts": [],
         "created": datetime.now().strftime("%Y-%m-%d"),
