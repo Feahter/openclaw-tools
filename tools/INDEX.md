@@ -17,7 +17,7 @@
 | 🔌 API/集成 | 5 | mcp-builder, apollo-client, openapi-generator, redis, redisson |
 | 📊 数据分析 | 5 | spark, datasets, mage-ai, haystack, langflow |
 | 🔍 DevOps/工具 | 8 | computer-use, agent-browser-0, dive, ModSecurity, skill-vetter, tools, repomix, whatsapp-web.js |
-| 🧪 测试 | 4 | playwright, puppeteer, lint-staged, fast-edit |
+| 🧪 测试/编辑 | 5 | playwright, puppeteer, lint-staged, fast-edit, fastapi |
 | 📦 自动化/工作流 | 4 | huginn, insomnia, workflow-automation, automation-workflows |
 | 🎯 专业工具 | 6 | algorithm-toolkit, design-resources-for-developers, the-book-of-secret-knowledge, markitdown, writer, memvid |
 | 🔧 开发框架 | 6 | gitnexus, gitnexus-debugging, gitnexus-exploring, gitnexus-impact-analysis, gitnexus-refactoring |
