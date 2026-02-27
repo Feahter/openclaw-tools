@@ -622,6 +622,65 @@ class OptimizedHeartbeat:
             self.report["sections"]["aqa_decider"] = {"status": "error"}
 
     # ═══════════════════════════════════════════════════════════
+    # 模块 7: 反思机制
+    # ═══════════════════════════════════════════════════════════
+    def run_reflect(self):
+        """执行反思机制"""
+        print("\n🪞 模块7: 反思机制")
+        print("-" * 50)
+        
+        try:
+            # 读取最近的心跳报告
+            reports = sorted(DATA_DIR.glob("heartbeat-report-*.json"))
+            if not reports:
+                print("  ℹ️ 无历史报告，跳过")
+                self.report["sections"]["reflect"] = {"status": "no_history"}
+                return
+            
+            # 分析最近3次心跳
+            recent = reports[-3:]
+            print(f"  📊 分析最近 {len(recent)} 次心跳...")
+            
+            # 统计各模块成功率
+            success_count = 0
+            total_count = 0
+            
+            for report_file in recent:
+                try:
+                    with open(report_file) as f:
+                        report = json.load(f)
+                    sections = report.get("sections", {})
+                    total_count += len(sections)
+                    success_count += sum(1 for s in sections.values() if s.get("status") == "success")
+                except:
+                    pass
+            
+            # 计算成功率
+            if total_count > 0:
+                success_rate = success_count / total_count * 100
+                print(f"  📈 模块成功率: {success_rate:.1f}% ({success_count}/{total_count})")
+                
+                # 写入反思记录
+                reflect_file = DATA_DIR / "reflect-log.json"
+                reflect_data = {"timestamp": self.timestamp.isoformat(), "success_rate": success_rate}
+                
+                with open(reflect_file, "a") as f:
+                    f.write(json.dumps(reflect_data) + "\n")
+                
+                self.report["sections"]["reflect"] = {
+                    "status": "success",
+                    "success_rate": success_rate,
+                    "analyzed": len(recent)
+                }
+            else:
+                self.report["sections"]["reflect"] = {"status": "no_data"}
+                
+        except Exception as e:
+            print(f"  ❌ 反思出错: {e}")
+            self.log("reflect", f"错误: {str(e)}", "error")
+            self.report["sections"]["reflect"] = {"status": "error"}
+
+    # ═══════════════════════════════════════════════════════════
     # 主运行循环
     # ═══════════════════════════════════════════════════════════
     def run(self, max_retries: int = 2):
@@ -643,6 +702,7 @@ class OptimizedHeartbeat:
             ("evolution", self.run_evolution_analysis),
             ("sqm", self.run_skill_quality_manager),
             ("aqa_decider", self.run_aqa_auto_decider),
+            ("reflect", self.run_reflect),  # 反思模块
         ]
         
         # 第一轮执行

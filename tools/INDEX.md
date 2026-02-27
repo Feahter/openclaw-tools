@@ -84,6 +84,7 @@
 ### 系统工具
 - `auto-backup.py` - 自动备份关键数据
 - `health-check.py` - 系统健康检查
+- `memory-manager.py` - 三层记忆管理系统
 
 ### 语音/TTS
 - `voice-quick.sh` - 快速语音
