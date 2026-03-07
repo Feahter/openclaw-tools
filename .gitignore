@@ -1,53 +1,29 @@
-# Skills 开源目录（追踪）
-skills-repo/
-!skills-repo/
+# === 只开源 skills 目录 ===
+# 排除一切
+/*
+/.*
 
-# 敏感配置（排除）
-~/.api-keys/
-~/.openclaw/*-state.json
-~/.openclaw/task-board*.json
-~/.openclaw/message-board*.json
-~/.openclaw/heartbeat*.json
-~/.openclaw/agent*.json
-~/.openclaw/credentials/
-~/.openclaw/subagents/
+# 保留这些
+!skills/
+!skills/**
+!marketplace.json
+!README.md
+!LICENSE
+!.gitignore
+!scripts/
+!scripts/generate-marketplace.sh
 
-# 个人数据（排除）
-memory/
-MEMORY.md
-data/
-cache/
-tmp/
-docs/
+# Skills 中的敏感文件
+skills/**/.clawhub/
+skills/**/credentials.json
+skills/**/config.local.json
 
 # 系统文件
+.DS_Store
+node_modules/
 *.log
 *.tmp
 *.bak
 *~
-.DS_Store
-node_modules/
-
-# Skills 中的敏感文件
-skills/**/.clawdhub/
-skills/**/credentials.json
-skills/**/config.local.json
-
-# 启动和个人文件（排除）
-BOOTSTRAP.md
-IDENTITY.md
-USER.md
-
-# 临时文件
 __pycache__/
 *.pyc
-*.pyo
-EOF
-backup_*/
-.test */
-.gitnexus
-.clawhub
-.clawdhub
-.claude
-.openclaw
-.omc

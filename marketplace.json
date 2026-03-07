@@ -1,0 +1,1470 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-03-07T08:18:04Z",
+  "count": 209,
+  "skills": [
+    {
+      "name": "ImageToolbox",
+      "slug": "ImageToolbox",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/ImageToolbox"
+    },
+    {
+      "name": "ModSecurity",
+      "slug": "ModSecurity",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/ModSecurity"
+    },
+    {
+      "name": "MoneyPrinterTurbo",
+      "slug": "MoneyPrinterTurbo",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/MoneyPrinterTurbo"
+    },
+    {
+      "name": "RagaAI-Catalyst",
+      "slug": "RagaAI-Catalyst",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/RagaAI-Catalyst"
+    },
+    {
+      "name": "query",
+      "slug": "TanStack",
+      "description": "🤖 Powerful asynchronous state management, server-state utilities and data fetching for the web. TS/JS, React Query, Solid Query, Svelte Query and Vue Query.",
+      "version": "1.0.0",
+      "path": "skills/TanStack"
+    },
+    {
+      "name": "a2achat",
+      "slug": "a2achat",
+      "description": "Secure agent-to-agent messaging — handshake, send, poll, and stream messages between AI agents via the a2achat.top API.",
+      "version": "1.4.2",
+      "path": "skills/a2achat"
+    },
+    {
+      "name": "agent-autonomy-kit",
+      "slug": "agent-autonomy-kit",
+      "description": "",
+      "version": "1.0.0",
+      "path": "skills/agent-autonomy-kit"
+    },
+    {
+      "name": "Agent Browser",
+      "slug": "agent-browser",
+      "description": "A fast Rust-based headless browser automation CLI with Node.js fallback that enables AI agents to navigate, click, type, and snapshot pages via structured commands.",
+      "version": "0.2.0",
+      "path": "skills/agent-browser"
+    },
+    {
+      "name": "agent-commander",
+      "slug": "agent-commander",
+      "description": "Agent 会话管理能力。用于创建子会话、发送消息、查看状态、管理多代理协作。触发场景：(1) 需要隔离上下文时创建新会话 (2) 向其他会话发送消息 (3) 查看/监控会话状态 (4) 多代理协作编排",
+      "version": "",
+      "path": "skills/agent-commander"
+    },
+    {
+      "name": "agent-dispatch",
+      "slug": "agent-dispatch",
+      "description": "Lightweight agent registry and router. Consult BEFORE performing specialized work such as code review, security audit, debugging, refactoring, performance optimization, infrastructure, data analysis, API design, testing, documentation, or any domain-specific engineering task. Maps tasks to installed subagents so work is delegated instead of done inline.",
+      "version": "1.0.0",
+      "path": "skills/agent-dispatch"
+    },
+    {
+      "name": "airflow",
+      "slug": "airflow",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/airflow"
+    },
+    {
+      "name": "algorithm-toolkit",
+      "slug": "algorithm-toolkit",
+      "description": "|",
+      "version": "1.0.0",
+      "path": "skills/algorithm-toolkit"
+    },
+    {
+      "name": "canvas-design",
+      "slug": "anthropics-canvas-design",
+      "description": "Create beautiful visual art in .png and .pdf documents using design philosophy. You should use this skill when the user asks to create a poster, piece of art, design, or other static piece. Create original visual designs, never copying existing artists' work to avoid copyright violations.",
+      "version": "",
+      "path": "skills/anthropics-canvas-design"
+    },
+    {
+      "name": "docx",
+      "slug": "anthropics-docx",
+      "description": "Use this skill whenever the user wants to create, read, edit, or manipulate Word documents (.docx files). Triggers include: any mention of 'Word doc', 'word document', '.docx', or requests to produce professional documents with formatting like tables of contents, headings, page numbers, or letterheads. Also use when extracting or reorganizing content from .docx files, inserting or replacing images in documents, performing find-and-replace in Word files, working with tracked changes or comments, or converting content into a polished Word document. If the user asks for a 'report', 'memo', 'letter', 'template', or similar deliverable as a Word or .docx file, use this skill. Do NOT use for PDFs, spreadsheets, Google Docs, or general coding tasks unrelated to document generation.",
+      "version": "",
+      "path": "skills/anthropics-docx"
+    },
+    {
+      "name": "frontend-design",
+      "slug": "anthropics-frontend-design",
+      "description": "Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics.",
+      "version": "",
+      "path": "skills/anthropics-frontend-design"
+    },
+    {
+      "name": "pdf",
+      "slug": "anthropics-pdf",
+      "description": "Use this skill whenever the user wants to do anything with PDF files. This includes reading or extracting text/tables from PDFs, combining or merging multiple PDFs into one, splitting PDFs apart, rotating pages, adding watermarks, creating new PDFs, filling PDF forms, encrypting/decrypting PDFs, extracting images, and OCR on scanned PDFs to make them searchable. If the user mentions a .pdf file or asks to produce one, use this skill.",
+      "version": "",
+      "path": "skills/anthropics-pdf"
+    },
+    {
+      "name": "pptx",
+      "slug": "anthropics-pptx",
+      "description": "Use this skill any time a .pptx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates, layouts, speaker notes, or comments. Trigger whenever the user mentions \\\"deck,\\\" \\\"slides,\\\" \\\"presentation,\\\" or references a .pptx filename, regardless of what they plan to do with the content afterward. If a .pptx file needs to be opened, created, or touched, use this skill.",
+      "version": "",
+      "path": "skills/anthropics-pptx"
+    },
+    {
+      "name": "xlsx",
+      "slug": "anthropics-xlsx",
+      "description": "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .csv, or .tsv file (e.g., adding columns, computing formulas, formatting, charting, cleaning messy data); create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path — even casually (like \\\"the xlsx in my downloads\\\") — and wants something done to it or produced from it. Also trigger for cleaning or restructuring messy tabular data files (malformed rows, misplaced headers, junk data) into proper spreadsheets. The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved.",
+      "version": "",
+      "path": "skills/anthropics-xlsx"
+    },
+    {
+      "name": "apollo-client",
+      "slug": "apollo-client",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/apollo-client"
+    },
+    {
+      "name": "apple-notes",
+      "slug": "apple-notes",
+      "description": "Manage Apple Notes via the `memo` CLI on macOS (create, view, edit, delete, search, move, and export notes). Use when a user asks Clawdbot to add a note, list notes, search notes, or manage note folders.",
+      "version": "1.0.0",
+      "path": "skills/apple-notes"
+    },
+    {
+      "name": "attention-system",
+      "slug": "attention-system",
+      "description": "",
+      "version": "",
+      "path": "skills/attention-system"
+    },
+    {
+      "name": "auto-content-creator",
+      "slug": "auto-content-creator",
+      "description": "基于素材自动生成内容，支持多种创作类型、模板风格管理、一键发布到多平台",
+      "version": "1.0.0",
+      "path": "skills/auto-content-creator"
+    },
+    {
+      "name": "auto-knowledge-acquisition",
+      "slug": "auto-knowledge-acquisition",
+      "description": "研究和发现 GitHub 高质量项目，记录学习笔记。不自动生成 Skills，仅提供研究数据和创建建议。",
+      "version": "1.0.0",
+      "path": "skills/auto-knowledge-acquisition"
+    },
+    {
+      "name": "automation-workflows",
+      "slug": "automation-workflows",
+      "description": "Design and implement automation workflows to save time and scale operations as a solopreneur. Use when identifying repetitive tasks to automate, building workflows across tools, setting up triggers and actions, or optimizing existing automations. Covers automation opportunity identification, workflow design, tool selection (Zapier, Make, n8n), testing, and maintenance. Trigger on \"automate\", \"automation\", \"workflow automation\", \"save time\", \"reduce manual work\", \"automate my business\", \"no-code automation\".",
+      "version": "0.1.0",
+      "path": "skills/automation-workflows"
+    },
+    {
+      "name": "autonomous-brain",
+      "slug": "autonomous-brain",
+      "description": "Advanced autonomous AI brain with proactive monitoring, intelligent decision-making, context awareness, and seamless task execution. Enables OpenClaw to think independently, anticipate needs, and act without constant user direction.",
+      "version": "1.0.0",
+      "path": "skills/autonomous-brain"
+    },
+    {
+      "name": "basal-ganglia-memory",
+      "slug": "basal-ganglia-memory",
+      "description": "Habit formation and procedural learning for AI agents. Develop preferences and shortcuts through repetition. Part of the AI Brain series.",
+      "version": "0.1.1",
+      "path": "skills/basal-ganglia-memory"
+    },
+    {
+      "name": "bat",
+      "slug": "bat",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/bat"
+    },
+    {
+      "name": "big-data-analysis",
+      "slug": "big-data-analysis",
+      "description": "Analyze large-scale construction datasets. Process thousands of projects for patterns, benchmarks, and predictive insights.",
+      "version": "1.0.0",
+      "path": "skills/big-data-analysis"
+    },
+    {
+      "name": "blade-of-logic",
+      "slug": "blade-of-logic",
+      "description": "逻辑之刃 - 使用命题化、符号推理和逻辑分析庖丁解牛般拆解文本逻辑脉络。用于分析论证结构、识别逻辑谬误、构建严密推理、学术写作论证。适用场景：论文写作、辩论准备、决策分析、批判性思维训练。",
+      "version": "",
+      "path": "skills/blade-of-logic"
+    },
+    {
+      "name": "branch-of-disciplines",
+      "slug": "branch-of-disciplines",
+      "description": "学科分枝 - 分析任意学科的主流派别、核心理念与代表人物。用于学习规划、学术入门、知识梳理。适用场景：学科入门、考研择校、研究方向选择、通识教育。",
+      "version": "",
+      "path": "skills/branch-of-disciplines"
+    },
+    {
+      "name": "browser",
+      "slug": "browser-automation",
+      "description": "Automate web browser interactions using natural language via CLI commands. Use when the user asks to browse websites, navigate web pages, extract data from websites, take screenshots, fill forms, click buttons, or interact with web applications.",
+      "version": "1.0.1",
+      "path": "skills/browser-automation"
+    },
+    {
+      "name": "checklist-manager",
+      "slug": "checklist-manager",
+      "description": "清单管理 - 结构化清单生成与管理，将复杂任务拆解为可执行步骤。用于任务规划、流程管理、质量控制。适用场景：项目管理、流程标准化、质量检查、习惯养成。",
+      "version": "",
+      "path": "skills/checklist-manager"
+    },
+    {
+      "name": "chromadb",
+      "slug": "chromadb",
+      "description": "",
+      "version": "1.0.0",
+      "path": "skills/chromadb"
+    },
+    {
+      "name": "clawdhub",
+      "slug": "clawdhub-copy",
+      "description": "Use the ClawdHub CLI to search, install, update, and publish agent skills from clawdhub.com. Use when you need to fetch new skills on the fly, sync installed skills to latest or a specific version, or publish new/updated skill folders with the npm-installed clawdhub CLI.",
+      "version": "1.0.0",
+      "path": "skills/clawdhub-copy"
+    },
+    {
+      "name": "code-review-expert",
+      "slug": "code-review-expert",
+      "description": "Expert code review of current git changes with a senior engineer lens. Detects SOLID violations, security risks, and proposes actionable improvements.",
+      "version": "",
+      "path": "skills/code-review-expert"
+    },
+    {
+      "name": "coding-agent",
+      "slug": "coding-agent",
+      "description": "Run Codex CLI, Claude Code, OpenCode, or Pi Coding Agent via background process for programmatic control.",
+      "version": "",
+      "path": "skills/coding-agent"
+    },
+    {
+      "name": "composio",
+      "slug": "composio",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/composio"
+    },
+    {
+      "name": "computer-use",
+      "slug": "computer-use",
+      "description": "Full desktop computer use for headless Linux servers. Xvfb + XFCE virtual desktop with xdotool automation. 17 actions (click, type, scroll, screenshot, drag, etc). Unlike OpenClaw's browser tool, operates at the X11 level so websites cannot detect automation. Includes VNC for live viewing.",
+      "version": "1.2.1",
+      "path": "skills/computer-use"
+    },
+    {
+      "name": "consensus-interact",
+      "slug": "consensus-interact",
+      "description": "Operate consensus.tools end-to-end (post jobs, create submissions, cast votes, resolve results) using the local-first board. Hosted boards are optional and coming soon.",
+      "version": "1.0.1",
+      "path": "skills/consensus-interact"
+    },
+    {
+      "name": "content-editor",
+      "slug": "content-editor",
+      "description": "审稿润色系统，支持语言润色、逻辑检查、结构优化、风格统一、错别字修正，可联动内容生成系统",
+      "version": "1.0.0",
+      "path": "skills/content-editor"
+    },
+    {
+      "name": "context-manager",
+      "slug": "context-manager",
+      "description": "上下文管理器 - 智能压缩、摘要和管理对话历史，优化长对话的token使用。用于长对话维护、信息提取、记忆管理。适用场景：长任务跟踪、多轮对话优化、历史会话检索。",
+      "version": "",
+      "path": "skills/context-manager"
+    },
+    {
+      "name": "context-mode",
+      "slug": "context-mode",
+      "description": "",
+      "version": "",
+      "path": "skills/context-mode"
+    },
+    {
+      "name": "core",
+      "slug": "core",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/core"
+    },
+    {
+      "name": "coroot",
+      "slug": "coroot",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/coroot"
+    },
+    {
+      "name": "cron-mastery",
+      "slug": "cron-mastery",
+      "description": "Master OpenClaw's timing systems. Use for scheduling reliable reminders, setting up periodic maintenance (janitor jobs), and understanding when to use Cron vs Heartbeat for time-sensitive tasks.",
+      "version": "1.0.1",
+      "path": "skills/cron-mastery"
+    },
+    {
+      "name": "cron-scheduling",
+      "slug": "cron-scheduling",
+      "description": "Schedule and manage recurring tasks with cron and systemd timers. Use when setting up cron jobs, writing systemd timer units, handling timezone-aware scheduling, monitoring failed jobs, implementing retry patterns, or debugging why a scheduled task didn't run.",
+      "version": "1.0.0",
+      "path": "skills/cron-scheduling"
+    },
+    {
+      "name": "cron-writer",
+      "slug": "cron-writer",
+      "description": "Convert natural language to cron expressions. Use when you need to schedule tasks.",
+      "version": "1.0.0",
+      "path": "skills/cron-writer"
+    },
+    {
+      "name": "dash-cog",
+      "slug": "dash-cog",
+      "description": "Interactive dashboards and apps powered by CellCog. Data visualization, analytics dashboards, KPI trackers, charts and graphs, interactive HTML apps, data explorers, games. Build web apps with AI.",
+      "version": "1.0.1",
+      "path": "skills/dash-cog"
+    },
+    {
+      "name": "data-analyst",
+      "slug": "data-analyst",
+      "description": "Data visualization, report generation, SQL queries, and spreadsheet automation. Transform your AI agent into a data-savvy analyst that turns raw data into actionable insights.",
+      "version": "1.0.0",
+      "path": "skills/data-analyst"
+    },
+    {
+      "name": "data-visualization",
+      "slug": "data-visualization",
+      "description": "Create visualizations for construction data. Generate charts, graphs, heatmaps, and interactive dashboards using Matplotlib, Seaborn, and Plotly for project analysis and reporting.",
+      "version": "1.0.0",
+      "path": "skills/data-visualization"
+    },
+    {
+      "name": "database",
+      "slug": "database",
+      "description": "Database management and queries. Connect to SQL and NoSQL databases, run queries, and manage schemas.",
+      "version": "1.1.0",
+      "path": "skills/database"
+    },
+    {
+      "name": "datasets",
+      "slug": "datasets",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/datasets"
+    },
+    {
+      "name": "db-query",
+      "slug": "db-query",
+      "description": "Query project databases with automatic SSH tunnel management. Use when you need to execute SQL queries against configured databases, especially those accessible only via SSH tunnels. Automatically manages SSH connection lifecycle (establishes tunnel before query, closes after). Supports multiple databases distinguished by description/name from config file.",
+      "version": "1.0.0",
+      "path": "skills/db-query"
+    },
+    {
+      "name": "deep-productivity",
+      "slug": "deep-productivity",
+      "description": "",
+      "version": "",
+      "path": "skills/deep-productivity"
+    },
+    {
+      "name": "haystack",
+      "slug": "deepset-ai",
+      "description": "AI orchestration framework to build customizable, production-ready LLM applications. Connect components (models, vector DBs, file converters) to pipelines or agents that can interact with your data. With advanced retrieval methods, it's best suited for building RAG, question answering, semantic search or conversational agent chatbots.",
+      "version": "1.0.0",
+      "path": "skills/deepset-ai"
+    },
+    {
+      "name": "deer-flow",
+      "slug": "deer-flow",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/deer-flow"
+    },
+    {
+      "name": "design-resources-for-developers",
+      "slug": "design-resources-for-developers",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/design-resources-for-developers"
+    },
+    {
+      "name": "dive",
+      "slug": "dive",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/dive"
+    },
+    {
+      "name": "docx",
+      "slug": "docx",
+      "description": "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. When Claude needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks",
+      "version": "0.1.0",
+      "path": "skills/docx"
+    },
+    {
+      "name": "download-waytoagi-prompts",
+      "slug": "download-waytoagi-prompts",
+      "description": "Download AI prompts from waytoagi.com to local directory. Supports parallel downloads, retry failed downloads, and quick test mode. Multi-author support.",
+      "version": "",
+      "path": "skills/download-waytoagi-prompts"
+    },
+    {
+      "name": "fastapi",
+      "slug": "fastapi",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/fastapi"
+    },
+    {
+      "name": "feishu",
+      "slug": "feishu",
+      "description": "飞书 AI 对话机器人集成 - 完整接入方案",
+      "version": "",
+      "path": "skills/feishu"
+    },
+    {
+      "name": "find-skills",
+      "slug": "find-skills",
+      "description": "",
+      "version": "",
+      "path": "skills/find-skills"
+    },
+    {
+      "name": "finishing-a-development-branch",
+      "slug": "finishing-a-development-branch",
+      "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for merge, PR, or cleanup",
+      "version": "",
+      "path": "skills/finishing-a-development-branch"
+    },
+    {
+      "name": "folk-marketing",
+      "slug": "folk-marketing",
+      "description": "民间艺术家 - 用通俗易懂的民间俚语表达，生成让人一看就想买的宣传语。用于产品文案、广告语、销售话术。适用场景：电商文案、摆摊叫卖、社交媒体推广、口语化营销。",
+      "version": "",
+      "path": "skills/folk-marketing"
+    },
+    {
+      "name": "frontend-slides",
+      "slug": "frontend-slides",
+      "description": "Create stunning, animation-rich HTML presentations from scratch or by converting PowerPoint files. Use when the user wants to build a presentation, convert a PPT/PPTX to web, or create slides for a talk/pitch. Helps non-designers discover their aesthetic through visual exploration rather than abstract choices.",
+      "version": "",
+      "path": "skills/frontend-slides"
+    },
+    {
+      "name": "game-designer-toolkit",
+      "slug": "game-designer-toolkit",
+      "description": "Complete game design toolkit for creating professional GDD, game systems, level design, and prototypes. Use when: (1) Creating a new game concept or GDD, (2) Designing game systems (economy, combat, progression), (3) Planning levels and difficulty curves, (4) Writing game narratives and lore, (5) Creating game pitches or prototypes. Supports all game genres including RPG, FPS, strategy, mobile, indie, and AAA.",
+      "version": "1.0.0",
+      "path": "skills/game-designer-toolkit"
+    },
+    {
+      "name": "game-engine",
+      "slug": "game-engine",
+      "description": "Expert skill for building web-based game engines and games using HTML5, Canvas, WebGL, and JavaScript. Use when asked to create games, build game engines, implement game physics, handle collision detection, set up game loops, manage sprites, add game controls, or work with 2D/3D rendering. Covers techniques for platformers, breakout-style games, maze games, tilemaps, audio, multiplayer via WebRTC, and publishing games.",
+      "version": "1.0.0",
+      "path": "skills/game-engine"
+    },
+    {
+      "name": "gatsby",
+      "slug": "gatsby",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/gatsby"
+    },
+    {
+      "name": "gin",
+      "slug": "gin",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/gin"
+    },
+    {
+      "name": "git",
+      "slug": "git",
+      "description": "",
+      "version": "1.0.0",
+      "path": "skills/git"
+    },
+    {
+      "name": "github-to-skills",
+      "slug": "github-to-skills",
+      "description": "GitHub 操作中心：转换仓库为 Skills + gh CLI 操作。触发场景：(1) 打包 GitHub 仓库为 Skill (2) GitHub PR/CI/API 操作 (3) 检查更新、列出/删除 Skills。",
+      "version": "",
+      "path": "skills/github-to-skills"
+    },
+    {
+      "name": "gitnexus",
+      "slug": "gitnexus",
+      "description": "零服务器代码智能引擎 - 知识图谱 + MCP",
+      "version": "1.0.0",
+      "path": "skills/gitnexus"
+    },
+    {
+      "name": "gitnexus-debugging",
+      "slug": "gitnexus-debugging-bak",
+      "description": "Trace bugs through call chains using knowledge graph",
+      "version": "1.0.0",
+      "path": "skills/gitnexus-debugging-bak"
+    },
+    {
+      "name": "gitnexus-exploring",
+      "slug": "gitnexus-exploring-bak",
+      "description": "Navigate unfamiliar code using GitNexus knowledge graph",
+      "version": "1.0.0",
+      "path": "skills/gitnexus-exploring-bak"
+    },
+    {
+      "name": "gitnexus-impact-analysis",
+      "slug": "gitnexus-impact-analysis-bak",
+      "description": "Analyze blast radius before making code changes",
+      "version": "1.0.0",
+      "path": "skills/gitnexus-impact-analysis-bak"
+    },
+    {
+      "name": "gitnexus-refactoring",
+      "slug": "gitnexus-refactoring-bak",
+      "description": "Plan safe refactors using blast radius and dependency mapping",
+      "version": "1.0.0",
+      "path": "skills/gitnexus-refactoring-bak"
+    },
+    {
+      "name": "hacker-arsenal",
+      "slug": "hacker-arsenal",
+      "description": "基于PTES、OWASP Testing Guide、MITRE ATT&CK等权威框架构建的全面黑客攻防技术参考。涵盖渗透测试全生命周期(侦察→扫描→漏洞分析→利用→后渗透)、Web应用测试、CTF竞赛技巧。提供可直接使用的命令、工具和攻防技术速查，用于合法安全测试、红队演练、安全研究和CTF竞赛。",
+      "version": "",
+      "path": "skills/hacker-arsenal"
+    },
+    {
+      "name": "hammer-of-questions",
+      "slug": "hammer-of-questions",
+      "description": "问题之锤 - 苏格拉底式追问，锤破人类知识边界，直达第一问题。用于深度思考、问题澄清、根源分析、哲学探索。适用场景：决策困惑、创新突破、学术研究、自我探索。",
+      "version": "",
+      "path": "skills/hammer-of-questions"
+    },
+    {
+      "name": "haystack",
+      "slug": "haystack",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/haystack"
+    },
+    {
+      "name": "hn-extract",
+      "slug": "hn-extract",
+      "description": "Extract a HackerNews post (article + comments) into single clean Markdown for quick reading or LLM input.",
+      "version": "0.1.5",
+      "path": "skills/hn-extract"
+    },
+    {
+      "name": "hoppscotch",
+      "slug": "hoppscotch",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/hoppscotch"
+    },
+    {
+      "name": "huginn",
+      "slug": "huginn",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/huginn"
+    },
+    {
+      "name": "infinite-memory",
+      "slug": "infinite-memory-v2",
+      "description": "High-precision memory with 100% recall accuracy for long contexts.",
+      "version": "1.0.0",
+      "path": "skills/infinite-memory-v2"
+    },
+    {
+      "name": "insomnia",
+      "slug": "insomnia",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/insomnia"
+    },
+    {
+      "name": "jq-json-processor",
+      "slug": "jq-json-processor",
+      "description": "Process, filter, and transform JSON data using jq - the lightweight and flexible command-line JSON processor.",
+      "version": "1.0.0",
+      "path": "skills/jq-json-processor"
+    },
+    {
+      "name": "web-design-guidelines",
+      "slug": "kj-web-design-guidelines",
+      "description": "Review UI code for Web Interface Guidelines compliance. Use when asked to \"review my UI\", \"check accessibility\", \"audit design\", \"review UX\", or \"check my site against best practices\".",
+      "version": "1.0.0",
+      "path": "skills/kj-web-design-guidelines"
+    },
+    {
+      "name": "kubernetes",
+      "slug": "kubernetes",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/kubernetes"
+    },
+    {
+      "name": "ladder-of-abstraction",
+      "slug": "ladder-of-abstraction",
+      "description": "抽象之梯 - 将文本在具象细节与抽象概括之间自如转换。用于写作、思考、沟通时，把含混不清的表达改写成细腻具象（如莫言般的感官描写）或凝练抽象（如哲学概念）的表达。适用场景：创意写作、学术写作、演讲稿优化、概念澄清。",
+      "version": "",
+      "path": "skills/ladder-of-abstraction"
+    },
+    {
+      "name": "langflow",
+      "slug": "langflow",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/langflow"
+    },
+    {
+      "name": "lint-staged",
+      "slug": "lint-staged",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/lint-staged"
+    },
+    {
+      "name": "llm-app",
+      "slug": "llm-app",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/llm-app"
+    },
+    {
+      "name": "llm",
+      "slug": "llm",
+      "description": "Multi-provider LLM integration. Unified interface for OpenAI, Anthropic, Google, and local models.",
+      "version": "1.1.0",
+      "path": "skills/llm-bak"
+    },
+    {
+      "name": "llm-suite",
+      "slug": "llm-suite",
+      "description": "LLM工具箱 - 多提供商集成 + RAG",
+      "version": "",
+      "path": "skills/llm-suite"
+    },
+    {
+      "name": "llmware",
+      "slug": "llmware",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/llmware"
+    },
+    {
+      "name": "llmware",
+      "slug": "llmware-ai-bak",
+      "description": "Unified framework for building enterprise RAG pipelines with small, specialized models",
+      "version": "1.0.0",
+      "path": "skills/llmware-ai-bak"
+    },
+    {
+      "name": "uptime-kuma",
+      "slug": "louislam",
+      "description": "A fancy self-hosted monitoring tool",
+      "version": "1.0.0",
+      "path": "skills/louislam"
+    },
+    {
+      "name": "mac-use",
+      "slug": "mac-use",
+      "description": "Control macOS GUI apps visually — take screenshots, click, scroll, type. Use when the user asks to interact with any Mac desktop application's graphical interface.",
+      "version": "1.0.0",
+      "path": "skills/mac-use"
+    },
+    {
+      "name": "macbook-optimizer",
+      "slug": "macbook-optimizer",
+      "description": "Complete MacBook optimization suite: monitoring, troubleshooting, cleanup, and performance tuning. Works on all Macs (Intel & Apple Silicon). No extra tools required.",
+      "version": "1.0.1",
+      "path": "skills/macbook-optimizer"
+    },
+    {
+      "name": "macos-image-generation",
+      "slug": "macos-image-generation",
+      "description": "在 macOS 上本地部署 AI 文生图工具（Stable Diffusion）。支持 InvokeAI 和 Diffusers，提供安装、模型管理、生成工作流的完整指南。",
+      "version": "",
+      "path": "skills/macos-image-generation"
+    },
+    {
+      "name": "mage-ai",
+      "slug": "mage-ai",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/mage-ai"
+    },
+    {
+      "name": "markitdown",
+      "slug": "markitdown",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/markitdown"
+    },
+    {
+      "name": "mcp-builder",
+      "slug": "mcp-builder",
+      "description": "Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate external APIs or services, whether in Python (FastMCP) or Node/TypeScript (MCP SDK).",
+      "version": "1.0.0",
+      "path": "skills/mcp-builder"
+    },
+    {
+      "name": "mcporter",
+      "slug": "mcporter",
+      "description": "Use the mcporter CLI to list, configure, auth, and call MCP servers/tools directly (HTTP or stdio), including ad-hoc servers, config edits, and CLI/type generation.",
+      "version": "1.0.0",
+      "path": "skills/mcporter"
+    },
+    {
+      "name": "memory-on-demand",
+      "slug": "memory-on-demand",
+      "description": "按需记忆检索。当用户询问历史相关问题时，自动搜索 memory 和 QMD 获取相关信息。",
+      "version": "1.0.0",
+      "path": "skills/memory-on-demand"
+    },
+    {
+      "name": "memvid",
+      "slug": "memvid",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/memvid"
+    },
+    {
+      "name": "playwright",
+      "slug": "microsoft",
+      "description": "Playwright is a framework for Web Testing and Automation. It allows testing Chromium, Firefox and WebKit with a single API. ",
+      "version": "1.0.0",
+      "path": "skills/microsoft"
+    },
+    {
+      "name": "mirror-of-perspectives",
+      "slug": "mirror-of-perspectives",
+      "description": "视角之镜 - 找到独特的观察角度，使复杂问题变得异常简单易解。用于问题解决、创新思考、突破思维定势。适用场景：难题攻关、产品设计、战略决策、创意发想。",
+      "version": "",
+      "path": "skills/mirror-of-perspectives"
+    },
+    {
+      "name": "musk-business-framework",
+      "slug": "musk-business-framework",
+      "description": "基于马斯克第一性原理和商业策略的决策框架。帮助用物理思维分析商业问题，识别隐藏假设，验证目标可行性。",
+      "version": "1.0.0",
+      "path": "skills/musk-business-framework"
+    },
+    {
+      "name": "navclaw",
+      "slug": "navclaw",
+      "description": "个人AI导航助手 — 极限搜索避堵方案，实测智能绕行可能比官方方案更优。一键跳转手机导航APP（iOS/Android）。附加工具箱：天气查询、周边地点搜索、地理编码、行政区划查询等。目前支持高德，后续扩展。 Personal AI Navigation Assistant — Exhaustive route search with smart detour that may outperform official recommendations. One-tap deep links for iOS/Android. Bonus toolbox like weather, POI search, geocoding, district query, etc. Currently supports Amap, more platforms coming",
+      "version": "0.1.5",
+      "path": "skills/navclaw"
+    },
+    {
+      "name": "nodeppt",
+      "slug": "nodeppt",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/nodeppt"
+    },
+    {
+      "name": "novel-quality-guardian",
+      "slug": "novel-quality-guardian",
+      "description": "小说质量守护者 - 强制锚定 + 质量门 + 迭代机制。解决长篇小说创作中的人物走样、情节重复、前后矛盾等问题。核心原理：不是AI能力不行，而是锚定信息不够。触发场景：写新章节、质检、创作质量崩塌诊断。",
+      "version": "",
+      "path": "skills/novel-quality-guardian"
+    },
+    {
+      "name": "novel-writing-sop",
+      "slug": "novel-writing-sop",
+      "description": "基于「种子→萌芽→枝干→枝叶」模型的小说创作完整SOP，新增分级执行机制、爽点强制嵌入、自动化衔接检查",
+      "version": "4.1.0",
+      "path": "skills/novel-writing-sop"
+    },
+    {
+      "name": "nuclei",
+      "slug": "nuclei",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/nuclei"
+    },
+    {
+      "name": "game-design-philosophy",
+      "slug": "nyx-archive-game-design-philosophy",
+      "description": "Auto-learns your design instincts. Adapts to how you think about mechanics, player experience, and what makes games meaningful. Game design philosophy that grows with you — from prototyping to systems thinking to the art of fun. Games are machines for practicing the three foundational skills: fallibilism (learn through failure by design), relational ontology (the relationship IS the game), and absurdist play (the meta-skill everything else is built on).",
+      "version": "1.1.1",
+      "path": "skills/nyx-archive-game-design-philosophy"
+    },
+    {
+      "name": "ohmyzsh",
+      "slug": "ohmyzsh",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/ohmyzsh"
+    },
+    {
+      "name": "one-sentence-novel",
+      "slug": "one-sentence-novel",
+      "description": "一言小说 - 用一句话写小说，以简练文字创造深邃世界。用于创意写作、文学训练、意境表达。适用场景：微小说创作、文案金句、朋友圈文案、写作练习。",
+      "version": "",
+      "path": "skills/one-sentence-novel"
+    },
+    {
+      "name": "openapi-generator",
+      "slug": "openapi-generator",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/openapi-generator"
+    },
+    {
+      "name": "openclaw-agent-optimize",
+      "slug": "openclaw-agent-optimize",
+      "description": "Optimize an OpenClaw agent setup (model routing, context management, delegation, rules, memory). Use when asked about optimizing agents, improving OpenClaw setup, agent best practices, or choosing optimization priorities across cost/quality/reliability.",
+      "version": "1.0.8",
+      "path": "skills/openclaw-agent-optimize"
+    },
+    {
+      "name": "openclaw-auto-updater",
+      "slug": "openclaw-auto-updater",
+      "description": "Schedule automatic OpenClaw and skill updates with reliable cron templates, timezone-safe scheduling, and clear summary outputs. Use for hands-off maintenance, scheduled upgrades, and concise update reports.",
+      "version": "1.0.0",
+      "path": "skills/openclaw-auto-updater"
+    },
+    {
+      "name": "token-optimizer",
+      "slug": "openclaw-token-optimizer",
+      "description": "Reduce OpenClaw token usage and API costs through smart model routing, heartbeat optimization, budget tracking, and multi-provider fallbacks. Use when token costs are high, API rate limits are being hit, or hosting multiple agents at scale. Includes ready-to-use scripts for task classification, usage monitoring, and optimized heartbeat scheduling.",
+      "version": "1.2.7",
+      "path": "skills/openclaw-token-optimizer"
+    },
+    {
+      "name": "opencode-usage",
+      "slug": "opencode-usage",
+      "description": "",
+      "version": "",
+      "path": "skills/opencode-usage"
+    },
+    {
+      "name": "para-second-brain",
+      "slug": "para-second-brain",
+      "description": "Organize your agent's knowledge using PARA (Projects, Areas, Resources, Archive) — then make it ALL searchable. The symlink trick enables full semantic search across your entire knowledge base, not just MEMORY.md. Includes session transcript indexing and memory flush protocol. Your agent finally has a real second brain.",
+      "version": "2.0.1",
+      "path": "skills/para-second-brain"
+    },
+    {
+      "name": "llm-app",
+      "slug": "pathwaycom",
+      "description": "Ready-to-run cloud templates for RAG, AI pipelines, and enterprise search with live data. 🐳Docker-friendly.⚡Always in sync with Sharepoint, Google Drive, S3, Kafka, PostgreSQL, real-time data APIs, and more.",
+      "version": "1.0.0",
+      "path": "skills/pathwaycom"
+    },
+    {
+      "name": "pdf",
+      "slug": "pdf",
+      "description": "Use this skill whenever the user wants to do anything with PDF files. This includes reading or extracting text/tables from PDFs, combining or merging multiple PDFs into one, splitting PDFs apart, rotating pages, adding watermarks, creating new PDFs, filling PDF forms, encrypting/decrypting PDFs, extracting images, and OCR on scanned PDFs to make them searchable. If the user mentions a .pdf file or asks to produce one, use this skill.",
+      "version": "1.0.0",
+      "path": "skills/pdf"
+    },
+    {
+      "name": "pdf-text-extractor",
+      "slug": "pdf-text-extractor",
+      "description": "Extract text from PDFs with OCR support. Perfect for digitizing documents, processing invoices, or analyzing content. Zero dependencies required.",
+      "version": "1.0.0",
+      "path": "skills/pdf-text-extractor"
+    },
+    {
+      "name": "pdfcpu",
+      "slug": "pdfcpu",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/pdfcpu"
+    },
+    {
+      "name": "perf-profiler",
+      "slug": "perf-profiler",
+      "description": "Profile and optimize application performance. Use when diagnosing slow code, measuring CPU/memory usage, generating flame graphs, benchmarking functions, load testing APIs, finding memory leaks, or optimizing database queries.",
+      "version": "1.0.0",
+      "path": "skills/perf-profiler"
+    },
+    {
+      "name": "performance-optimizer",
+      "slug": "performance-optimizer",
+      "description": "Comprehensive performance bottleneck detection and optimization algorithms with cross-language generalization capabilities. Use when analyzing code performance, identifying bottlenecks, optimizing algorithms, profiling applications, or designing high-performance systems. Covers systematic profiling methods, complexity analysis, caching strategies, memory optimization, concurrency patterns, and language-specific optimization techniques.",
+      "version": "",
+      "path": "skills/performance-optimizer"
+    },
+    {
+      "name": "pkl",
+      "slug": "pkl",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/pkl"
+    },
+    {
+      "name": "planning-with-files",
+      "slug": "planning-with-files",
+      "description": "",
+      "version": "",
+      "path": "skills/planning-with-files"
+    },
+    {
+      "name": "playwright",
+      "slug": "playwright",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/playwright"
+    },
+    {
+      "name": "playwright-browser-automation",
+      "slug": "playwright-browser-automation",
+      "description": "Browser automation using Playwright API directly. Navigate websites, interact with elements, extract data, take screenshots, generate PDFs, record videos, and automate complex workflows. More reliable than MCP approach.",
+      "version": "2.0.0",
+      "path": "skills/playwright-browser-automation"
+    },
+    {
+      "name": "playwright-scraper-skill",
+      "slug": "playwright-scraper-skill",
+      "description": "Playwright-based web scraping OpenClaw Skill with anti-bot protection. Successfully tested on complex sites like Discuss.com.hk.",
+      "version": "1.2.0",
+      "path": "skills/playwright-scraper-skill"
+    },
+    {
+      "name": "postgres",
+      "slug": "postgres",
+      "description": "PostgreSQL 专用技能，支持高级查询、索引优化、JSON 操作。",
+      "version": "",
+      "path": "skills/postgres"
+    },
+    {
+      "name": "ppt-engineering",
+      "slug": "ppt-engineering",
+      "description": "演示文稿内容策略与结构设计。融合 Nancy Duarte、Edward Tufte、Barbara Minto 等顶级专家方法论，覆盖需求分析、叙事结构、内容工程、视觉规范全流程。触发场景：'帮我做PPT'、'设计演示文稿'、'优化PPT结构'、'技术分享怎么做'、'准备一个汇报'等。注意：本 skill 专注内容策略与结构，实际生成 HTML 演示文稿时调用 frontend-slides skill。",
+      "version": "",
+      "path": "skills/ppt-engineering"
+    },
+    {
+      "name": "pptx",
+      "slug": "pptx",
+      "description": "Use this skill any time a .pptx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates, layouts, speaker notes, or comments. Trigger whenever the user mentions \\\"deck,\\\" \\\"slides,\\\" \\\"presentation,\\\" or references a .pptx filename, regardless of what they plan to do with the content afterward. If a .pptx file needs to be opened, created, or touched, use this skill.",
+      "version": "1.0.0",
+      "path": "skills/pptx"
+    },
+    {
+      "name": "prettier",
+      "slug": "prettier",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/prettier"
+    },
+    {
+      "name": "proactive-agent",
+      "slug": "proactive-agent",
+      "description": "Transform AI agents from task-followers into proactive partners that anticipate needs and continuously improve. Now with WAL Protocol, Working Buffer, Autonomous Crons, and battle-tested patterns. Part of the Hal Stack 🦞",
+      "version": "3.1.0",
+      "path": "skills/proactive-agent"
+    },
+    {
+      "name": "process-monitor",
+      "slug": "process-monitor",
+      "description": "Monitor system processes, identify top CPU/memory consumers, and alert on resource thresholds.",
+      "version": "1.1.0",
+      "path": "skills/process-monitor"
+    },
+    {
+      "name": "project-planning",
+      "slug": "project-planning",
+      "description": "",
+      "version": "",
+      "path": "skills/project-planning"
+    },
+    {
+      "name": "prometheus",
+      "slug": "prometheus",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/prometheus"
+    },
+    {
+      "name": "proxmox-ops",
+      "slug": "proxmox-ops",
+      "description": "|",
+      "version": "1.0.3",
+      "path": "skills/proxmox-ops"
+    },
+    {
+      "name": "puppeteer",
+      "slug": "puppeteer",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/puppeteer"
+    },
+    {
+      "name": "pydantic",
+      "slug": "pydantic",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/pydantic"
+    },
+    {
+      "name": "qmd",
+      "slug": "qmd",
+      "description": "Local search/indexing CLI (BM25 + vectors + rerank) with MCP mode.",
+      "version": "1.0.0",
+      "path": "skills/qmd"
+    },
+    {
+      "name": "query",
+      "slug": "query",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/query"
+    },
+    {
+      "name": "lingzhu",
+      "slug": "r-wmi",
+      "description": "通过灵珠平台，将 CpenClaw 接入 Rokid Glasses,支持控制拍照传图、导航、日程工具,支持与智能体同步眼镜设备信息,灵珠平台地址 https://agent-develop.rokid.com",
+      "version": "0.0.7",
+      "path": "skills/r-wmi"
+    },
+    {
+      "name": "rag-search",
+      "slug": "rag-search",
+      "description": "Minimal RAG search skill for backend retrieval.",
+      "version": "0.1.1",
+      "path": "skills/rag-search"
+    },
+    {
+      "name": "redisson",
+      "slug": "redisson",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/redisson"
+    },
+    {
+      "name": "reflect",
+      "slug": "reflect-learn",
+      "description": "Self-improvement through conversation analysis. Extracts learnings from corrections and success patterns, permanently encoding them into agent definitions. Philosophy - Correct once, never again.",
+      "version": "2.0.0",
+      "path": "skills/reflect-learn"
+    },
+    {
+      "name": "remark",
+      "slug": "remark",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/remark"
+    },
+    {
+      "name": "remotion-best-practices",
+      "slug": "remotion-best-practices",
+      "description": "Best practices for Remotion - Video creation in React",
+      "version": "",
+      "path": "skills/remotion-best-practices"
+    },
+    {
+      "name": "repomix",
+      "slug": "repomix",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/repomix"
+    },
+    {
+      "name": "rescueclaw",
+      "slug": "rescueclaw",
+      "description": "",
+      "version": "0.2.1",
+      "path": "skills/rescueclaw"
+    },
+    {
+      "name": "screenshot",
+      "slug": "screenshot",
+      "description": "使用系统原生工具截取屏幕截图或窗口截图",
+      "version": "1.0.0",
+      "path": "skills/screenshot"
+    },
+    {
+      "name": "security-monitor",
+      "slug": "security-monitor",
+      "description": "Real-time security monitoring for Clawdbot. Detects intrusions, unusual API calls, credential usage patterns, and alerts on breaches.",
+      "version": "1.0.0",
+      "path": "skills/security-monitor"
+    },
+    {
+      "name": "self-improvement",
+      "slug": "self-improving-agent",
+      "description": "Captures learnings, errors, and corrections to enable continuous improvement. Use when: (1) A command or operation fails unexpectedly, (2) User corrects Claude ('No, that's wrong...', 'Actually...'), (3) User requests a capability that doesn't exist, (4) An external API or tool fails, (5) Claude realizes its knowledge is outdated or incorrect, (6) A better approach is discovered for a recurring task. Also review learnings before major tasks.",
+      "version": "1.0.11",
+      "path": "skills/self-improving-agent"
+    },
+    {
+      "name": "server-health",
+      "slug": "server-health",
+      "description": "Comprehensive server health monitoring showing system stats, top processes, OpenClaw gateway status, and running services. Perfect for quick health checks via Telegram or CLI.",
+      "version": "1.0.0",
+      "path": "skills/server-health"
+    },
+    {
+      "name": "six-thinking-hats",
+      "slug": "six-thinking-hats",
+      "description": "六顶思考帽 - 爱德华·德博诺的平行思考方法。系统化地从六个维度分析问题：客观事实、情感直觉、风险谨慎、乐观价值、创意创新、控制流程。用于全面决策分析、团队讨论、问题解决。适用场景：重大决策、方案评估、创新发想、团队共识。",
+      "version": "",
+      "path": "skills/six-thinking-hats"
+    },
+    {
+      "name": "skill-creator",
+      "slug": "skill-creator",
+      "description": "Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.",
+      "version": "",
+      "path": "skills/skill-creator"
+    },
+    {
+      "name": "skill-evolution-manager",
+      "slug": "skill-evolution-manager",
+      "description": "基于对话反馈持续改进 Skills 的核心工具。在对话结束时总结优化并迭代现有 Skills，将用户反馈和经验转化为结构化数据并持久化。",
+      "version": "1.0.0",
+      "path": "skills/skill-evolution-manager"
+    },
+    {
+      "name": "skill-from-github",
+      "slug": "skill-from-github",
+      "description": "通过学习高质量 GitHub 项目来创建 Skills。当用户想完成某任务时，搜索高质量项目，深入理解，然后基于这些知识创建 Skill。",
+      "version": "",
+      "path": "skills/skill-from-github"
+    },
+    {
+      "name": "skill-from-masters",
+      "slug": "skill-from-masters",
+      "description": "基于专家方法论创建高质量 Skills。使用前先发现并整合领域专家的框架和最佳实践。触发场景：\"帮我创建一个 X 的 skill\" 或 \"我想做一个能 Y 的 skill\"。这个 Skill 先进行方法论研究，然后指导创建最终 Skill。",
+      "version": "",
+      "path": "skills/skill-from-masters"
+    },
+    {
+      "name": "skill-from-notebook",
+      "slug": "skill-from-notebook",
+      "description": "从文档、示例中提取方法论，创建可执行的 Skills。核心哲学：NotebookLM 帮你理解，这个 Skill 帮你**执行**。",
+      "version": "",
+      "path": "skills/skill-from-notebook"
+    },
+    {
+      "name": "skill-manager",
+      "slug": "skill-manager",
+      "description": "GitHub Skills 生命周期管理器。用于扫描 Skills 目录、检查 GitHub 更新、批量升级 Skill 包装器。当用户想\"检查更新\"、\"列出 Skills\"或\"删除 Skill\"时触发。",
+      "version": "1.0.0",
+      "path": "skills/skill-manager"
+    },
+    {
+      "name": "skill-orchestrator",
+      "slug": "skill-orchestrator",
+      "description": "|",
+      "version": "",
+      "path": "skills/skill-orchestrator"
+    },
+    {
+      "name": "skill-vetter",
+      "slug": "skill-vetter",
+      "description": "Security-first skill vetting for AI agents. Use before installing any skill from ClawdHub, GitHub, or other sources. Checks for red flags, permission scope, and suspicious patterns.",
+      "version": "1.0.0",
+      "path": "skills/skill-vetter"
+    },
+    {
+      "name": "slides",
+      "slug": "slides",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/slides"
+    },
+    {
+      "name": "smart-browser",
+      "slug": "smart-browser",
+      "description": "AI增强的智能浏览器自动化 - 基于agent-browser，添加页面结构分析和智能数据提取",
+      "version": "1.0.0",
+      "path": "skills/smart-browser"
+    },
+    {
+      "name": "spark",
+      "slug": "spark",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/spark"
+    },
+    {
+      "name": "browser",
+      "slug": "stagehand-browser-cli",
+      "description": "Automate web browser interactions using natural language via CLI commands. Use when the user asks to browse websites, navigate web pages, extract data from websites, take screenshots, fill forms, click buttons, or interact with web applications.",
+      "version": "1.0.0",
+      "path": "skills/stagehand-browser-cli"
+    },
+    {
+      "name": "story-architect",
+      "slug": "story-architect",
+      "description": "融合世界观设定、情节大纲、人物设计的创作系统，支持多种题材（科幻/奇幻/都市/历史）和素材库联动",
+      "version": "1.0.0",
+      "path": "skills/story-architect"
+    },
+    {
+      "name": "superstruct",
+      "slug": "superstruct",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/superstruct"
+    },
+    {
+      "name": "svg-card-generator",
+      "slug": "svg-card-generator",
+      "description": "SVG卡片生成器 - 将文本内容转换为优雅简洁的SVG卡片可视化。支持多种卡片模板和自定义配置。用于内容展示、社交媒体分享、概念可视化。适用场景：文案美化、概念卡片、读书笔记、金句分享。",
+      "version": "",
+      "path": "skills/svg-card-generator"
+    },
+    {
+      "name": "sw-data-scientist",
+      "slug": "sw-data-scientist",
+      "description": "",
+      "version": "1.0.0",
+      "path": "skills/sw-data-scientist"
+    },
+    {
+      "name": "mobile-debugging",
+      "slug": "sw-mobile-debugging",
+      "description": "React Native debugging with Flipper, React DevTools, and crash analysis. Use for mobile app debugging or network request issues.",
+      "version": "1.0.0",
+      "path": "skills/sw-mobile-debugging"
+    },
+    {
+      "name": "system-health-reporter",
+      "slug": "system-health-reporter",
+      "description": "Generate system health reports with CPU, memory, disk, network diagnostics and recommendations.",
+      "version": "1.1.0",
+      "path": "skills/system-health-reporter"
+    },
+    {
+      "name": "system_monitor",
+      "slug": "system-monitor",
+      "description": "Check the current CPU, RAM, and GPU status of the local server.",
+      "version": "1.0.0",
+      "path": "skills/system-monitor"
+    },
+    {
+      "name": "talent-mind",
+      "slug": "talent-mind",
+      "description": "天才思维方法论 - 三层递归操作系统。用于深度思考、问题分析、认知升级。触发场景：遇到难题、思维瓶颈、需要创新解决方案。",
+      "version": "",
+      "path": "skills/talent-mind"
+    },
+    {
+      "name": "tapestry",
+      "slug": "tapestry",
+      "description": "知识图谱构建技能，用于文档关联和知识网络管理",
+      "version": "1.0.0",
+      "path": "skills/tapestry"
+    },
+    {
+      "name": "task-workflow",
+      "slug": "task-workflow",
+      "description": "Standardized Planning + Subagent + Progress Report workflow for complex tasks",
+      "version": "1.0.0",
+      "path": "skills/task-workflow"
+    },
+    {
+      "name": "tavily",
+      "slug": "tavily-search",
+      "description": "AI-optimized web search via Tavily API. Returns concise, relevant results for AI agents.",
+      "version": "1.0.0",
+      "path": "skills/tavily-search"
+    },
+    {
+      "name": "technical-roadmaps",
+      "slug": "technical-roadmaps",
+      "description": "",
+      "version": "",
+      "path": "skills/technical-roadmaps"
+    },
+    {
+      "name": "telegraf",
+      "slug": "telegraf",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/telegraf"
+    },
+    {
+      "name": "test-driven-development",
+      "slug": "test-driven-development",
+      "description": "",
+      "version": "0.1.0",
+      "path": "skills/test-driven-development"
+    },
+    {
+      "name": "text-game-dev",
+      "slug": "text-game-dev",
+      "description": "离线版文字游戏（视觉小说/文字冒险）设计与开发全流程指导。适用于：(1) 设计游戏核心玩法机制 (2) 规划叙事结构与分支 (3) 选择游戏引擎 (4) 制作美术音效资源 (5) 实现存档系统 (6) 设计UI/UX (7) 规划多结局",
+      "version": "",
+      "path": "skills/text-game-dev"
+    },
+    {
+      "name": "the-book-of-secret-knowledge",
+      "slug": "the-book-of-secret-knowledge",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/the-book-of-secret-knowledge"
+    },
+    {
+      "name": "thingsboard",
+      "slug": "thingsboard",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/thingsboard"
+    },
+    {
+      "name": "tmux",
+      "slug": "tmux",
+      "description": "Remote-control tmux sessions for interactive CLIs by sending keystrokes and scraping pane output.",
+      "version": "1.0.0",
+      "path": "skills/tmux"
+    },
+    {
+      "name": "tokio",
+      "slug": "tokio",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/tokio"
+    },
+    {
+      "name": "tools",
+      "slug": "tools",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/tools"
+    },
+    {
+      "name": "tools-ui",
+      "slug": "tools-ui",
+      "description": "",
+      "version": "0.1.0",
+      "path": "skills/tools-ui"
+    },
+    {
+      "name": "uptime-kuma",
+      "slug": "uptime-kuma",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/uptime-kuma"
+    },
+    {
+      "name": "using-git-worktrees",
+      "slug": "using-git-worktrees",
+      "description": "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification",
+      "version": "",
+      "path": "skills/using-git-worktrees"
+    },
+    {
+      "name": "valibot",
+      "slug": "valibot",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/valibot"
+    },
+    {
+      "name": "vercel-composition-patterns",
+      "slug": "vercel-composition-patterns",
+      "description": "React composition patterns that scale. Use when refactoring components with",
+      "version": "",
+      "path": "skills/vercel-composition-patterns"
+    },
+    {
+      "name": "vercel-react-best-practices",
+      "slug": "vercel-react-best-practices",
+      "description": "",
+      "version": "",
+      "path": "skills/vercel-react-best-practices"
+    },
+    {
+      "name": "vercel-react-best-practices",
+      "slug": "vercel-react-best-practices copy",
+      "description": "React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.",
+      "version": "",
+      "path": "skills/vercel-react-best-practices copy"
+    },
+    {
+      "name": "vercel-react-native-skills",
+      "slug": "vercel-react-native",
+      "description": "React Native and Expo best practices for building performant mobile apps. Use",
+      "version": "",
+      "path": "skills/vercel-react-native"
+    },
+    {
+      "name": "web-artifacts-builder",
+      "slug": "web-artifacts-builder",
+      "description": "Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). Use for complex artifacts requiring state management, routing, or shadcn/ui components - not for simple single-file HTML/JSX artifacts.",
+      "version": "",
+      "path": "skills/web-artifacts-builder"
+    },
+    {
+      "name": "web-design-guidelines",
+      "slug": "web-design-guidelines",
+      "description": "Review UI code for Web Interface Guidelines compliance. Use when asked to \"review my UI\", \"check accessibility\", \"audit design\", \"review UX\", or \"check my site against best practices\".",
+      "version": "",
+      "path": "skills/web-design-guidelines"
+    },
+    {
+      "name": "webapp-testing",
+      "slug": "webapp-testing",
+      "description": "Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs.",
+      "version": "",
+      "path": "skills/webapp-testing"
+    },
+    {
+      "name": "whatsapp-web.js",
+      "slug": "whatsapp-web.js",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/whatsapp-web.js"
+    },
+    {
+      "name": "workflow-automation",
+      "slug": "workflow-automation",
+      "description": "Automate construction data workflows. Build ETL pipelines and DAG workflows for recurring tasks.",
+      "version": "1.0.0",
+      "path": "skills/workflow-automation"
+    },
+    {
+      "name": "writer",
+      "slug": "writer",
+      "description": "Fix AI writing patterns that create repetitive and robotic content",
+      "version": "1.0.2",
+      "path": "skills/writer"
+    },
+    {
+      "name": "x-post-automation",
+      "slug": "x-post-automation",
+      "description": "",
+      "version": "1.0.0",
+      "path": "skills/x-post-automation"
+    },
+    {
+      "name": "xlsx",
+      "slug": "xlsx",
+      "description": "Comprehensive spreadsheet creation, editing, and analysis with support for formulas, formatting, data analysis, and visualization. When Claude needs to work with spreadsheets (.xlsx, .xlsm, .csv, .tsv, etc) for: (1) Creating new spreadsheets with formulas and formatting, (2) Reading or analyzing data, (3) Modify existing spreadsheets while preserving formulas, (4) Data analysis and visualization in spreadsheets, or (5) Recalculating formulas",
+      "version": "0.1.0",
+      "path": "skills/xlsx"
+    },
+    {
+      "name": "zx",
+      "slug": "zx",
+      "description": "高分项目，建议创建 Skill",
+      "version": "1.0.0",
+      "path": "skills/zx"
+    }
+  ]
+}
