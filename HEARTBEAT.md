@@ -14,14 +14,61 @@
 4. 🧬 **进化分析** - 记录成功模式、追踪改进项
 
 **进化增强 Skills**（已纳入心跳 SOP）:
-- `autonomous-brain` - 主动监控、自主决策、持续运行
-- `reflect-learn` - 从对话中学习，持续改进
-- `basal-ganglia-memory` - 习惯形成，自动化常用操作
-- `agent-autonomy-kit` - 任务队列，主动工作
-- `para-second-brain` - 知识管理，语义搜索
-- `ai-rag-pipeline` - 检索增强生成，知识获取
+- `autonomous-brain` - 主动监控、自主决策、持续运行 ✅ 已启用
+- `reflect-learn` - 从对话中学习，持续改进 ✅ 已启用
+- `basal-ganglia-memory` - 习惯形成，自动化常用操作 ❌ 开发中，暂不启用
+- `agent-autonomy-kit` - 任务队列，主动工作 ❌ 与现有Cron重复，暂不启用
+- `para-second-brain` - 知识管理，语义搜索 ✅ 已启用
+- `ai-rag-pipeline` - 检索增强生成，知识获取 ❌ 需API Key，暂不启用
 
 **日志位置**: `data/heartbeat-report-YYYYMMDD-HHMM.json`
+
+---
+
+## 🔧 心跳检查清单（每小时）
+
+| 检查项 | 说明 |
+|--------|------|
+| API 额度 | Coding Plan 用量 |
+| 关键软件 | tmux, xcode-select, brew 等 |
+| Skills 更新 | 检查新 skills |
+| Cron 任务 | 运行状态 |
+
+---
+
+## 📚 编程学习任务
+
+**任务**：无限期持续学习编程知识
+
+**触发频率**：每天一次（建议晚间心跳）
+
+**文档位置**：
+- 学习记录：`docs/programming-learning/daily/YYYY-MM-DD.md`
+- 周汇总：`docs/programming-learning/weekly/YYYY-MM-DD-to-YYYY-MM-DD.md`
+
+**学习内容方向**：
+- 编程语言（Python, JavaScript, Rust, Go）
+- 框架（React, Next.js, FastAPI）
+- 工具（Docker, Git, AI/ML）
+- 最佳实践（设计模式、架构）
+- 新技术（AI Agents, MCP）
+
+**记录要求**：
+- 每次学习一个独立文档
+- 包含：主题、知识点、代码示例、心得
+- 每周日生成周汇总
+
+**状态**：
+- 首次学习：2026-03-04 ✅
+- 下次学习：2026-03-06
+
+### 软件安装状态追踪
+
+需要定期检查的软件：
+- [x] tmux - 已安装 ✅
+- [x] xcode-select - 已安装 ✅
+- [x] brew - 5.0.16 ✅
+- [x] Ollama - 0.17.6 ✅
 
 ---
 

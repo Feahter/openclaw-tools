@@ -1,62 +1,37 @@
 ---
 name: pdfcpu
-description: "A PDF processor written in Go."
+description: "高分项目，建议创建 Skill"
 triggers:
   - "pdfcpu"
   - "pdfcpu"
-  - "pdfcpu" if '/' in full else "pdfcpu"
+load_mode: on-demand
 source:
-  project: pdfcpu/pdfcpu
+  project: pdfcpu
   url: https://github.com/pdfcpu/pdfcpu
-  license: Apache-2.0
-  auto_generated: false
-  enhanced_via: skill-creator
-  updated_at: 2026-02-11T14:09:59
+  auto_generated: true
+  generated_at: 2026-03-03T01:00:29
+  score: 3.05
 ---
 
 # Pdfcpu
 
-A PDF processor written in Go.
+Auto-generated skill from GitHub project.
 
 ## 项目信息
 
-- **Stars**: 8,456
-- **License**: Apache-2.0
-- **语言**: Go
-- **GitHub**: [pdfcpu/pdfcpu](https://github.com/pdfcpu/pdfcpu)
+- **Stars**: 8482
+- **Score**: 3.05
+- **URL**: https://github.com/pdfcpu/pdfcpu
 
-## 核心功能
+## 加载模式
 
-- Please [create](https://github.com/pdfcpu/pdfcpu/issues/new/choose) an issue if you find a bug or want to propose a change.
-- Feature requests - always welcome!
-- Bug fixes - always welcome!
-- PRs - let's [discuss](https://github.com/pdfcpu/pdfcpu/discussions) first or [create](https://github.com/pdfcpu/pdfcpu/issues/new/choose) an issue.
-- pdfcpu is stable but still *Alpha* and occasionally undergoing heavy changes.
-- The pdfcpu [discussion board](https://github.com/pdfcpu/pdfcpu/discussions) is open! Please engage in any form helpful for the community.
+- **on-demand** - 按需加载
 
-## 安装
+## 使用方式
 
-```bash
-$ git clone https://github.com/pdfcpu/pdfcpu
-$ cd pdfcpu/cmd/pdfcpu
-$ go install
-$ pdfcpu version
-```
+（请根据项目 README 补充使用方式）
 
-## 使用示例
-
-```
-$ docker build -t pdfcpu .
-# mount current host folder into container as /app to process files in the local host folder
-$ docker run -it -v "$(pwd)":/app pdfcpu validate a.pdf
-```
-
-## 适用场景
-
-- PDF 验证时
-- PDF 加密时
-- PDF 操作
 ## 注意事项
 
-*基于 pdfcpu/pdfcpu 官方文档生成*
-*更新时间: 2026-02-11*
+*本 Skill 由 AQA 自动创建*
+*创建时间: 2026-03-03*

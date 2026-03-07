@@ -1,0 +1,22 @@
+{
+  "name": "smart-browser",
+  "version": "1.0.0",
+  "description": "AI增强的智能浏览器自动化 - 基于agent-browser，添加页面结构分析和智能数据提取",
+  "source": {
+    "type": "custom",
+    "url": null
+  },
+  "created": "2026-02-28",
+  "author": "auto-generated",
+  "capabilities": [
+    "智能爬取",
+    "AI页面分析",
+    "结构化数据提取",
+    "多Tab/分页处理"
+  ],
+  "requires": {
+    "bins": ["node", "npm", "agent-browser"],
+    "skills": []
+  },
+  "status": "ready"
+}

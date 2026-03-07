@@ -1,31 +1,31 @@
 ---
 name: tools
-description: "Unified developer tools for JavaScript, TypeScript, and the web"
+description: "高分项目，建议创建 Skill"
 triggers:
   - "tools"
   - "tools"
+load_mode: on-demand
 source:
-  project: rome/tools
+  project: tools
   url: https://github.com/rome/tools
-  license: MIT
   auto_generated: true
-  generated_at: 2026-02-11T08:59:23
+  generated_at: 2026-03-04T07:00:45
   score: 3.25
 ---
 
 # Tools
 
-基于 [rome/tools](https://github.com/rome/tools) 创建的 Skill。
+Auto-generated skill from GitHub project.
 
 ## 项目信息
 
-- **Stars**: 23514
-- **License**: MIT
-- **语言**: Rust
+- **Stars**: 23498
+- **Score**: 3.25
+- **URL**: https://github.com/rome/tools
 
-## 描述
+## 加载模式
 
-Unified developer tools for JavaScript, TypeScript, and the web
+- **on-demand** - 按需加载
 
 ## 使用方式
 
@@ -34,4 +34,4 @@ Unified developer tools for JavaScript, TypeScript, and the web
 ## 注意事项
 
 *本 Skill 由 AQA 自动创建*
-*创建时间: 2026-02-11*
+*创建时间: 2026-03-04*

@@ -1,0 +1,20 @@
+{
+  "name": "screenshot",
+  "description": "使用 macOS 原生 screencapture 进行屏幕截图",
+  "version": "1.0.0",
+  "author": "OpenClaw",
+  "category": "system",
+  "tags": ["screenshot", "screen", "capture", "macos"],
+  "capabilities": [
+    "截取整个屏幕",
+    "交互式选择窗口/区域",
+    "截取特定窗口"
+  ],
+  "scripts": [
+    "scripts/screenshot.sh"
+  ],
+  "created": "2025-02-11",
+  "updated": "2025-02-11",
+  "source_url": "https://github.com/Feahter/openclaw-tools",
+  "platform": "macos"
+}

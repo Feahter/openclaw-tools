@@ -1,58 +1,37 @@
 ---
 name: prometheus
-description: "The Prometheus monitoring system and time series database."
+description: "高分项目，建议创建 Skill"
 triggers:
   - "prometheus"
   - "prometheus"
-  - "prometheus" if '/' in full else "prometheus"
+load_mode: on-demand
 source:
-  project: prometheus/prometheus
+  project: prometheus
   url: https://github.com/prometheus/prometheus
-  license: Apache-2.0
-  auto_generated: false
-  enhanced_via: skill-creator
-  updated_at: 2026-02-11T14:09:59
+  auto_generated: true
+  generated_at: 2026-03-03T01:00:29
+  score: 3.25
 ---
 
 # Prometheus
 
-The Prometheus monitoring system and time series database.
+Auto-generated skill from GitHub project.
 
 ## 项目信息
 
-- **Stars**: 62,652
-- **License**: Apache-2.0
-- **语言**: Go
-- **GitHub**: [prometheus/prometheus](https://github.com/prometheus/prometheus)
+- **Stars**: 62953
+- **Score**: 3.25
+- **URL**: https://github.com/prometheus/prometheus
 
-## 核心功能
+## 加载模式
 
-- <h1 align="center" style="border-bottom: none">     <a href="https://prometheus.io" target="_blank"><img alt="Prometheus" src="/documentation/images/prometheus-logo.svg"></a><br>Prometheus </h1>
+- **on-demand** - 按需加载
 
-## 安装
+## 使用方式
 
-```bash
-docker run --name prometheus -d -p 127.0.0.1:9090:9090 prom/prometheus
-```
+（请根据项目 README 补充使用方式）
 
-## 使用示例
-
-```
-build:
-    tags:
-        all:
-            - netgo
-            - builtinassets
-            - remove_all_sd           # Exclude all optional SDs
-            - enable_kubernetes_sd    # Re-enable only kubernetes
-```
-
-## 适用场景
-
-- 系统监控时
-- 指标收集时
-- 告警设置
 ## 注意事项
 
-*基于 prometheus/prometheus 官方文档生成*
-*更新时间: 2026-02-11*
+*本 Skill 由 AQA 自动创建*
+*创建时间: 2026-03-03*

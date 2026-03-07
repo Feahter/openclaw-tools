@@ -1,46 +1,37 @@
 ---
 name: prettier
-description: "Prettier is an opinionated code formatter."
+description: "高分项目，建议创建 Skill"
 triggers:
   - "prettier"
   - "prettier"
-  - "prettier" if '/' in full else "prettier"
+load_mode: on-demand
 source:
-  project: prettier/prettier
+  project: prettier
   url: https://github.com/prettier/prettier
-  license: MIT
-  auto_generated: false
-  enhanced_via: skill-creator
-  updated_at: 2026-02-11T14:09:59
+  auto_generated: true
+  generated_at: 2026-03-03T01:00:29
+  score: 3.25
 ---
 
 # Prettier
 
-Prettier is an opinionated code formatter.
+Auto-generated skill from GitHub project.
 
 ## 项目信息
 
-- **Stars**: 51,539
-- **License**: MIT
-- **语言**: JavaScript
-- **GitHub**: [prettier/prettier](https://github.com/prettier/prettier)
+- **Stars**: 51689
+- **Score**: 3.25
+- **URL**: https://github.com/prettier/prettier
 
-## 核心功能
+## 加载模式
 
-- [![Prettier Banner](https://unpkg.com/prettier-logo@1.0.3/images/prettier-banner-light.svg)](https://prettier.io)
+- **on-demand** - 按需加载
 
-## 快速开始
+## 使用方式
 
-```bash
-npx prettier --write file.js
-```
+（请根据项目 README 补充使用方式）
 
-## 适用场景
-
-- 代码格式化时
-- 统一代码风格时
-- CI/CD 集成
 ## 注意事项
 
-*基于 prettier/prettier 官方文档生成*
-*更新时间: 2026-02-11*
+*本 Skill 由 AQA 自动创建*
+*创建时间: 2026-03-03*

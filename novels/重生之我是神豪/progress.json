@@ -1,0 +1,11 @@
+{
+  "current_storyboard": 1,
+  "completed": [],
+  "last_updated": "2026-02-17",
+  "total": 34,
+  "volumes": {
+    "前卷": { "start": 1, "end": 8, "status": "pending" },
+    "中卷": { "start": 9, "end": 24, "status": "pending" },
+    "后卷": { "start": 25, "end": 34, "status": "pending" }
+  }
+}

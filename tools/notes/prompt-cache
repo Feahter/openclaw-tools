@@ -1,0 +1,73 @@
+#!/usr/bin/env python3
+"""
+OpenClaw 轻量缓存 - 减少重复 API 调用
+"""
+
+import hashlib
+import json
+import os
+import time
+from pathlib import Path
+
+CACHE_DIR = Path.home() / ".openclaw" / "cache" / "responses"
+CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+def get_cache(prompt: str) -> dict:
+    """获取缓存"""
+    key = hashlib.sha256(prompt.encode()).hexdigest()[:16]
+    cache_file = CACHE_DIR / f"{key}.json"
+    
+    if not cache_file.exists():
+        return None
+    
+    with open(cache_file) as f:
+        data = json.load(f)
+    
+    # 检查过期
+    if time.time() - data["timestamp"] > data["ttl"]:
+        cache_file.unlink()
+        return None
+    
+    return data
+
+def set_cache(prompt: str, response: dict, ttl: int = 3600):
+    """设置缓存"""
+    key = hashlib.sha256(prompt.encode()).hexdigest()[:16]
+    cache_file = CACHE_DIR / f"{key}.json"
+    
+    data = {
+        "prompt": prompt[:100] + "...",
+        "response": response,
+        "timestamp": time.time(),
+        "ttl": ttl
+    }
+    
+    with open(cache_file, 'w') as f:
+        json.dump(data, f)
+
+def stats():
+    """缓存统计"""
+    files = list(CACHE_DIR.glob("*.json"))
+    total_size = sum(f.stat().st_size for f in files)
+    
+    return {
+        "entries": len(files),
+        "size_mb": round(total_size / 1024 / 1024, 2)
+    }
+
+def clear():
+    """清空缓存"""
+    for f in CACHE_DIR.glob("*.json"):
+        f.unlink()
+
+if __name__ == "__main__":
+    import sys
+    
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "stats":
+            print(json.dumps(stats(), indent=2))
+        elif sys.argv[1] == "clear":
+            clear()
+            print("缓存已清空")
+    else:
+        print("用法: prompt-cache [stats|clear]")

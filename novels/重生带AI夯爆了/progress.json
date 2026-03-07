@@ -1,0 +1,73 @@
+{
+  "novel": {
+    "title": "重生带AI夯爆了",
+    "author": "OpenClaw AI",
+    "chapter_count": 120,
+    "current_volume": 5,
+    "volume_2_planned": true,
+    "volume_3_planned": true,
+    "volume_4_planned": true,
+    "status": "已完结",
+    "completed_chapters": 120,
+    "completed": true
+  },
+  "L1_种子层": {
+    "status": "completed",
+    "文件": "核心概念卡.md",
+    "完成时间": "2026-02-15"
+  },
+  "L2_萌芽层": {
+    "status": "completed",
+    "文件": "大纲.md, 人物档案.md",
+    "完成时间": "2026-02-15"
+  },
+  "recovery_status": {
+    "恢复时间": "2026-02-14",
+    "总章节数": 120,
+    "已有章节": [
+      "ch039_危机.md",
+      "ch057_神秘礼物.md"
+    ],
+    "最终状态": "全部完成"
+  },
+  "第一卷": {
+    "总章节": 30,
+    "已完成": 30,
+    "进度": "100%",
+    "最后章节": "ch030_终极对决.md"
+  },
+  "第二卷": {
+    "总章节": 30,
+    "已完成": 30,
+    "进度": "100%",
+    "最后章节": "ch060_新的开始.md"
+  },
+  "第三卷": {
+    "总章节": 30,
+    "已完成": 30,
+    "进度": "100%",
+    "最后章节": "ch090_创世纪终章.md"
+  },
+  "第四卷": {
+    "总章节": 30,
+    "已完成": 30,
+    "进度": "100%",
+    "最后章节": "ch100_终局之战.md",
+    "completed": true
+  },
+  "第五卷": {
+    "总章节": 20,
+    "已完成": 20,
+    "进度": "100%",
+    "最后章节": "ch120_新时代宣言",
+    "completed": true
+  },
+  "current_chapter": "ch120_新时代宣言",
+  "chapter_status": "completed",
+  "completed_chapters": 120,
+  "last_updated": "2026-02-16T04:00:00+08:00",
+  "last_chapter_words": 3000,
+  "total_words": "约36万字",
+  "novel_completed": true,
+  "completion_date": "2026-02-16"
+}

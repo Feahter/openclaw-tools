@@ -1,0 +1,95 @@
+#!/bin/bash
+# OpenClaw Skill Profile Manager
+# 用法: skill-profile [list|switch|status|load]
+
+PROFILES_DIR="$HOME/.openclaw/profiles"
+SKILLS_DIR="$HOME/.openclaw/workspace/skills"
+CACHE_DIR="$HOME/.openclaw/skill-cache"
+LOG_FILE="$HOME/.openclaw/logs/profile-switch.log"
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE" 2>/dev/null
+}
+
+list_profiles() {
+    echo "📂 可用 Profile:"
+    for f in "$PROFILES_DIR"/*.json; do
+        [[ -f "$f" ]] || continue
+        name=$(basename "$f" .json)
+        desc=$(python3 -c "import json; print(json.load(open('$f')).get('description','无描述'))" 2>/dev/null || echo "无描述")
+        echo "  • $name: $desc"
+    done
+}
+
+get_skills() {
+    local profile=$1
+    local file="$PROFILES_DIR/${profile}.json"
+    if [[ -f "$file" ]]; then
+        grep -oP '"skills":\s*\[\K[^\]]+' "$file" | tr -d '"' | tr ',' '\n' | grep -v '^$'
+    fi
+}
+
+switch_profile() {
+    local profile=$1
+    local file="$PROFILES_DIR/${profile}.json"
+    
+    if [[ ! -f "$file" ]]; then
+        echo "❌ Profile '$profile' 不存在"
+        list_profiles
+        return 1
+    fi
+    
+    log "切换到: $profile"
+    
+    # 读取 skills
+    skills=$(get_skills "$profile")
+    
+    echo "📦 Profile: $profile"
+    echo "   Skills: $skills"
+    echo ""
+    echo "💡 当前 OpenClaw 已加载所有 skills/"
+    echo "   如需按需加载，可手动移动 skills 到 skill-cache/"
+}
+
+show_status() {
+    echo "📊 当前状态:"
+    echo "  Skills目录: $SKILLS_DIR"
+    count=$(ls -d "$SKILLS_DIR"/*/ 2>/dev/null | wc -l)
+    echo "  已安装 Skills: $count 个"
+    echo ""
+    echo "📂 Profiles:"
+    list_profiles
+}
+
+load_profile() {
+    local profile=$1
+    local file="$PROFILES_DIR/${profile}.json"
+    
+    if [[ ! -f "$file" ]]; then
+        echo "❌ Profile '$profile' 不存在"
+        return 1
+    fi
+    
+    skills=$(get_skills "$profile")
+    echo "📦 加载 $profile 的 skills: $skills"
+    
+    for skill in $skills; do
+        if [[ -d "$CACHE_DIR/$skill" ]]; then
+            ln -sfn "$CACHE_DIR/$skill" "$SKILLS_DIR/$skill" 2>/dev/null && echo "  ✅ $skill" || echo "  ❌ $skill"
+        else
+            echo "  ⚠️ $skill (未在缓存中)"
+        fi
+    done
+}
+
+case "$1" in
+    list|ls) list_profiles ;;
+    switch|sw) shift; switch_profile "$1" ;;
+    status|stat) show_status ;;
+    load) shift; load_profile "$1" ;;
+    *) 
+        echo "用法: skill-profile [list|switch|status|load]"
+        echo ""
+        list_profiles
+        ;;
+esac

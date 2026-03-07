@@ -1,0 +1,73 @@
+#!/bin/bash
+# Coding Plan 用量查询
+
+API_KEY_FILE="$HOME/.openclaw/credentials/minimax-coding.json"
+
+# 读取 API Key
+if [ -f "$API_KEY_FILE" ]; then
+    API_KEY=$(cat "$API_KEY_FILE" | python3 -c "import json,sys; print(json.load(sys.stdin).get('api_key',''))" 2>/dev/null)
+fi
+
+# 如果没有配置文件，从 openclaw.json 读取
+if [ -z "$API_KEY" ]; then
+    API_KEY=$(cat "$HOME/.openclaw/openclaw.json" | python3 -c "
+import json,sys
+d = json.load(sys.stdin)
+for k,v in d.get('models',{}).items():
+    if 'minimax' in k.lower() or 'coding' in str(v).lower():
+        if 'apiKey' in v:
+            print(v['apiKey'])
+            break
+" 2>/dev/null)
+fi
+
+if [ -z "$API_KEY" ]; then
+    echo "❌ 未找到 API Key"
+    exit 1
+fi
+
+# 查询
+echo "📊 Coding Plan 用量查询..."
+echo ""
+
+RESPONSE=$(curl -s "https://www.minimaxi.com/v1/api/openplatform/coding_plan/remains" \
+    -H "Authorization: Bearer $API_KEY" \
+    -H "Content-Type: application/json")
+
+# 解析
+echo "$RESPONSE" | python3 -c "
+import json,sys,datetime
+
+try:
+    data = json.load(sys.stdin)
+    if 'model_remains' in data:
+        m = data['model_remains'][0]
+        total = m.get('current_interval_total_count', 0)
+        used = m.get('current_interval_usage_count', 0)
+        remaining = total - used
+        pct = used / total * 100 if total > 0 else 0
+        
+        print(f'已用: {used} / {total} prompts')
+        print(f'剩余: {remaining} prompts')
+        print(f'使用率: {pct:.1f}%')
+        
+        # 窗口时间
+        remains_time = m.get('remains_time', 0) // 1000
+        if remains_time > 3600:
+            print(f'重置: 约 {remains_time//3600} 小时 {remains_time%3600//60} 分钟后')
+        elif remains_time > 60:
+            print(f'重置: 约 {remains_time//60} 分钟后')
+        
+        # 套餐推断
+        if total == 40:套餐='Starter'
+        elif total == 100:套餐='Plus'
+        elif total == 300:套餐='Max'
+        elif total == 2000:套餐='Ultra'
+        else:套餐=f'自定义({total})'
+        print(f'套餐: {套餐}')
+    else:
+        print('❌ 查询失败')
+        print(data)
+except Exception as e:
+    print(f'解析错误: {e}')
+"

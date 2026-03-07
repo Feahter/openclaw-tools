@@ -1,0 +1,66 @@
+#!/bin/bash
+# Skill Auto-Cleanup - 按需加载辅助脚本
+# 每小时清理不常用的 skills
+
+SKILLS_DIR="$HOME/.openclaw/workspace/skills"
+CACHE_DIR="$HOME/.openclaw/skill-cache"
+LOG_FILE="$HOME/.openclaw/logs/skill-cleanup.log"
+LAST_USE_FILE="$HOME/.openclaw/skill-cache/last-use.json"
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE" 2>/dev/null
+}
+
+# 创建缓存目录
+mkdir -p "$CACHE_DIR"
+
+# 统计每个 skill 的使用情况
+log "📊 Skills 使用统计:"
+
+# 简单实现：随机保留 20 个常用 skills，其余移到缓存
+total=$(ls -d "$SKILLS_DIR"/*/ 2>/dev/null | wc -l | tr -d ' ')
+keep=20
+
+if [[ $total -gt $keep ]]; then
+    log "   当前: $total 个, 保留: $keep 个"
+    
+    # 保留列表（手动维护的常用 skills）
+    core_skills=(
+        "skill-vetter" "memory-on-demand" "fast-edit"
+        "algorithm-toolkit" "mcp-builder" "writer"
+        "canvas-design" "pdf" "docx" "pptx" "xlsx"
+        "tavily-search" "qmd" "proactive-agent"
+        "computer-use" "agent-browser-0"
+    )
+    
+    # 移动不常用的到缓存
+    moved=0
+    for dir in "$SKILLS_DIR"/*/; do
+        skill=$(basename "$dir")
+        
+        # 检查是否在保留列表
+        skip=false
+        for core in "${core_skills[@]}"; do
+            if [[ "$skill" == "$core" ]]; then
+                skip=true
+                break
+            fi
+        done
+        
+        if [[ "$skip" == "false" ]]; then
+            # 移动到缓存
+            if [[ ! -d "$CACHE_DIR/$skill" ]]; then
+                mv "$dir" "$CACHE_DIR/$skill" 2>/dev/null && ((moved++))
+            fi
+        fi
+    done
+    
+    log "   已移动: $moved 个到缓存"
+else
+    log "   当前: $total 个 (无需清理)"
+fi
+
+# 显示当前状态
+active=$(ls -d "$SKILLS_DIR"/*/ 2>/dev/null | wc -l | tr -d ' ')
+cached=$(ls -d "$CACHE_DIR"/*/ 2>/dev/null | wc -l | tr -d ' ')
+log "📦 活跃: $active 个 | 缓存: $cached 个"

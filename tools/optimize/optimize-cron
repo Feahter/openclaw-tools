@@ -1,0 +1,41 @@
+#!/bin/bash
+# OpenClaw 优化 Cron - 每小时运行
+# 位置: ~/.openclaw/workspace/tools/optimize cron
+
+CACHE_DIR="$HOME/.openclaw/cache/responses"
+LOG_FILE="$HOME/.openclaw/logs/optimize.log"
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
+}
+
+# 1. 清理过期缓存
+log "🧹 清理过期缓存..."
+
+if [[ -d "$CACHE_DIR" ]]; then
+    # 删除 24 小时前的缓存文件（系统信息类）
+    find "$CACHE_DIR" -name "*.json" -mtime +1 -delete 2>/dev/null
+    
+    # 删除 7 天前的所有缓存
+    find "$CACHE_DIR" -name "*.json" -mtime +7 -delete 2>/dev/null
+    
+    count=$(find "$CACHE_DIR" -name "*.json" 2>/dev/null | wc -l | tr -d ' ')
+    log "   保留: $count 条缓存"
+else
+    log "   缓存目录不存在"
+fi
+
+# 2. 统计
+log "📊 缓存统计:"
+~/.openclaw/workspace/tools/prompt-cache stats 2>/dev/null | tee -a "$LOG_FILE"
+
+# 3. Skills 清理
+log "🧹 Skills 定期清理..."
+~/.openclaw/workspace/tools/skill-cleanup 2>/dev/null | tee -a "$LOG_FILE"
+
+# 4. 压缩统计
+log "📦 活跃 Skills:"
+active=$(ls -d ~/.openclaw/workspace/skills/*/ 2>/dev/null | wc -l | tr -d ' ')
+log "   $active 个"
+
+log "✅ 优化完成"

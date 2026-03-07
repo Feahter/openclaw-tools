@@ -1,0 +1,40 @@
+#!/bin/bash
+# Context Tools Wrapper - 简化的命令行接口
+
+TOOL="/Users/fuzhuo/.openclaw/workspace/tools/context-tools.py"
+
+case "$1" in
+    search|s)
+        shift
+        python3 "$TOOL" search "$@"
+        ;;
+    execute|exec|x)
+        shift
+        python3 "$TOOL" execute "$1" "${2:-python}"
+        ;;
+    filter|f)
+        shift
+        python3 "$TOOL" filter "$1" "${2:-}"
+        ;;
+    index|i)
+        python3 "$TOOL" index
+        ;;
+    help|--help|-h)
+        echo "Usage: ctx <command> [args]"
+        echo ""
+        echo "Commands:"
+        echo "  search <query>    搜索工作区 (s <query>)"
+        echo "  exec <code> [lang] 执行代码 (x <code> [lang])"
+        echo "  filter <content> [intent] 过滤大输出 (f <content> [intent])"
+        echo "  index            重建搜索索引 (i)"
+        echo ""
+        echo "Examples:"
+        echo "  ctx search 小说创作"
+        echo "  ctx exec 'print(2+2)' python"
+        echo "  ctx filter '\$(cat large.log)' error"
+        ;;
+    *)
+        echo "Unknown command: $1"
+        echo "Run 'ctx help' for usage"
+        ;;
+esac

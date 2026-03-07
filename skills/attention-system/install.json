@@ -1,0 +1,17 @@
+{
+  "name": "attention-system",
+  "description": "注意力分析捕获正向循环系统 - 基于元认知与第一性原理设计的6个核心技能模块",
+  "version": "1.0",
+  "author": "Kimi",
+  "modules": [
+    "trend_radar - 趋势感知雷达 (四维度信号扫描 + 认知缝隙)",
+    "hook_encoder - 认知钩子编码器 (五元素拆解 + 情绪匹配)",
+    "mve - 最小可验证单元 (假设测试 + 失败熔断)",
+    "double_loop - 双环学习系统 (单环优化 + 双环质疑)",
+    "trust_flywheel - 信任飞轮 (注意力→信任→变现闭环)",
+    "cognitive_offload - 认知卸载工具箱 (外部化工作记忆)"
+  ],
+  "source": "https://www.kimi.com/share/19ca7cdc-8bd2-82a7-8000-0000bfefe14a",
+  "installed_at": "2026-03-01",
+  "note": "完整版来自 assets/attention_system_skills.md"
+}

@@ -1,0 +1,31 @@
+{
+  "name": "musk-business-framework",
+  "description": "基于马斯克第一性原理的商业决策框架",
+  "version": "1.0.0",
+  "author": "OpenClaw",
+  "category": "strategy",
+  "tags": ["business", "decision-making", "first-principles", "musk", "analysis"],
+  "capabilities": [
+    "第一性原理分析",
+    "假设识别与验证",
+    "10% 法则应用",
+    "目标倒推验证",
+    "成本本质分析",
+    "商业决策框架"
+  ],
+  "scripts": [
+    "framework.py"
+  ],
+  "type": "framework",
+  "created": "2026-02-11",
+  "updated": "2026-02-11",
+  "requires": {
+    "python": ">=3.9"
+  },
+  "related_skills": [
+    "brainstorming",
+    "blade-of-logic",
+    "six-thinking-hats",
+    "skill-creator"
+  ]
+}

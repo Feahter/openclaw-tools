@@ -1,0 +1,166 @@
+{
+  "metadata": {
+    "collection_name": "2026年流行搞笑梗段子素材库",
+    "created_at": "2026-02-12T22:22:00+08:00",
+    "updated_at": "2026-02-12T22:22:00+08:00",
+    "total_memes": 15,
+    "curator": "material-collector skill"
+  },
+  "tags": {
+    "meme_types": ["吐槽类", "情感类", "自嘲类", "恋爱类", "巧合类", "顿悟类", "期待类", "套路类", "反转类", "无奈类"],
+    "emotions": ["无奈", "幽默", "崩溃", "触动", "自嘲", "扎心", "心动", "惊喜", "清醒", "期待", "认同", "忍不住"],
+    "platforms": ["微博", "抖音", "小红书", "B站", "快手", "全平台"]
+  },
+  "materials": [
+    {
+      "id": "meme_001",
+      "name": "我真的会谢",
+      "type": "吐槽类",
+      "emotions": ["无奈", "崩溃", "幽默", "自嘲"],
+      "platforms": ["微博", "抖音", "小红书", "B站"],
+      "hotness": 5,
+      "file": "2026_humor_memes_collection.md",
+      "tags": ["高频", "全平台", "2025-2026"]
+    },
+    {
+      "id": "meme_002",
+      "name": "破防了",
+      "type": "情感类",
+      "emotions": ["触动", "震惊", "扎心", "搞笑"],
+      "platforms": ["微博", "抖音", "小红书"],
+      "hotness": 5,
+      "file": "2026_humor_memes_collection.md",
+      "tags": ["持续流行", "情感共鸣"]
+    },
+    {
+      "id": "meme_003",
+      "name": "精神状态良好",
+      "type": "自嘲类",
+      "emotions": ["自嘲", "幽默", "无奈", "清醒"],
+      "platforms": ["小红书", "B站", "微博"],
+      "hotness": 4,
+      "file": "2026_humor_memes_collection.md",
+      "tags": ["反讽", "自嘲", "2025-2026"]
+    },
+    {
+      "id": "meme_004",
+      "name": "栓Q了我真的",
+      "type": "吐槽类",
+      "emotions": ["无奈", "无语", "幽默"],
+      "platforms": ["抖音", "快手", "B站"],
+      "hotness": 4,
+      "file": "2026_humor_memes_collection.md",
+      "tags": ["谐音", "外语梗"]
+    },
+    {
+      "id": "meme_005",
+      "name": "完蛋 我好像恋爱了",
+      "type": "恋爱类",
+      "emotions": ["心动", "甜蜜", "慌张", "搞笑"],
+      "platforms": ["全平台"],
+      "hotness": 5,
+      "file": "2026_humor_memes_collection.md",
+      "tags": ["恋爱", "心动", "高频"]
+    },
+    {
+      "id": "meme_006",
+      "name": "我不配",
+      "type": "自嘲类",
+      "emotions": ["自嘲", "无奈", "幽默", "躺平"],
+      "platforms": ["微博", "小红书", "抖音"],
+      "hotness": 4,
+      "file": "2026_humor_memes_collection.md",
+      "tags": ["躺平", "自嘲", "低姿态"]
+    },
+    {
+      "id": "meme_007",
+      "name": "这不巧了吗这不是",
+      "type": "巧合类",
+      "emotions": ["惊喜", "巧合", "调侃", "幽默"],
+      "platforms": ["B站", "抖音", "微博"],
+      "hotness": 4,
+      "file": "2026_humor_memes_collection.md",
+      "tags": ["方言", "相声梗"]
+    },
+    {
+      "id": "meme_008",
+      "name": "你是懂xx的",
+      "type": "吐槽类",
+      "emotions": ["吐槽", "无奈", "幽默", "扎心"],
+      "platforms": ["全平台"],
+      "hotness": 5,
+      "file": "2026_humor_memes_collection.md",
+      "tags": ["高频", "通用模板", "持续流行"]
+    },
+    {
+      "id": "meme_009",
+      "name": "所以爱会消失对吗",
+      "type": "恋爱类",
+      "emotions": ["扎心", "失落", "幽默", "清醒"],
+      "platforms": ["微博", "抖音", "小红书"],
+      "hotness": 4,
+      "file": "2026_humor_memes_collection.md",
+      "tags": ["恋爱", "金句", "持续流行"]
+    },
+    {
+      "id": "meme_010",
+      "name": "我悟了",
+      "type": "顿悟类",
+      "emotions": ["清醒", "恍然大悟", "幽默", "自嘲"],
+      "platforms": ["小红书", "B站", "微博"],
+      "hotness": 4,
+      "file": "2026_humor_memes_collection.md",
+      "tags": ["顿悟", "玄学", "自嘲"]
+    },
+    {
+      "id": "meme_011",
+      "name": "浅浅期待一下",
+      "type": "期待类",
+      "emotions": ["期待", "乐观", "躺平", "幽默"],
+      "platforms": ["微博", "小红书", "抖音"],
+      "hotness": 4,
+      "file": "2026_humor_memes_collection.md",
+      "tags": ["期待", "保守", "2025-2026"]
+    },
+    {
+      "id": "meme_012",
+      "name": "这波啊这波是",
+      "type": "套路类",
+      "emotions": ["分析", "幽默", "无奈", "套路"],
+      "platforms": ["B站", "抖音", "微博"],
+      "hotness": 5,
+      "file": "2026_humor_memes_collection.md",
+      "tags": ["电竞梗", "模板", "持续流行"]
+    },
+    {
+      "id": "meme_013",
+      "name": "笑死 根本笑不死",
+      "type": "反转类",
+      "emotions": ["想笑", "无奈", "幽默", "自嘲"],
+      "platforms": ["全平台"],
+      "hotness": 4,
+      "file": "2026_humor_memes_collection.md",
+      "tags": ["反转", "自嘲", "2024-2026"]
+    },
+    {
+      "id": "meme_014",
+      "name": "很难不支持啊",
+      "type": "无奈类",
+      "emotions": ["认同", "无奈", "幽默", "躺平"],
+      "platforms": ["微博", "抖音", "B站"],
+      "hotness": 4,
+      "file": "2026_humor_memes_collection.md",
+      "tags": ["认同", "无奈", "被迫"]
+    },
+    {
+      "id": "meme_015",
+      "name": "蚌埠住了",
+      "type": "情感类",
+      "emotions": ["忍不住", "破防", "搞笑", "自嘲"],
+      "platforms": ["全平台"],
+      "hotness": 5,
+      "file": "2026_humor_memes_collection.md",
+      "tags": ["谐音", "方言", "持续流行", "高频"]
+    }
+  ]
+}

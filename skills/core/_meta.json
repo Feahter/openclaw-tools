@@ -7,13 +7,14 @@
   "tags": [
     "auto-generated"
   ],
+  "load_mode": "on-demand",
   "capabilities": [
     "\u5f85\u8865\u5145"
   ],
   "scripts": [],
-  "created": "2026-02-26",
-  "updated": "2026-02-26",
+  "created": "2026-03-03",
+  "updated": "2026-03-03",
   "source_url": "https://github.com/home-assistant/core",
-  "stars": 84764,
+  "stars": 85064,
   "score": 3.25
 }

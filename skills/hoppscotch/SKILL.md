@@ -1,46 +1,37 @@
 ---
 name: hoppscotch
-description: "Open-Source API Development Ecosystem • https://hoppscotch.io • Offline, On-Prem & Cloud • Web, Desktop & CLI • Open-Source Alternative to Postman, Insomnia"
+description: "高分项目，建议创建 Skill"
 triggers:
   - "hoppscotch"
   - "hoppscotch"
-  - "hoppscotch" if '/' in full else "hoppscotch"
+load_mode: on-demand
 source:
-  project: hoppscotch/hoppscotch
+  project: hoppscotch
   url: https://github.com/hoppscotch/hoppscotch
-  license: MIT
-  auto_generated: false
-  enhanced_via: skill-creator
-  updated_at: 2026-02-11T14:09:59
+  auto_generated: true
+  generated_at: 2026-03-03T01:00:29
+  score: 3.25
 ---
 
 # Hoppscotch
 
-Open-Source API Development Ecosystem • https://hoppscotch.io • Offline, On-Prem & Cloud • Web, Desktop & CLI • Open-Source Alternative to Postman, Insomnia
+Auto-generated skill from GitHub project.
 
 ## 项目信息
 
-- **Stars**: 77,839
-- **License**: MIT
-- **语言**: TypeScript
-- **GitHub**: [hoppscotch/hoppscotch](https://github.com/hoppscotch/hoppscotch)
+- **Stars**: 77932
+- **Score**: 3.25
+- **URL**: https://github.com/hoppscotch/hoppscotch
 
-## 核心功能
+## 加载模式
 
-- <div align="center">   <a href="https://hoppscotch.io">     <img       src="https://avatars.githubusercontent.com/u/56705483"       alt="Hoppscotch"       height="64"     />   </a>   <h3>     <b>     
+- **on-demand** - 按需加载
 
-## 快速开始
+## 使用方式
 
-```bash
-访问 https://hoppscotch.io 开始使用
-```
+（请根据项目 README 补充使用方式）
 
-## 适用场景
-
-- API 开发和测试时
-- 调试接口时
-- 团队协作测试
 ## 注意事项
 
-*基于 hoppscotch/hoppscotch 官方文档生成*
-*更新时间: 2026-02-11*
+*本 Skill 由 AQA 自动创建*
+*创建时间: 2026-03-03*

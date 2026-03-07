@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+"""
+OpenClaw 轻量预处理 - Token 压缩
+减少无效 Token，提升响应速度
+"""
+
+import re
+import sys
+import json
+
+class Preprocessor:
+    def __init__(self):
+        self.patterns = {
+            "whitespace": re.compile(r'\n\s*\n\s*\n+'),
+            "comments": re.compile(r'//\s*TODO.*$|#\s*FIXME.*$|^#.*#$', re.MULTILINE),
+            "trailing": re.compile(r'\s+$'),
+        }
+    
+    def process_code(self, code: str) -> dict:
+        """代码预处理"""
+        original = len(code)
+        
+        # 1. 移除多余空行
+        code = self.patterns["whitespace"].sub('\n\n', code)
+        
+        # 2. 移除注释（可选）
+        # code = self.patterns["comments"].sub('', code)
+        
+        # 3. 移除行尾空格
+        code = self.patterns["trailing"].sub('', code)
+        
+        compressed = len(code)
+        
+        return {
+            "original": original,
+            "compressed": compressed,
+            "saved": original - compressed,
+            "ratio": round((1 - compressed/original) * 100, 1) if original > 0 else 0,
+            "code": code
+        }
+    
+    def process_query(self, query: str) -> str:
+        """查询预处理 - 移除无效礼貌用语"""
+        # 移除无效前缀
+        prefixes = ['请', '麻烦', '能不能', '可以不可以', '帮我']
+        for p in prefixes:
+            if query.startswith(p):
+                query = query[len(p):].lstrip('，,：:')
+        
+        return query.strip()
+
+def main():
+    pp = Preprocessor()
+    
+    if len(sys.argv) > 1 and sys.argv[1] == '--code':
+        # 从 stdin 读取代码
+        code = sys.stdin.read()
+        result = pp.process_code(code)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+    else:
+        # 从 stdin 读取查询
+        query = sys.stdin.read()
+        result = pp.process_query(query)
+        print(result)
+
+if __name__ == "__main__":
+    main()

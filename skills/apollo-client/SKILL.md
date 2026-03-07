@@ -1,31 +1,31 @@
 ---
 name: apollo-client
-description: "The industry-leading GraphQL client for TypeScript, JavaScript, React, Vue, Angular, and more. Apollo Client delivers powerful caching, intuitive APIs, and comprehensive developer tools to accelerate "
+description: "高分项目，建议创建 Skill"
 triggers:
   - "apollo-client"
-  - "apollo-client"
+  - "apollo client"
+load_mode: on-demand
 source:
-  project: apollographql/apollo-client
+  project: apollo-client
   url: https://github.com/apollographql/apollo-client
-  license: MIT
   auto_generated: true
-  generated_at: 2026-02-11T08:59:23
+  generated_at: 2026-03-03T01:00:29
   score: 3.25
 ---
 
 # Apollo Client
 
-基于 [apollographql/apollo-client](https://github.com/apollographql/apollo-client) 创建的 Skill。
+Auto-generated skill from GitHub project.
 
 ## 项目信息
 
-- **Stars**: 19726
-- **License**: MIT
-- **语言**: TypeScript
+- **Stars**: 19725
+- **Score**: 3.25
+- **URL**: https://github.com/apollographql/apollo-client
 
-## 描述
+## 加载模式
 
-The industry-leading GraphQL client for TypeScript, JavaScript, React, Vue, Angular, and more. Apollo Client delivers powerful caching, intuitive APIs, and comprehensive developer tools to accelerate 
+- **on-demand** - 按需加载
 
 ## 使用方式
 
@@ -34,4 +34,4 @@ The industry-leading GraphQL client for TypeScript, JavaScript, React, Vue, Angu
 ## 注意事项
 
 *本 Skill 由 AQA 自动创建*
-*创建时间: 2026-02-11*
+*创建时间: 2026-03-03*
