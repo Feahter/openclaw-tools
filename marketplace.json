@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-07T08:18:04Z",
-  "count": 209,
+  "generatedAt": "2026-03-13T13:05:44Z",
+  "count": 207,
   "skills": [
     {
       "name": "ImageToolbox",
@@ -48,7 +48,7 @@
     {
       "name": "agent-autonomy-kit",
       "slug": "agent-autonomy-kit",
-      "description": "",
+      "description": "Stop waiting for prompts. Keep working.",
       "version": "1.0.0",
       "path": "skills/agent-autonomy-kit"
     },
@@ -58,6 +58,13 @@
       "description": "A fast Rust-based headless browser automation CLI with Node.js fallback that enables AI agents to navigate, click, type, and snapshot pages via structured commands.",
       "version": "0.2.0",
       "path": "skills/agent-browser"
+    },
+    {
+      "name": "agent-browser",
+      "slug": "agent-browser-clawdbot",
+      "description": "Headless browser automation CLI optimized for AI agents with accessibility tree snapshots and ref-based element selection",
+      "version": "0.1.0",
+      "path": "skills/agent-browser-clawdbot"
     },
     {
       "name": "agent-commander",
@@ -72,6 +79,13 @@
       "description": "Lightweight agent registry and router. Consult BEFORE performing specialized work such as code review, security audit, debugging, refactoring, performance optimization, infrastructure, data analysis, API design, testing, documentation, or any domain-specific engineering task. Maps tasks to installed subagents so work is delegated instead of done inline.",
       "version": "1.0.0",
       "path": "skills/agent-dispatch"
+    },
+    {
+      "name": "ai-rag-pipeline",
+      "slug": "ai-rag-pipeline",
+      "description": "Build RAG (Retrieval Augmented Generation) pipelines with web search and LLMs. Tools: Tavily Search, Exa Search, Exa Answer, Claude, GPT-4, Gemini via OpenRouter. Capabilities: research, fact-checking, grounded responses, knowledge retrieval. Use for: AI agents, research assistants, fact-checkers, knowledge bases. Triggers: rag, retrieval augmented generation, grounded ai, search and answer, research agent, fact checking, knowledge retrieval, ai research, search + llm, web grounded, perplexity alternative, ai with sources, citation, research pipeline",
+      "version": "0.1.5",
+      "path": "skills/ai-rag-pipeline"
     },
     {
       "name": "airflow",
@@ -172,13 +186,6 @@
       "path": "skills/automation-workflows"
     },
     {
-      "name": "autonomous-brain",
-      "slug": "autonomous-brain",
-      "description": "Advanced autonomous AI brain with proactive monitoring, intelligent decision-making, context awareness, and seamless task execution. Enables OpenClaw to think independently, anticipate needs, and act without constant user direction.",
-      "version": "1.0.0",
-      "path": "skills/autonomous-brain"
-    },
-    {
       "name": "basal-ganglia-memory",
       "slug": "basal-ganglia-memory",
       "description": "Habit formation and procedural learning for AI agents. Develop preferences and shortcuts through repetition. Part of the AI Brain series.",
@@ -233,6 +240,13 @@
       "description": "",
       "version": "1.0.0",
       "path": "skills/chromadb"
+    },
+    {
+      "name": "clawdhub",
+      "slug": "clawdhub",
+      "description": "Use the ClawdHub CLI to search, install, update, and publish agent skills from clawdhub.com. Use when you need to fetch new skills on the fly, sync installed skills to latest or a specific version, or publish new/updated skill folders with the npm-installed clawdhub CLI.",
+      "version": "1.0.0",
+      "path": "skills/clawdhub"
     },
     {
       "name": "clawdhub",
@@ -424,6 +438,13 @@
       "path": "skills/download-waytoagi-prompts"
     },
     {
+      "name": "fast-edit",
+      "slug": "fast-edit",
+      "description": "大文件编辑、批量修改、剪贴板/stdin粘贴、多文件写入、编辑验证/回滚。用于替代慢速的 Edit/Write 工具。（重构测试版）",
+      "version": "1.0.0",
+      "path": "skills/fast-edit"
+    },
+    {
       "name": "fastapi",
       "slug": "fastapi",
       "description": "高分项目，建议创建 Skill",
@@ -436,6 +457,13 @@
       "description": "飞书 AI 对话机器人集成 - 完整接入方案",
       "version": "",
       "path": "skills/feishu"
+    },
+    {
+      "name": "feishu-debug",
+      "slug": "feishu-debug",
+      "description": "飞书机器人故障排查与修复指南",
+      "version": "",
+      "path": "skills/feishu-debug"
     },
     {
       "name": "find-skills",
@@ -501,6 +529,13 @@
       "path": "skills/git"
     },
     {
+      "name": "github",
+      "slug": "github",
+      "description": "Interact with GitHub using the `gh` CLI. Use `gh issue`, `gh pr`, `gh run`, and `gh api` for issues, PRs, CI runs, and advanced queries.",
+      "version": "1.0.0",
+      "path": "skills/github"
+    },
+    {
       "name": "github-to-skills",
       "slug": "github-to-skills",
       "description": "GitHub 操作中心：转换仓库为 Skills + gh CLI 操作。触发场景：(1) 打包 GitHub 仓库为 Skill (2) GitHub PR/CI/API 操作 (3) 检查更新、列出/删除 Skills。",
@@ -513,34 +548,6 @@
       "description": "零服务器代码智能引擎 - 知识图谱 + MCP",
       "version": "1.0.0",
       "path": "skills/gitnexus"
-    },
-    {
-      "name": "gitnexus-debugging",
-      "slug": "gitnexus-debugging-bak",
-      "description": "Trace bugs through call chains using knowledge graph",
-      "version": "1.0.0",
-      "path": "skills/gitnexus-debugging-bak"
-    },
-    {
-      "name": "gitnexus-exploring",
-      "slug": "gitnexus-exploring-bak",
-      "description": "Navigate unfamiliar code using GitNexus knowledge graph",
-      "version": "1.0.0",
-      "path": "skills/gitnexus-exploring-bak"
-    },
-    {
-      "name": "gitnexus-impact-analysis",
-      "slug": "gitnexus-impact-analysis-bak",
-      "description": "Analyze blast radius before making code changes",
-      "version": "1.0.0",
-      "path": "skills/gitnexus-impact-analysis-bak"
-    },
-    {
-      "name": "gitnexus-refactoring",
-      "slug": "gitnexus-refactoring-bak",
-      "description": "Plan safe refactors using blast radius and dependency mapping",
-      "version": "1.0.0",
-      "path": "skills/gitnexus-refactoring-bak"
     },
     {
       "name": "hacker-arsenal",
@@ -571,32 +578,11 @@
       "path": "skills/hn-extract"
     },
     {
-      "name": "hoppscotch",
-      "slug": "hoppscotch",
-      "description": "高分项目，建议创建 Skill",
-      "version": "1.0.0",
-      "path": "skills/hoppscotch"
-    },
-    {
-      "name": "huginn",
-      "slug": "huginn",
-      "description": "高分项目，建议创建 Skill",
-      "version": "1.0.0",
-      "path": "skills/huginn"
-    },
-    {
       "name": "infinite-memory",
       "slug": "infinite-memory-v2",
       "description": "High-precision memory with 100% recall accuracy for long contexts.",
       "version": "1.0.0",
       "path": "skills/infinite-memory-v2"
-    },
-    {
-      "name": "insomnia",
-      "slug": "insomnia",
-      "description": "高分项目，建议创建 Skill",
-      "version": "1.0.0",
-      "path": "skills/insomnia"
     },
     {
       "name": "jq-json-processor",
@@ -611,13 +597,6 @@
       "description": "Review UI code for Web Interface Guidelines compliance. Use when asked to \"review my UI\", \"check accessibility\", \"audit design\", \"review UX\", or \"check my site against best practices\".",
       "version": "1.0.0",
       "path": "skills/kj-web-design-guidelines"
-    },
-    {
-      "name": "kubernetes",
-      "slug": "kubernetes",
-      "description": "高分项目，建议创建 Skill",
-      "version": "1.0.0",
-      "path": "skills/kubernetes"
     },
     {
       "name": "ladder-of-abstraction",
@@ -648,13 +627,6 @@
       "path": "skills/llm-app"
     },
     {
-      "name": "llm",
-      "slug": "llm",
-      "description": "Multi-provider LLM integration. Unified interface for OpenAI, Anthropic, Google, and local models.",
-      "version": "1.1.0",
-      "path": "skills/llm-bak"
-    },
-    {
       "name": "llm-suite",
       "slug": "llm-suite",
       "description": "LLM工具箱 - 多提供商集成 + RAG",
@@ -667,13 +639,6 @@
       "description": "高分项目，建议创建 Skill",
       "version": "1.0.0",
       "path": "skills/llmware"
-    },
-    {
-      "name": "llmware",
-      "slug": "llmware-ai-bak",
-      "description": "Unified framework for building enterprise RAG pipelines with small, specialized models",
-      "version": "1.0.0",
-      "path": "skills/llmware-ai-bak"
     },
     {
       "name": "uptime-kuma",
@@ -760,6 +725,20 @@
       "path": "skills/mirror-of-perspectives"
     },
     {
+      "name": "model-usage",
+      "slug": "model-usage",
+      "description": "Use CodexBar CLI local cost usage to summarize per-model usage for Codex or Claude, including the current (most recent) model or a full model breakdown. Trigger when asked for model-level usage/cost data from codexbar, or when you need a scriptable per-model summary from codexbar cost JSON.",
+      "version": "1.0.0",
+      "path": "skills/model-usage"
+    },
+    {
+      "name": "multi-search-engine",
+      "slug": "multi-search-engine",
+      "description": "Multi search engine integration with 17 engines (8 CN + 9 Global). Supports advanced search operators, time filters, site search, privacy engines, and WolframAlpha knowledge queries. No API keys required.",
+      "version": "2.0.1",
+      "path": "skills/multi-search-engine"
+    },
+    {
       "name": "musk-business-framework",
       "slug": "musk-business-framework",
       "description": "基于马斯克第一性原理和商业策略的决策框架。帮助用物理思维分析商业问题，识别隐藏假设，验证目标可行性。",
@@ -809,6 +788,13 @@
       "path": "skills/nyx-archive-game-design-philosophy"
     },
     {
+      "name": "obsidian",
+      "slug": "obsidian",
+      "description": "Work with Obsidian vaults (plain Markdown notes) and automate via obsidian-cli.",
+      "version": "1.0.0",
+      "path": "skills/obsidian"
+    },
+    {
       "name": "ohmyzsh",
       "slug": "ohmyzsh",
       "description": "高分项目，建议创建 Skill",
@@ -821,6 +807,13 @@
       "description": "一言小说 - 用一句话写小说，以简练文字创造深邃世界。用于创意写作、文学训练、意境表达。适用场景：微小说创作、文案金句、朋友圈文案、写作练习。",
       "version": "",
       "path": "skills/one-sentence-novel"
+    },
+    {
+      "name": "openai-whisper",
+      "slug": "openai-whisper",
+      "description": "Local speech-to-text with the Whisper CLI (no API key).",
+      "version": "1.0.0",
+      "path": "skills/openai-whisper"
     },
     {
       "name": "openapi-generator",
@@ -942,18 +935,11 @@
       "path": "skills/playwright-scraper-skill"
     },
     {
-      "name": "postgres",
-      "slug": "postgres",
-      "description": "PostgreSQL 专用技能，支持高级查询、索引优化、JSON 操作。",
+      "name": "ppt-design-guide",
+      "slug": "ppt-design-guide",
+      "description": "PPT 制作完整指南。覆盖从入门到专业的全场景需求，入门5步法 + 深度6阶段法 + 工具链 + 避坑指南。触发场景：'帮我做PPT'、'怎么做PPT'、'PPT入门'、'技术分享PPT'、'商业计划书'等。",
       "version": "",
-      "path": "skills/postgres"
-    },
-    {
-      "name": "ppt-engineering",
-      "slug": "ppt-engineering",
-      "description": "演示文稿内容策略与结构设计。融合 Nancy Duarte、Edward Tufte、Barbara Minto 等顶级专家方法论，覆盖需求分析、叙事结构、内容工程、视觉规范全流程。触发场景：'帮我做PPT'、'设计演示文稿'、'优化PPT结构'、'技术分享怎么做'、'准备一个汇报'等。注意：本 skill 专注内容策略与结构，实际生成 HTML 演示文稿时调用 frontend-slides skill。",
-      "version": "",
-      "path": "skills/ppt-engineering"
+      "path": "skills/ppt-design-guide"
     },
     {
       "name": "pptx",
@@ -989,13 +975,6 @@
       "description": "",
       "version": "",
       "path": "skills/project-planning"
-    },
-    {
-      "name": "prometheus",
-      "slug": "prometheus",
-      "description": "高分项目，建议创建 Skill",
-      "version": "1.0.0",
-      "path": "skills/prometheus"
     },
     {
       "name": "proxmox-ops",
@@ -1047,17 +1026,10 @@
       "path": "skills/rag-search"
     },
     {
-      "name": "redisson",
-      "slug": "redisson",
-      "description": "高分项目，建议创建 Skill",
-      "version": "1.0.0",
-      "path": "skills/redisson"
-    },
-    {
       "name": "reflect",
       "slug": "reflect-learn",
-      "description": "Self-improvement through conversation analysis. Extracts learnings from corrections and success patterns, permanently encoding them into agent definitions. Philosophy - Correct once, never again.",
-      "version": "2.0.0",
+      "description": "|",
+      "version": "2.1.0",
       "path": "skills/reflect-learn"
     },
     {
@@ -1126,8 +1098,8 @@
     {
       "name": "skill-creator",
       "slug": "skill-creator",
-      "description": "Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.",
-      "version": "",
+      "description": "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.",
+      "version": "0.1.0",
       "path": "skills/skill-creator"
     },
     {
@@ -1194,11 +1166,25 @@
       "path": "skills/smart-browser"
     },
     {
+      "name": "sonoscli",
+      "slug": "sonoscli",
+      "description": "Control Sonos speakers (discover/status/play/volume/group).",
+      "version": "1.0.0",
+      "path": "skills/sonoscli"
+    },
+    {
       "name": "spark",
       "slug": "spark",
       "description": "高分项目，建议创建 Skill",
       "version": "1.0.0",
       "path": "skills/spark"
+    },
+    {
+      "name": "spen-memory",
+      "slug": "spen-memory",
+      "description": "Agent 动态按需记忆系统 - 基于 SPEN 思想的轻量级记忆存储与检索。用于需要持久记忆、长程对话上下文管理的场景。支持多路检索、自动压缩、归档恢复、向量语义。",
+      "version": "1.0.0",
+      "path": "skills/spen-memory"
     },
     {
       "name": "browser",
@@ -1213,6 +1199,13 @@
       "description": "融合世界观设定、情节大纲、人物设计的创作系统，支持多种题材（科幻/奇幻/都市/历史）和素材库联动",
       "version": "1.0.0",
       "path": "skills/story-architect"
+    },
+    {
+      "name": "summarize",
+      "slug": "summarize",
+      "description": "Summarize URLs or files with the summarize CLI (web, PDFs, images, audio, YouTube).",
+      "version": "1.0.0",
+      "path": "skills/summarize"
     },
     {
       "name": "superstruct",
@@ -1355,13 +1348,6 @@
       "path": "skills/tools-ui"
     },
     {
-      "name": "uptime-kuma",
-      "slug": "uptime-kuma",
-      "description": "高分项目，建议创建 Skill",
-      "version": "1.0.0",
-      "path": "skills/uptime-kuma"
-    },
-    {
       "name": "using-git-worktrees",
       "slug": "using-git-worktrees",
       "description": "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification",
@@ -1388,13 +1374,6 @@
       "description": "",
       "version": "",
       "path": "skills/vercel-react-best-practices"
-    },
-    {
-      "name": "vercel-react-best-practices",
-      "slug": "vercel-react-best-practices copy",
-      "description": "React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.",
-      "version": "",
-      "path": "skills/vercel-react-best-practices copy"
     },
     {
       "name": "vercel-react-native-skills",
@@ -1458,6 +1437,13 @@
       "description": "Comprehensive spreadsheet creation, editing, and analysis with support for formulas, formatting, data analysis, and visualization. When Claude needs to work with spreadsheets (.xlsx, .xlsm, .csv, .tsv, etc) for: (1) Creating new spreadsheets with formulas and formatting, (2) Reading or analyzing data, (3) Modify existing spreadsheets while preserving formulas, (4) Data analysis and visualization in spreadsheets, or (5) Recalculating formulas",
       "version": "0.1.0",
       "path": "skills/xlsx"
+    },
+    {
+      "name": "zeroclaw-driver",
+      "slug": "zeroclaw-driver",
+      "description": "Driver for ZeroClaw - a lightweight Rust-based AI agent runtime. Use this skill whenever: (1) User wants to run a lightweight AI assistant that uses minimal memory (under 5MB), (2) Need fast cold-start agent (under 10ms) for quick queries, (3) Running simple automated tasks in background with cron/heartbeat, (4) Using local AI models (Ollama, LM Studio, llama.cpp) for offline or cost-effective inference, (5) User mentions lightweight alternative to OpenClaw or wants to save resources, (6) Low-memory environment deployment like Raspberry Pi or edge devices, (7) User wants to test AI tasks without full OpenClaw overhead.",
+      "version": "",
+      "path": "skills/zeroclaw-driver"
     },
     {
       "name": "zx",
