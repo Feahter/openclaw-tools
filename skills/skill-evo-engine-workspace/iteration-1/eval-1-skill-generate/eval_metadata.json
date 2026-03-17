@@ -1,0 +1,11 @@
+{
+  "eval_id": 1,
+  "eval_name": "skill-generate",
+  "prompt": "帮我做个能提取GitHub仓库stars数的技能",
+  "assertions": [
+    "Generated skill name contains only ASCII letters, digits, and hyphens (no Chinese)",
+    "A SKILL.md file is created inside the new skill directory",
+    "SKILL.md has valid YAML frontmatter with name and description fields",
+    "Skill name starts with 'auto-'"
+  ]
+}

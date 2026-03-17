@@ -1,0 +1,10 @@
+📝 正在分析需求: 提取GitHub仓库stars数
+
+==================================================
+生成结果:
+{
+  "status": "exists",
+  "skill_name": "auto-extract-repo-github",
+  "message": "技能 auto-extract-repo-github 已存在"
+}
+==================================================

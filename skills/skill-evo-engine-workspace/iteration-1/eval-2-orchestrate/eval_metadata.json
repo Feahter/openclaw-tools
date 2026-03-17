@@ -1,0 +1,10 @@
+{
+  "eval_id": 2,
+  "eval_name": "orchestrate",
+  "prompt": "分析这个CSV数据：name,value\\na,10\\nb,20\\nc,30，告诉我需要哪些Skills来完成完整的分析和可视化",
+  "assertions": [
+    "Response identifies at least one relevant skill (xlsx, canvas-design, or data-analyst)",
+    "Response explains what each identified skill would do",
+    "No crash or unhandled error"
+  ]
+}

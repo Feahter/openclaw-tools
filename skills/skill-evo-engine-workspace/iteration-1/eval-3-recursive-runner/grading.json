@@ -1,0 +1,30 @@
+{
+  "eval_id": 3,
+  "eval_name": "recursive-runner",
+  "prompt": "用recursive-runner执行一个会先失败再成功的任务，展示自动重试机制",
+  "assertions": [
+    "Output shows at least 2 attempts",
+    "Final status is 'success'",
+    "Execution history includes score per attempt"
+  ],
+  "with_skill": {
+    "passed": [true, true, true],
+    "evidence": [
+      "2 attempts shown in both built-in demo and custom flaky_skill demo ✅",
+      "status: SUCCESS in both demos ✅",
+      "History includes score 0.0 (attempt 1) and 1.0 (attempt 2) per attempt ✅"
+    ],
+    "pass_rate": 1.0,
+    "notes": "Ran actual script. Showed strategy adjustment injecting _retry_count and _last_error. Persistent log confirmed."
+  },
+  "without_skill": {
+    "passed": [true, true, false],
+    "evidence": [
+      "2 attempts shown (attempt 1 failed, attempt 2 succeeded) ✅",
+      "Final result: Task completed successfully ✅",
+      "No score (0.0/1.0) per attempt — used exception-based control flow, no numeric scoring ❌"
+    ],
+    "pass_rate": 0.67,
+    "notes": "Hand-written recursive retry works correctly but lacks the structured score/history that skill-evo-engine provides."
+  }
+}
