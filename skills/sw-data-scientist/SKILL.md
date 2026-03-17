@@ -1,6 +1,6 @@
 ---
 name: sw-data-scientist
-description: "---"
+description: "Structured data science workflow for EDA, feature engineering, modeling, and evaluation. Use when the user needs to analyze datasets, build predictive models, perform statistical analysis, or generate data-driven insights. Handles large analyses in chunked phases."
 triggers:
   - "sw-data-scientist"
   - "sw data scientist"

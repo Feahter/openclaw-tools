@@ -1,3 +1,8 @@
+---
+name: opencode-usage
+description: "OpenCode CLI usage guide for code maintenance and task execution. Use when the user wants to run coding tasks with opencode, needs guidance on opencode commands, or wants to automate code fixes and development workflows via CLI."
+---
+
 # opencode-usage
 
 使用 opencode CLI 进行代码维护和任务执行。

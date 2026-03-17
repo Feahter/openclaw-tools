@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { margin: 0; padding: 20px; font-family: system-ui, sans-serif; background: #f8fafc; }
+  svg { width: 100%; max-width: 700px; display: block; margin: 0 auto; }
+  .node { cursor: pointer; }
+  .node rect { rx: 8; ry: 8; }
+  .label { font-size: 12px; font-weight: 600; fill: white; text-anchor: middle; dominant-baseline: middle; }
+  .sublabel { font-size: 10px; fill: rgba(255,255,255,0.8); text-anchor: middle; dominant-baseline: middle; }
+  .arrow { stroke: #cbd5e1; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead); }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
+    </marker>
+  </defs>
+  
+  <!-- Client Layer -->
+  <g class="node">
+    <rect x="80" y="40" width="100" height="45" fill="#3b82f6"/>
+    <text x="130" y="62" class="label">Web App</text>
+    <text x="130" y="76" class="sublabel">React</text>
+  </g>
+  <g class="node">
+    <rect x="220" y="40" width="100" height="45" fill="#3b82f6"/>
+    <text x="270" y="62" class="label">Mobile App</text>
+    <text x="270" y="76" class="sublabel">Flutter</text>
+  </g>
+  <g class="node">
+    <rect x="360" y="40" width="100" height="45" fill="#3b82f6"/>
+    <text x="410" y="62" class="label">Admin Panel</text>
+    <text x="410" y="76" class="sublabel">Vue</text>
+  </g>
+  
+  <!-- Arrows to API Gateway -->
+  <line x1="130" y1="85" x2="270" y2="130" class="arrow"/>
+  <line x1="270" y1="85" x2="270" y2="130" class="arrow"/>
+  <line x1="410" y1="85" x2="410" y2="130" class="arrow"/>
+  
+  <!-- API Gateway -->
+  <g class="node">
+    <rect x="200" y="130" width="140" height="45" fill="#8b5cf6"/>
+    <text x="270" y="152" class="label">API Gateway</text>
+    <text x="270" y="166" class="sublabel">Kong</text>
+  </g>
+  
+  <!-- Load Balancer -->
+  <g class="node">
+    <rect x="380" y="130" width="100" height="45" fill="#f59e0b"/>
+    <text x="430" y="152" class="label">Load Balancer</text>
+    <text x="430" y="166" class="sublabel">Nginx</text>
+  </g>
+  
+  <!-- Arrows to Services -->
+  <line x1="270" y1="175" x2="130" y2="220" class="arrow"/>
+  <line x1="270" y1="175" x2="270" y2="220" class="arrow"/>
+  <line x1="430" y1="175" x2="410" y2="220" class="arrow"/>
+  
+  <!-- Services -->
+  <g class="node">
+    <rect x="60" y="220" width="100" height="45" fill="#10b981"/>
+    <text x="110" y="242" class="label">User Service</text>
+    <text x="110" y="256" class="sublabel">Node.js</text>
+  </g>
+  <g class="node">
+    <rect x="200" y="220" width="100" height="45" fill="#10b981"/>
+    <text x="250" y="242" class="label">Order Service</text>
+    <text x="250" y="256" class="sublabel">Go</text>
+  </g>
+  <g class="node">
+    <rect x="340" y="220" width="100" height="45" fill="#10b981"/>
+    <text x="390" y="242" class="label">Payment</text>
+    <text x="390" y="256" class="sublabel">Python</text>
+  </g>
+  <g class="node">
+    <rect x="480" y="220" width="100" height="45" fill="#10b981"/>
+    <text x="530" y="242" class="label">Notification</text>
+    <text x="530" y="256" class="sublabel">Java</text>
+  </g>
+  
+  <!-- Arrows to DB -->
+  <line x1="110" y1="265" x2="110" y2="300" class="arrow"/>
+  <line x1="250" y1="265" x2="250" y2="300" class="arrow"/>
+  <line x1="390" y1="265" x2="390" y2="300" class="arrow"/>
+  <line x1="530" y1="265" x2="530" y2="300" class="arrow"/>
+  
+  <!-- Data Layer -->
+  <g class="node">
+    <rect x="60" y="300" width="100" height="35" fill="#ef4444"/>
+    <text x="110" y="322" class="label" style="font-size:11px">PostgreSQL</text>
+  </g>
+  <g class="node">
+    <rect x="200" y="300" width="100" height="35" fill="#ef4444"/>
+    <text x="250" y="322" class="label" style="font-size:11px">MongoDB</text>
+  </g>
+  <g class="node">
+    <rect x="340" y="300" width="100" height="35" fill="#ef4444"/>
+    <text x="390" y="322" class="label" style="font-size:11px">Redis</text>
+  </g>
+  <g class="node">
+    <rect x="480" y="300" width="100" height="35" fill="#ef4444"/>
+    <text x="530" y="322" class="label" style="font-size:11px">RabbitMQ</text>
+  </g>
+</svg>
+</body>
+</html>

@@ -1,3 +1,8 @@
+---
+name: rescueclaw
+description: "Checkpoint and rollback safety system for risky operations. Use before modifying configs, installing skills, or updating the gateway to create recoverable checkpoints. Auto-restores if the agent becomes unresponsive within the rollback window."
+---
+
 # RescueClaw Skill
 
 Provides checkpoint/rollback safety net for risky operations.

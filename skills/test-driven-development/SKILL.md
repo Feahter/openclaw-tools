@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: "---"
+description: "Test-driven development workflow enforcing RED-GREEN-REFACTOR cycle. Use when the user wants to write tests first, follow TDD practices, generate test stubs from specs, or implement features using test-first methodology."
 triggers:
   - "test-driven-development"
   - "test driven development"

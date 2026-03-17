@@ -1,3 +1,8 @@
+---
+name: context-mode
+description: "Local context toolkit for output compression, sandboxed code execution, and intelligent search. Use when the user needs to search local content with FTS5, execute code in a sandbox, filter large outputs, or manage context efficiently."
+---
+
 # context-mode
 
 **用途**：本地上下文工具集，压缩输出 + 沙箱执行 + 智能搜索

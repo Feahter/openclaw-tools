@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { margin: 0; padding: 20px; font-family: system-ui, sans-serif; background: #f8fafc; }
+  .container { max-width: 700px; margin: 0 auto; }
+  h3 { text-align: center; margin-bottom: 20px; }
+  .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .card { background: white; border: 2px solid #e2e8f0; border-radius: 16px; overflow: hidden; }
+  .card.winner { border-color: #3b82f6; box-shadow: 0 4px 12px rgba(59,130,246,0.15); }
+  .card-header { padding: 20px; text-align: center; }
+  .card-header.a { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); }
+  .card-header.b { background: linear-gradient(135deg, #dbeafe, #bfdbfe); }
+  .card-name { font-size: 20px; font-weight: 700; color: #1f2937; }
+  .card-subtitle { font-size: 14px; color: #64748b; margin-top: 4px; }
+  .winner-badge { display: inline-block; background: #3b82f6; color: white; font-size: 12px; padding: 4px 12px; border-radius: 20px; margin-top: 8px; font-weight: 600; }
+  .card-body { padding: 20px; }
+  .metric { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+  .metric:last-child { border-bottom: none; }
+  .metric-name { font-size: 13px; color: #64748b; }
+  .metric-value { font-size: 14px; font-weight: 600; color: #374151; }
+  .better { color: #10b981; }
+  .worse { color: #ef4444; }
+  .summary { margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 12px; font-size: 13px; color: #475569; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h3>技术方案对比</h3>
+  <div class="comparison">
+    <div class="card">
+      <div class="card-header a">
+        <div class="card-name">REST API</div>
+        <div class="card-subtitle">传统架构</div>
+      </div>
+      <div class="card-body">
+        <div class="metric">
+          <span class="metric-name">学习成本</span>
+          <span class="metric-value better">低</span>
+        </div>
+        <div class="metric">
+          <span class="metric-name">开发速度</span>
+          <span class="metric-value better">快</span>
+        </div>
+        <div class="metric">
+          <span class="metric-name">请求次数</span>
+          <span class="metric-value worse">多 (N+1)</span>
+        </div>
+        <div class="metric">
+          <span class="metric-name">数据冗余</span>
+          <span class="metric-value worse">高</span>
+        </div>
+        <div class="metric">
+          <span class="metric-name">版本兼容</span>
+          <span class="metric-value worse">需维护</span>
+        </div>
+        <div class="metric">
+          <span class="metric-name">实时能力</span>
+          <span class="metric-value worse">需额外实现</span>
+        </div>
+      </div>
+    </div>
+    <div class="card winner">
+      <div class="card-header b">
+        <div class="card-name">GraphQL</div>
+        <div class="card-subtitle">现代架构</div>
+        <div class="winner-badge">✓ 推荐</div>
+      </div>
+      <div class="card-body">
+        <div class="metric">
+          <span class="metric-name">学习成本</span>
+          <span class="metric-value worse">中</span>
+        </div>
+        <div class="metric">
+          <span class="metric-name">开发速度</span>
+          <span class="metric-value worse">初期较慢</span>
+        </div>
+        <div class="metric">
+          <span class="metric-name">请求次数</span>
+          <span class="metric-value better">少 (单次)</span>
+        </div>
+        <div class="metric">
+          <span class="metric-name">数据冗余</span>
+          <span class="metric-value better">按需获取</span>
+        </div>
+        <div class="metric">
+          <span class="metric-name">版本兼容</span>
+          <span class="metric-value better">无版本问题</span>
+        </div>
+        <div class="metric">
+          <span class="metric-name">实时能力</span>
+          <span class="metric-value better">原生支持</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="summary">
+    <strong>建议：</strong>对于新项目或复杂数据关系的场景，推荐使用 GraphQL。虽然初期学习成本略高，但能显著减少请求次数和数据冗余。对于简单 CRUD 应用或团队技术栈限制，REST 仍是合理选择。
+  </div>
+</div>
+</body>
+</html>

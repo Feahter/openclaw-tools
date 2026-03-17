@@ -1,6 +1,6 @@
 ---
 name: git
-description: "---"
+description: "Git workflow best practices and safety rules. Use when the user is working with git operations, committing code, resolving merge conflicts, pushing branches, or needs guidance on proper git hygiene and recovery techniques."
 triggers:
   - "git"
   - "git"

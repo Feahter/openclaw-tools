@@ -1,6 +1,6 @@
 ---
 name: tools-ui
-description: "---"
+description: "Tool UI components for agent tool lifecycle visualization. Use when building interfaces that display tool calls, tool results, tool approval flows, or agent interactions. Provides React components for pending, running, success, and error states."
 triggers:
   - "tools-ui"
   - "tools ui"

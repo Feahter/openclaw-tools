@@ -1,15 +1,16 @@
+---
+name: chromadb
+description: "ChromaDB vector database skill for RAG operations. Use when the user needs to store and retrieve document embeddings, perform similarity search, manage vector collections, or build retrieval-augmented generation pipelines. Supports automatic chunking and multiple similarity metrics."
+---
+
 # ChromaDB Skill
 
 ## Overview
 A ChromaDB vector database skill for RAG (Retrieval-Augmented Generation) operations, supporting document embedding, storage, and retrieval.
 
-## Metadata
-- **name**: chromadb
-- **description**: ChromaDB 向量数据库技能，用于 RAG（检索增强生成）的向量存储和相似性检索
-- **version**: 1.0.0
-- **dependencies**: 
-  - chromadb
-  - sentence-transformers
+## Dependencies
+- chromadb
+- sentence-transformers
 
 ## Capabilities
 

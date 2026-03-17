@@ -1,6 +1,6 @@
 ---
 name: x-post-automation
-description: "---"
+description: "Automate X (Twitter) content creation and posting. Use when the user wants to generate high-engagement tweets, analyze trending topics, compose posts with viral potential, or automate their X posting workflow. Includes trend analysis, content generation, and direct posting capabilities."
 triggers:
   - "x-post-automation"
   - "x post automation"
