@@ -25,11 +25,14 @@ git clone https://github.com/Feahter/openclaw-tools.git
 | `skill-creator` | 创建和优化 Skills |
 | `skill-manager` | Skills 生命周期管理 |
 | `skill-vetter` | Skills 安全审核 |
+| `skill-evo-engine` | 技能进化引擎（智能编排+自动重试） |
+| `github-stars-extractor` | GitHub 仓库 Stars 提取 |
 
 ### 🌐 浏览器 & 自动化 (Browser & Automation)
 | Skill | 描述 |
 |-------|------|
 | `browser` | 浏览器自动化 |
+| `agent-reach` | 网络搜索与内容抓取 |
 | `agent-browser` | Headless 浏览器 |
 | `playwright` | Playwright 自动化 |
 | `smart-browser` | AI 增强浏览器 |
@@ -44,6 +47,7 @@ git clone https://github.com/Feahter/openclaw-tools.git
 | `pptx` | PPT 演示文稿 |
 | `xlsx` | Excel 表格 |
 | `canvas-design` | Canvas 视觉设计 |
+| `auto-canvas-design` | Canvas 自动设计 |
 | `frontend-slides` | HTML 幻灯片 |
 
 ### 🧠 AI & 机器学习 (AI/ML)
@@ -130,4 +134,4 @@ git add -A && git commit -m "chore: update skills" && git push
 3. 提交并推送
 
 ---
-Generated: 2026-03-13 | Total: 200+ Skills
+Generated: 2026-03-18 | Total: 200+ Skills
