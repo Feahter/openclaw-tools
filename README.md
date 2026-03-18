@@ -1,6 +1,6 @@
 # OpenClaw Skills
 
-> 200+ AI Agent Skills for OpenClaw
+> 145+ AI Agent Skills for OpenClaw | Last updated: 2026-03-19
 
 ## 📦 安装
 
@@ -9,7 +9,7 @@
 clawdhub install <skill-name>
 
 # 方式2: 从 GitHub 克隆
-git clone https://github.com/Feahter/openclaw-tools.git
+git clone https://github.com/Feather/openclaw-tools.git
 ```
 
 ## 🗂️ 分类索引
@@ -17,114 +17,207 @@ git clone https://github.com/Feahter/openclaw-tools.git
 ### 🔧 开发工具 (Development)
 | Skill | 描述 |
 |-------|------|
-| `coding-agent` | 运行 Codex / Claude Code / OpenCode |
+| `coding-agent` | 多 CLI Agent 协调（Codex/Claude/OpenCode） |
 | `github` | GitHub CLI 操作 |
 | `github-to-skills` | GitHub 仓库转 Skill |
-| `git-workflow-master` | Git 工作流专家 |
-| `code-review-expert` | 代码审查专家 |
+| `git` | Git 工作流规范 |
 | `skill-creator` | 创建和优化 Skills |
+| `skill-from-github` | 从 GitHub 项目创建 Skill |
+| `skill-from-notebook` | 从文档提取方法论创建 Skill |
+| `skill-orchestrator` | 技能编排器 |
+| `skill-evolution-manager` | Skill 迭代改进管理 |
 | `skill-manager` | Skills 生命周期管理 |
 | `skill-vetter` | Skills 安全审核 |
-| `skill-evo-engine` | 技能进化引擎（智能编排+自动重试） |
-| `github-stars-extractor` | GitHub 仓库 Stars 提取 |
+| `openclaw-agent-optimize` | OpenClaw 代理优化 |
+| `openclaw-token-optimizer` | Token 用量优化 |
+| `agent-dispatch` | Agent 注册与路由 |
+| `agent-commander` | Agent 会话管理 |
+| `rescueclaw` | 操作回滚安全系统 |
 
 ### 🌐 浏览器 & 自动化 (Browser & Automation)
 | Skill | 描述 |
 |-------|------|
-| `browser` | 浏览器自动化 |
-| `agent-reach` | 网络搜索与内容抓取 |
-| `agent-browser` | Headless 浏览器 |
-| `playwright` | Playwright 自动化 |
+| `browser-automation` | CLI 浏览器自动化 |
+| `stagehand-browser-cli` | Stagehand 浏览器自动化 |
+| `agent-browser` | Rust 无头浏览器 CLI |
+| `agent-browser-clawdbot` | agent-browser 的 Clawdbot 适配 |
 | `smart-browser` | AI 增强浏览器 |
-| `computer-use` | 桌面自动化 (Linux) |
-| `mac-use` | macOS GUI 自动化 |
+| `playwright-scraper-skill` | Playwright 爬虫 |
+| `playwright-browser-automation` | Playwright API 调用 |
+| `computer-use` | 桌面自动化 (Linux/Xvfb/XFCE) |
+| `mac-use` | macOS GUI 操控 |
+| `screenshot` | 截图工具 |
 
 ### 📄 文档处理 (Documents)
 | Skill | 描述 |
 |-------|------|
-| `pdf` | PDF 处理 |
-| `docx` | Word 文档 |
-| `pptx` | PPT 演示文稿 |
-| `xlsx` | Excel 表格 |
-| `canvas-design` | Canvas 视觉设计 |
-| `auto-canvas-design` | Canvas 自动设计 |
-| `frontend-slides` | HTML 幻灯片 |
+| `pdf` | PDF 全功能（读取/合并/拆分/OCR/水印） |
+| `docx` | Word 文档全功能 |
+| `pptx` | PPT 全功能 |
+| `xlsx` | Excel 全功能 |
+| `frontend-slides` | HTML 演示文稿生成 |
+| `generative-ui` | 交互式 HTML 组件/可视化 |
+| `svg-card-generator` | SVG 卡片可视化 |
+| `pdf-text-extractor` | PDF 文本提取 |
+| `anthropics-pdf` | Anthropic 官方 PDF 处理 |
+| `anthropics-docx` | Anthropic 官方 Word 处理 |
+| `anthropics-pptx` | Anthropic 官方 PPT 处理 |
+| `anthropics-xlsx` | Anthropic 官方 Excel 处理 |
+| `ppt-design-guide` | PPT 制作完整指南 |
 
 ### 🧠 AI & 机器学习 (AI/ML)
 | Skill | 描述 |
 |-------|------|
-| `ai-rag-pipeline` | RAG 流水线 |
-| `agency-model-qa` | ML 模型质量审计 |
-| `agency-data-engineer` | 数据工程 |
-| `mcp-builder` | MCP 服务器开发 |
-| `mcporter` | MCP 工具调用 |
+| `ai-rag-pipeline` | RAG 管道（Tavily/Exa/Claude/GPT-4） |
+| `mcp-builder` | MCP Server 开发完整指南 |
+| `mcporter` | MCP Server CLI 管理 |
+| `agency-mcp-builder` | MCP 开发 agent 角色卡 |
+| `chromadb` | ChromaDB 向量数据库 |
+| `tavily-search` | Tavily AI 搜索 |
+| `rag-search` | 最小化 RAG 搜索 |
+| `deepset-ai` | Haystack AI 编排框架 |
+| `auto-knowledge-acquisition` | GitHub 高质量项目发现与笔记 |
+| `oss-code-analysis` | 开源项目源码分析 |
+| `sw-data-scientist` | 结构化数据分析工作流 |
+| `r-wmi` | Rokid 智能眼镜控制 |
 
 ### ☁️ DevOps & 运维 (DevOps)
 | Skill | 描述 |
 |-------|------|
-| `agency-devops-automator` | DevOps 自动化 |
-| `server-health` | 服务器健康检查 |
-| `security-monitor` | 安全监控 |
-| `cron-scheduling` | Cron 任务管理 |
-| `database` | 数据库管理 |
-| `db-query` | 数据库查询 |
+| `proxmox-ops` | Proxmox VE 管理 |
+| `cron-scheduling` | Cron + systemd 定时任务 |
+| `cron-mastery` | OpenClaw Cron/Heartbeat 系统 |
+| `cron-writer` | 自然语言 → cron 表达式 |
+| `automation-workflows` | 自动化工作流设计 |
+| `server-health` | 服务器健康监控 |
+| `security-monitor` | 安全监控告警 |
+| `process-monitor` | 进程监控 |
+| `tmux` | tmux 远程控制 |
+| `macbook-optimizer` | MacBook 全面优化 |
+| `system-health-reporter` | 系统健康报告 |
 
 ### 📱 平台集成 (Integrations)
 | Skill | 描述 |
 |-------|------|
-| `feishu` | 飞书机器人 |
-| `apple-notes` | Apple Notes |
-| `sonoscli` | Sonos 音响控制 |
-| `obsidian` | Obsidian 笔记 |
-| `a2achat` | Agent 消息通讯 |
+| `feishu` | 飞书 AI 机器人 |
+| `feishu-debug` | 飞书机器人故障排查 |
+| `apple-notes` | Apple Notes CLI 管理 |
+| `obsidian` | Obsidian 笔记管理 |
+| `a2achat` | Agent-to-Agent 消息通信 |
+| `clawdhub` | ClawdHub 技能市场 CLI |
+| `summarize` | URL/文件/音频摘要 |
+| `tapestry` | 知识图谱构建 |
+| `openai-whisper` | 本地语音转文字 |
+| `sonoscli` | Sonos 音箱控制 |
 
 ### 🧠 记忆 & 认知 (Memory & Cognition)
 | Skill | 描述 |
 |-------|------|
-| `spen-memory` | SPEN 记忆系统 |
-| `context-manager` | 上下文管理 |
-| `para-second-brain` | 第二大脑 |
-| `infinite-memory` | 无限记忆 |
-| `agent-autonomy-kit` | 自主 Agent 套件 |
+| `spen-memory` | SPEN 时空记忆系统 |
+| `para-second-brain` | PARA 知识管理 + 语义搜索 |
+| `basal-ganglia-memory` | 习惯形成/程序性学习 |
+| `memory-on-demand` | 按需记忆检索 |
+| `attention-system` | 注意力分析与正反馈捕获 |
+| `agent-autonomy-kit` | Agent 自主执行工具包 |
+| `reflect-learn` | 对话分析自我改进 |
+| `self-improving-agent` | 自我改进系统 |
+| `proactive-agent` | Agent 主动性增强 |
 
 ### ✍️ 创作 & 写作 (Creative)
 | Skill | 描述 |
 |-------|------|
 | `novel-writing-sop` | 小说创作 SOP |
 | `novel-quality-guardian` | 小说质量守护 |
-| `story-architect` | 故事架构师 |
-| `one-sentence-novel` | 一句话小说 |
-| `content-editor` | 内容审稿 |
-| `folk-marketing` | 民间营销文案 |
+| `story-architect` | 世界观/情节/人物创作 |
+| `content-editor` | 审稿润色系统 |
+| `auto-content-creator` | 多平台内容自动生成 |
+| `writer` | 修正 AI 写作模式 |
+| `game-engine` | HTML5/Canvas/WebGL 游戏引擎 |
+| `game-designer-toolkit` | GDD/系统设计/关卡设计 |
+| `text-game-dev` | 文字游戏/视觉小说开发 |
+| `nyx-archive-game-design-philosophy` | 游戏设计哲学 |
 
 ### 🧩 思维模型 (Thinking)
 | Skill | 描述 |
 |-------|------|
 | `six-thinking-hats` | 六顶思考帽 |
-| `blade-of-logic` | 逻辑之刃 |
-| `hammer-of-questions` | 问题之锤 |
-| `ladder-of-abstraction` | 抽象之梯 |
-| `mirror-of-perspectives` | 视角之镜 |
-| `talent-mind` | 天才思维 |
+| `blade-of-logic` | 逻辑拆解与论证验证 |
+| `hammer-of-questions` | 苏格拉底式追问 |
+| `ladder-of-abstraction` | 具象↔抽象层级转换 |
+| `mirror-of-perspectives` | 多视角分析 |
+| `branch-of-disciplines` | 学科派别与核心理念 |
+| `talent-mind` | 天才思维三层递归方法论 |
+| `musk-business-framework` | 马斯克第一性原理商业决策 |
+| `checklist-manager` | 结构化清单管理 |
 
 ### 📊 数据分析 (Data)
 | Skill | 描述 |
 |-------|------|
-| `data-analyst` | 数据分析 |
-| `performance-optimizer` | 性能优化 |
+| `data-analyst` | 数据可视化 + 报表 + SQL |
+| `data-visualization` | Matplotlib/Seaborn/Plotly 图表 |
+| `big-data-analysis` | 大规模数据集分析 |
+| `dash-cog` | CellCog 交互式 Dashboard |
+| `performance-optimizer` | 性能优化框架 |
+| `perf-profiler` | 火焰图/CPU/内存 profiling |
+| `algorithm-toolkit` | 多语言算法代码库 |
 | `jq-json-processor` | JSON 处理 |
-| `dash-cog` | 数据可视化仪表盘 |
+
+### 🔐 安全 & 渗透 (Security)
+| Skill | 描述 |
+|-------|------|
+| `hacker-arsenal` | PTES/OWASP/MITRE ATT&CK 全栈攻防 |
+| `the-book-of-secret-knowledge` | 系统管理员/安全研究员知识库 |
+
+### 🎨 前端开发 (Frontend)
+| Skill | 描述 |
+|-------|------|
+| `vercel-react-best-practices` | React 19 + Next.js 最佳实践 |
+| `generative-ui` | 交互式 HTML 组件生成 |
+| `frontend-slides` | HTML 演示文稿 |
+| `anthropics-canvas-design` | Canvas 画布设计 |
+| `anthropics-frontend-design` | 前端界面设计 |
+| `web-artifacts-builder` | React + Tailwind artifact 构建 |
+| `vercel-react-native` | React Native + Expo |
+| `sw-mobile-debugging` | React Native 调试 |
+| `kj-web-design-guidelines` | Web 界面设计合规审查 |
+| `web-design-guidelines` | Web 设计指南 |
+| `tools-ui` | Agent 工具调用 UI 组件 |
+| `vercel-composition-patterns` | React 组合模式 |
+
+### 🔍 搜索 & 知识获取 (Search)
+| Skill | 描述 |
+|-------|------|
+| `multi-search-engine` | 17 个搜索引擎集成 |
+| `oss-code-analysis` | 开源项目源码分析 |
+| `hn-extract` | HackerNews 帖子提取 |
+| `download-waytoagi-prompts` | WayToAGI 提示词下载 |
+| `folk-marketing` | 民间风格营销文案 |
+| `x-post-automation` | X/Twitter 内容自动发布 |
+
+### 🛠️ 硬件 & IoT
+| Skill | 描述 |
+|-------|------|
+| `r-wmi` | Rokid 智能眼镜控制 |
+| `sonoscli` | Sonos 音箱控制 |
+
+### 🤖 Agent 角色卡 (Agency)
+| Skill | 描述 |
+|-------|------|
+| `agency-code-reviewer` | 代码审查 |
+| `agency-data-engineer` | 数据工程 |
+| `agency-devops-automator` | DevOps 自动化 |
+| `agency-document-generator` | 文档生成 |
+| `agency-git-workflow-master` | Git 工作流 |
+| `agency-senior-developer` | 全栈开发（Laravel/Three.js） |
+| `agency-model-qa` | 模型 QA |
 
 ---
 
 ## 🔄 更新
 
 ```bash
-# 生成 marketplace
-python3 scripts/generate-marketplace.py
-
 # 推送到 GitHub
-git add -A && git commit -m "chore: update skills" && git push
+git add -A && git commit -m "chore: cleanup and update skills" && git push
 ```
 
 ## 📝 添加新 Skill
@@ -134,4 +227,12 @@ git add -A && git commit -m "chore: update skills" && git push
 3. 提交并推送
 
 ---
-Generated: 2026-03-18 | Total: 200+ Skills
+
+**质量等级说明**：
+- S 级：>20K，内容完整，可直接上手
+- A 级：>5K，描述清晰，覆盖核心场景
+- B 级：1K-5K，轻量但特定场景有效
+- C 级：<1K，需补充或仅占位
+
+---
+Generated: 2026-03-19 | Total: 145 Skills
