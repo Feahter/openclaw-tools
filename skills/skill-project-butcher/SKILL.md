@@ -3,8 +3,9 @@ name: skill-project-butcher
 description: >
   GitHub 项目深度研究专家。当用户要分析、学习或理解一个 GitHub 项目时触发。
   触发条件：包含 "分析这个项目"、"研究一下"、"看看这个代码库"、"帮我理解"、
-  "项目结构"、"怎么用"、"代码学习"、"技术调研"、"提取项目信息"、"项目概览"、
-  "这个repo"、"clone了这个项目" 等，且涉及 GitHub URL 或本地代码路径。
+  "项目结构"、"怎么用"、"代码学习"、"技术调研"、"这个repo"、"clone了这个项目" 等，
+  且涉及 GitHub URL 或本地代码路径。
+  不包括：只问"这个项目是干嘛的"（一句话能答的简单问题不需要触发）。
   也适用于：克隆项目后结构分析、核心模块解读、技术选型理解。
 ---
 
@@ -54,8 +55,8 @@ web_fetch("https://raw.githubusercontent.com/<owner>/<repo>/master/README.md", m
 ```
 
 **决策树：**
-- Stars < 100 且最近 6 个月无更新 → 快速概览即可
-- Stars > 1000 或 Monorepo → 建议 clone 后深度分析
+- 项目不活跃（Stars 少、长期无更新）→ 先做快速概览
+- 项目复杂（Stars 多、Monorepo、目录结构深）→ 建议 clone 后深度分析
 - 用户明确说"分析这个项目" → clone 后走路径 B
 
 ### 路径 B：本地已有代码（已 clone 或给定路径）
@@ -141,7 +142,9 @@ for a in ai:
 fi
 
 echo "=== 框架检测（关键词）==="
+# 注意：此方法有局限，可能漏掉动态 import，主要依赖 package.json 的 dependencies
 grep -r -l --include="*.py" -e "^import (fastapi|flask|django|torch|transformers)" . 2>/dev/null | head -3
+grep -r -l --include="*.py" -e "^from (fastapi|flask|django|torch|transformers)" . 2>/dev/null | head -3
 grep -r -l --include="*.go" -e "^package main" . 2>/dev/null | head -3
 grep -r -l --include="*.rs" -e "^fn main" . 2>/dev/null | head -3
 
