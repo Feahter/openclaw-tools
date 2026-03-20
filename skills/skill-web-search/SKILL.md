@@ -2,7 +2,8 @@
 name: skill-web-search
 description: >
   网页正文提取与内容抓取。当用户要求读取URL、总结链接、抓取文章、提取网页内容、
-  分析某篇文章时触发。专门解决微信公众号、知乎、GitHub 等平台的正文提取问题。
+  分析某篇文章时触发。专门解决微信公众号、知乎、B站、小红书、Twitter 等平台的正文提取问题。
+  也支持 opencli（已安装）进行 API 级提取。
   触发条件：消息包含 URL 并要求「读取/总结/提取/抓取/分析/看看这篇文章」。
   不包括：仅搜索关键词（不用URL）、纯技术搜索（查bug/查文档）。
 ---
@@ -55,15 +56,48 @@ web_fetch(url, maxChars=30000)
 - 策略 1-3 全部失败时的保底；纯静态页面也可以优先使用
 - 返回原始 HTML，含导航/广告/页脚
 
+## 进阶：opencli 集成（可选）
+
+opencli 通过 Chrome 扩展 + XHR interception 发现真实 API，比 DOM 快照更精准。
+
+**前提**：
+1. Chrome 已安装 opencli Browser Bridge 扩展（加载 `extension/` 文件夹）
+2. 目标网站已在 Chrome 中登录
+
+**opencli 专用命令：**
+```bash
+# B站/知乎/小红书/推特 等平台，API 级提取（比 Scrapling 更准）
+opencli bilibili hot --limit 5 -f json
+opencli zhihu hot --limit 10 -f json
+opencli xiaohongshu search --keyword "美食" -f json
+opencli twitter trending --limit 10 -f json
+
+# 通用 XHR 拦截发现
+opencli explore <url> --site <name>
+opencli cascade <api-url>   # 自动探测认证策略（public → cookie → header → intercept → ui）
+
+# 快速单命令（URL 直接生成适配器）
+opencli generate <url> --goal "hot"
+```
+
+**适用场景**：策略 1-4 全部失败、且目标平台是 opencli 已支持的站点时，优先用 opencli。
+
+**支持的站点**：B站、知乎、小红书、Twitter/X、Reddit、YouTube、V2EX、Hacker News、微博、雪球、Boss直聘、什么值得买、携程 等（80+ 命令，19 个平台）
+
+**opencli 安装**：`npm install -g @jackwener/opencli`
+
+---
+
 ## 域名推荐策略
 
-| 域名 | 推荐 | 备选 |
+| 域名 | 推荐 | opencli（可选） |
 |------|------|------|
-| 普通网页（GitHub/博客/新闻） | Jina | web_fetch |
-| 微信公众号 | Scrapling | Browser |
-| 知乎 zhuanlan.zhihu.com | Jina → Scrapling | Browser |
-| 掘金/小红书/CSDN | Scrapling | Jina |
-| 需要登录的页面 | Browser | — |
+| B站 | Scrapling | ✅ `opencli bilibili hot` |
+| 知乎 | Scrapling | ✅ `opencli zhihu hot` |
+| 小红书 | Scrapling | ✅ `opencli xiaohongshu search` |
+| Twitter/X | Scrapling | ✅ `opencli twitter trending` |
+| 微信公众号 | Scrapling | ❌ 不支持（需 JS 渲染） |
+| 普通网页（GitHub/博客/新闻） | Jina | ❌ 不适用 |
 
 ## 防死循环
 
@@ -74,8 +108,10 @@ web_fetch(url, maxChars=30000)
 ## 依赖（已安装）
 ```
 scrapling, html2text, playwright
+opencli (可选): npm install -g @jackwener/opencli
 ```
 若 Scrapling 报错，检查：`playwright install chromium`
+若 opencli 命令报错，检查：`opencli doctor --fix`
 
 ## 脚本
 `scripts/fetch.py` — 策略 2 用，Scrapling + html2text 封装
