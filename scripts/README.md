@@ -142,5 +142,36 @@ curl -L https://example.com/redirect
 
 ---
 
+---
+
+### pure-zsh (sindresorhus/pure)
+**Stars**: ⭐ 21K+ | **语言**: Zsh
+
+**作用**：最流行的异步 Zsh 提示符，Fast, async, prompt
+
+**文件**：
+- `pure.zsh` — 主提示符脚本
+- `async.zsh` — 异步工具库
+
+**用法**：
+```bash
+# 添加到 .zshrc
+fpath+=(~/path/to/pure-zsh)
+autoload -U promptinit; promptinit
+prompt pure
+
+# 或使用 plugin manager
+# zinit: wait'0' light-mode forasync
+# zsh-users/zsh-autosuggestions
+```
+
+**特点**：
+- 异步执行，不卡终端
+- 显示 git 分支/状态/提交数
+- 显示当前命令执行时间（>5s）
+- 简洁优雅的视觉设计
+
+---
+
 *心跳任务每小时检查 GitHub，收集优质脚本*
 *贵精不贵多，每次最多 3 个*
