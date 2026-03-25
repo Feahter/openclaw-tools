@@ -320,7 +320,83 @@ MCP Manager 通过 mtime 检测配置文件变化，无需重启服务。
 
 ---
 
-## 8. 总结
+## 8. 核心价值验证
+
+*验证方法：对照 README 声称，逐条检查源码实现位置*
+
+### README 声称的 6 大核心价值
+
+| 核心价值 | README 原文 | 代码实现位置 | 验证结果 |
+|---------|------------|-------------|---------|
+| Super Agent Harness | "orchestrates sub-agents, memory, and sandboxes" | `packages/harness/deerflow/agents/lead_agent/agent.py` | ✅ 完整实现 |
+| Sub-agents | "handles different levels of tasks" | `agents/subagent/` | ✅ 完整实现，LangGraph Subgraph |
+| Memory | "long-term memory" | `backend/docs/MEMORY_IMPROVEMENTS.md` | ⚠️ tiktoken 计数已实现，TF-IDF 在 Roadmap |
+| Sandbox | "sandboxes for code execution" | `sandbox/local.py`, `community/aio_sandbox.py` | ✅ 三层隔离完整 |
+| Skills | "powered by extensible skills" | `skills/public/`, `skills/loader.py` | ✅ public/custom 双目录，SKILL.md 格式 |
+| MCP Integration | "MCP servers and skills to extend capabilities" | `mcp/manager.py` | ✅ 三协议支持，配置热重载 |
+
+### 验证结论
+
+README 声称的 6 项核心价值中：
+- ✅ 完整实现：**5 项**
+- ⚠️ 部分实现：**1 项**（Memory TF-IDF 在 Roadmap 中）
+- ❌ 未实现：**0 项**
+
+**总体评价**：README 声称基本属实，无虚标功能。Memory 系统相对较弱（TF-IDF 尚未实现），但已有 tiktoken 计数和 confidence 排序。
+
+---
+
+## 9. 泛用代码析出
+
+*提取可移植到其他项目的通用模块*
+
+### Tier 1 — 零依赖可直接移植
+
+| 模块 | 文件 | 用途 |
+|------|------|------|
+| **Middleware Chain 模式** | `agents/lead_agent/middleware.py` | Agent 执行前横切关注点链，可直接搬入任何 Agent 框架 |
+| **ThreadState 扩展** | `agents/lead_agent/state.py` | 在 LangGraph 状态上挂载 sandbox/todos/artifacts，扩展性强 |
+| **虚拟路径映射** | `sandbox/path.py` | 逻辑路径 → 物理路径的映射表，隔离性好 |
+| **Model Factory 反射** | `models/factory.py` | config.yaml → LangChain 实例的动态加载，配置驱动 |
+| **allowed-tools 白名单** | `skills/loader.py` | Skill 能调用的工具白名单，安全机制可直接复用 |
+
+### Tier 2 — 需简单适配后可移植
+
+| 模块 | 文件 | 需适配部分 |
+|------|------|---------|
+| **MCP Manager 热重载** | `mcp/manager.py` | 需对接 OpenClaw 的 MCP 插件系统接口 |
+| **Summarization 压缩** | `middleware/summarization.py` | 需对接 OpenClaw 的 context 管理（可能是 tiktoken 计数） |
+| **Sandbox Provider 抽象** | `sandbox/base.py` | 需实现 Local/Docker/K8s 三种 Provider 接口 |
+
+### Tier 3 — 强依赖需重构
+
+| 模块 | 文件 | 依赖问题 |
+|------|------|---------|
+| **LangGraph Agent Runtime** | 整体架构 | 强耦合 LangGraph，换框架需重构 |
+| **Next.js Frontend** | `frontend/` | 独立项目，不可单独移植 |
+
+### 最高价值模块详解
+
+**Middleware Chain（Tier 1）**：
+```python
+# 核心模式：Chain of Responsibility + 装饰器
+class Middleware:
+    def process(self, state, context, next_handler):
+        # 前置处理
+        result = next_handler()
+        # 后置处理
+        return result
+
+# 使用示例
+chain = ThreadDataMiddleware() | UploadsMiddleware() | SandboxMiddleware()
+result = chain.execute(agent_state)
+```
+
+**价值**：零依赖，任何 Python Agent 框架都可直接借鉴此模式。
+
+---
+
+## 10. 总结
 
 | 维度 | 评分 | 说明 |
 |------|------|------|
@@ -334,7 +410,7 @@ MCP Manager 通过 mtime 检测配置文件变化，无需重启服务。
 
 ---
 
-## 参考资料
+## 11. 参考资料
 
 1. [DeerFlow GitHub](https://github.com/bytedance/deer-flow)
 2. [DeerFlow 官网](https://deerflow.tech)
