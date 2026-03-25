@@ -1,7 +1,7 @@
 ---
 name: skill-tench-hunter
-description: |
-  技术研究猎手 — 从多源输入到结构化产出的完整管道。
+description: 技术研究 — 多源输入到结构化报告。触发：研究/深度分析/读链接。
+    技术研究猎手 — 从多源输入到结构化产出的完整管道。
 
   **触发条件（满足任一）：**
   - 用户说"研究下 XXX"、"深度分析 XXX"、"帮我了解 XXX 技术"
@@ -27,18 +27,18 @@ description: |
   │
   ├─ 有链接 → 并行抓取所有链接内容
   │
-  ├─ 无链接 → 搜索 GitHub + 官方文档
+  └─ 无链接 → 搜索 GitHub + 官方文档
   │
   ↓
 并行：内容抓取 + GitHub 项目 + 官方 Spec/Docs
   ↓
-合成：判断需要几份输出
+Phase 2：合成判断 → 确定输出类型和侧重点
   ↓
-产出：
-  ├─ 技术研究报告（`reports/[topic]-research-YYYYMMDD.md`）
-  └─ 最佳实践指南（如需要，`reports/[topic]-best-practices-YYYYMMDD.md`）
-  ↓
-Git 归档：git add → commit → push（如已有 remote）
+Phase 3：技术研究报告（核心节）
+  ├─ 3.1 核心价值验证（GitHub 项目时）
+  └─ 3.2 泛用代码析出（GitHub 项目时）
+Phase 4：最佳实践（如需要）
+Phase 5：Git 归档 → push（如有 remote）
 ```
 
 ---
@@ -50,36 +50,29 @@ Git 归档：git add → commit → push（如已有 remote）
 对每个 URL 并行执行 `web_fetch`（`maxChars: 8000~10000`）：
 
 ```typescript
-// 抓取策略
 const strategies = {
-  '公众号': { maxChars: 8000 },      // 公众号文章通常需要更多
-  '掘金/知乎/CSDN': { maxChars: 10000 }, // 技术平台内容更丰富
-  'GitHub README': { maxChars: 5000 },  // README 通常不长
-  '官方文档': { maxChars: 8000 },      // 官方 Spec/Docs
-  '通用网页': { maxChars: 6000 },       // 默认策略
+  '公众号': { maxChars: 8000 },
+  '掘金/知乎/CSDN': { maxChars: 10000 },
+  'GitHub README': { maxChars: 5000 },
+  '官方文档': { maxChars: 8000 },
+  '通用网页': { maxChars: 6000 },
 };
 ```
 
 ### 1.2 GitHub 项目发现
 
 ```bash
-# 搜索相关项目（并行多个 query）
 gh search repos "$TOPIC" --sort=stars --limit=10
 gh search repos "$TOPIC implementation" --sort=stars --limit=5
 gh search repos "$TOPIC javascript OR typescript OR python" --sort=stars --limit=5
-
-# 获取元数据
-# jq '{name, full_name, description, stars: stargazers_count, language, updated_at}'
 ```
 
 ### 1.3 官方 Spec/Docs
 
-```bash
-# 尝试常见官方资源
-# 官方 Spec: webmachinelearning.github.io/{topic}/
-# 官方 GitHub: github.com/{org}/{topic}
-# 官方文档: docs.{topic}.com
-```
+尝试常见官方资源：
+- 官方 Spec: `webmachinelearning.github.io/{topic}/`
+- 官方 GitHub: `github.com/{org}/{topic}`
+- 官方文档: `docs.{topic}.com`
 
 ### 1.4 信息收集优先级
 
@@ -89,42 +82,59 @@ gh search repos "$TOPIC javascript OR typescript OR python" --sort=stars --limit
 | GitHub 官方 Repo | P1 | 源码/Stars/Issues/原始 README |
 | 官方 Spec/Docs | P1 | 最权威的技术定义 |
 | 技术博客（掘金/知乎/CSDN）| P2 | 实战经验、中文解读 |
-| 公众号文章 | P2 | 可能有较深的分析（但容易被微信墙）|
+| 公众号文章 | P2 | 可能有较深的分析 |
 
 ---
 
 ## Phase 2：合成判断
 
-### 2.1 判断需要几份输出
+### 2.1 判断输出类型
 
 ```
 产出类型判断：
 
-只有 1 个链接 → 研究报告（聚焦）
-  └─ 如技术较成熟，有开发者场景 → 追加最佳实践
+[来源是 GitHub 项目？]
+  └─ 是 → 研究报告 + 核心价值验证 + 泛用代码析出
 
-多个链接 + 技术较新 → 研究报告（全面覆盖）
-  └─ 如有"如何在项目中落地"需求 → 追加最佳实践
+[技术是否成熟？] + [有开发者落地场景？]
+  └─ 两者皆是 → 追加最佳实践
 
-有代码库/框架 → 研究报告 + 最佳实践 + 项目分析附
+[只有 1 个链接？]
+  └─ 是 → 研究报告（聚焦）
 ```
+
+**最佳实践触发条件（同时满足）**：
+1. 技术栈成熟（非早期实验性项目）
+2. 有明确可复制的开发者使用场景
+3. 用户未明确说"只要研究报告"
 
 ### 2.2 报告定位
 
-在写之前先确认：
+写之前先确认：
 ```
-## 报告定位（写给谁）
-
 目标读者：[开发者 / 架构师 / 决策者 / ...]
 读完能：[理解原理 / 知道怎么用 / 能做技术选型 / ...]
 报告侧重点：[深度技术原理 / 实用性 / 生态全景 / ...]
 ```
 
+### 2.3 GitHub 项目判断
+
+满足任一即为 GitHub 项目研究：
+- 用户提供了 GitHub 链接
+- `gh search` 找到了高相关度项目（Stars > 1000）
+- 主题本身是一个代码库/框架
+
 ---
 
-## Phase 3：技术研究报告模板
+## Phase 3：技术研究报告
 
-文件命名：`reports/[topic]-research-YYYYMMDD.md`
+### 3.0 输出位置
+
+统一存到 `project/github/reports/[topic]-research-YYYYMMDD.md`
+
+如项目不是 GitHub 项目，存到 `reports/[topic]-research-YYYYMMDD.md`
+
+### 3.1 研究报告模板
 
 ```markdown
 # [技术名] 技术深度研究报告
@@ -196,18 +206,94 @@ gh search repos "$TOPIC javascript OR typescript OR python" --sort=stars --limit
 
 ---
 
-## Phase 4：最佳实践指南模板
+### 3.2 核心价值验证
 
-文件命名：`reports/[topic]-best-practices-YYYYMMDD.md`
+*仅限 GitHub 项目研究。插入到研究报告末尾，作为第 8 节。*
+
+对照 README 或官方文档列出的**核心价值/功能**，逐条检查是否有对应代码实现。
+
+**验证格式**：
+
+| 核心价值 | README 原文 | 代码实现位置 | 验证结果 |
+|---------|------------|-------------|---------|
+| [功能名] | [原文引用] | [文件:行号] | ✅/⚠️/❌ |
+
+**验证结果判定**：
+| 判定 | 含义 |
+|------|------|
+| ✅ 完整实现 | 有对应代码，功能与描述一致 |
+| ⚠️ 部分实现 | 有代码，但功能有限制或边界 |
+| ❌ 未实现 | README 声称但代码中没有 |
+
+**验证完成后结论**：
+```
+README 声称的 X 项核心价值中：
+- ✅ 完整实现：X 项
+- ⚠️ 部分实现：X 项
+- ❌ 未实现：X 项
+总体评价：[诚实 / 略有夸大 / 严重虚标]
+```
+
+---
+
+### 3.3 泛用代码析出
+
+*仅限 GitHub 项目研究。插入到核心价值验证之后，作为第 9 节。*
+
+识别可移植到其他项目的通用代码模块。
+
+**分级标准**：
+
+| 等级 | 定义 | 可移植性 |
+|------|------|---------|
+| **Tier 1** | 零依赖，逻辑完整，可直接复制使用 | 100% |
+| **Tier 2** | 依赖少，需简单适配 | 70-80% |
+| **Tier 3** | 强依赖，需重构 | 30-50% |
+
+**提取格式**：
+
+```
+## [模块名]
+
+**文件**：`path/to/file.ts`
+**分级**：Tier 1 / Tier 2 / Tier 3
+**用途**：解决什么问题
+
+**核心代码**：
+```[语言]
+[关键代码片段]
+```
+
+**依赖**：无 / [列出依赖]
+**适配成本**：无需适配 / [说明需改动的部分]
+```
+
+**优先提取场景**：
+| 场景 | 适合提取的代码 |
+|------|--------------|
+| 进程/线程通信 | Pipe、MessageChannel、共享内存 |
+| 国产 LLM 兼容 | 思考标签检测、流式处理 |
+| Electron/桌面 | 环境变量修正、进程启动 |
+| 上下文管理 | 记忆压缩、Token 计数 |
+| 协议设计 | 请求响应封装、错误处理 |
+
+---
+
+## Phase 4：最佳实践指南（如需要）
+
+*触发条件：技术成熟 + 有开发者落地场景 + 用户未明确拒绝*
+
+### 4.1 输出位置
+
+`project/github/reports/[topic]-best-practices-YYYYMMDD.md`
+（非 GitHub 项目：`reports/[topic]-best-practices-YYYYMMDD.md`）
+
+### 4.2 最佳实践模板
 
 ```markdown
 # [技术名] 最佳实践指南
 *Target: [目标读者]*
 *[版本/日期]*
-
-## 目录
-
-[自动生成]
 
 ## 1. 快速入门
 
@@ -257,33 +343,36 @@ gh search repos "$TOPIC javascript OR typescript OR python" --sort=stars --limit
 ### 5.1 判断是否已有 remote
 
 ```bash
-cd $WORKSPACE
-git remote -v  # 有输出则已有 remote
+cd $WORKSPACE && git remote -v
 ```
 
-### 5.2 创建 reports 目录
+### 5.2 确保目录存在
 
 ```bash
-mkdir -p $WORKSPACE/reports
+# GitHub 项目
+mkdir -p project/github/reports
+
+# 非 GitHub 项目
+mkdir -p reports
 ```
 
 ### 5.3 检查 .gitignore
 
-如果 `reports/` 被 `.gitignore` 忽略：
+如果目标目录被 `.gitignore` 忽略：
 ```bash
-git add -f reports/  # 强制添加
+git add -f project/github/reports/  # 强制添加
 ```
 
 ### 5.4 提交并推送
 
 ```bash
-git add reports/
-git commit -m "feat(reports): [技术名] research and best practices
+git add project/github/reports/
+git commit -m "feat(reports): [技术名] research
 
-- reports/[技术名]-research-YYYYMMDD.md: 技术深度研究
-- reports/[技术名]-best-practices-YYYYMMDD.md: 最佳实践指南"
+- project/github/reports/[技术名]-research-YYYYMMDD.md: 技术深度研究
+- project/github/reports/[技术名]-best-practices-YYYYMMDD.md: 最佳实践（如有）
+- project/github/[项目名]/: 克隆的源码（如有）"
 
-# 如果有 remote
 git push origin main
 ```
 
@@ -300,7 +389,8 @@ git push origin main
 
 ### Phase 2 完成后（合成判断）
 
-- [ ] 已确认输出份数（1份 or 2份）
+- [ ] 已确认是否 GitHub 项目研究
+- [ ] 已确认输出类型（报告 / 报告+最佳实践）
 - [ ] 已确认报告定位（读者 + 侧重点）
 
 ### Phase 3 完成后（研究报告）
@@ -311,25 +401,39 @@ git push origin main
 - [ ] 局限性不回避
 - [ ] 参考资料含链接
 
+### 3.2 节完成后（核心价值验证，GitHub 项目时）
+
+- [ ] README 每个核心价值都有代码位置对应
+- [ ] 验证结果有 ✅/⚠️/❌ 明确标注
+- [ ] 未实现或部分实现的功能有说明
+
+### 3.3 节完成后（泛用代码析出，GitHub 项目时）
+
+- [ ] Tier 1 代码可直接复制使用
+- [ ] Tier 2/3 代码有明确适配说明
+- [ ] 每个模块的依赖和适配成本清晰
+
 ### Phase 4 完成后（最佳实践，如需要）
 
-- [ ] 快速入门可实际操作（不是泛泛而谈）
+- [ ] 快速入门可实际操作
 - [ ] 代码示例完整可复制
 - [ ] 安全/避坑清单实用
 
 ### Phase 5 完成后（归档）
 
-- [ ] 文件已写入 `reports/` 目录
+- [ ] 文件已写入正确目录
 - [ ] 已 commit（含清晰 commit message）
-- [ ] 已 push（如果有 remote）
+- [ ] 已 push（如有 remote）
 
 ---
 
 ## 输出规范
 
 **研究报告**：深度 + 准确 + 结构清晰，读者能向他人解释这项技术
+**核心价值验证**：README vs 代码，一一对应，结论明确
+**泛用代码析出**：分级清晰，依赖明确，可直接评估可移植性
 **最佳实践**：可操作 + 可复制，读者能立即在项目中使用
-**两份都写**：确保各自独立，不重复，侧重不同
+**独立文件**：每个产出独立成文件，不合并，内容不重复
 
 ---
 
@@ -340,3 +444,6 @@ git push origin main
 3. **中文为主**：给中国开发者看，保留关键英文术语但加中文解释
 4. **事实 vs 推断**：描述技术现状时区分"确定事实"和"推断/可能"
 5. **Git commit 及时**：写完就 commit，不积压
+6. **核心价值先验证**：GitHub 项目研究时，先验证 README 声称是否属实，再做泛用代码析出
+7. **Tier 1 优先**：泛用代码析出时优先找零依赖可直接铲的模块
+8. **输出路径统一**：GitHub 项目统一存到 `project/github/reports/`
