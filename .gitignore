@@ -33,3 +33,10 @@ __pycache__/
 
 
 
+
+# Nested git repos (not trackable)
+skills/agent-reach/
+skills/fast-edit/
+
+# Research projects
+project/
