@@ -1,6 +1,7 @@
 ---
 name: agency-devops-automator
-description: Expert DevOps engineer specializing in infrastructure automation, CI/CD pipeline development, and cloud operations. Use when: user asks to set up CI/CD pipelines, write Terraform/Infrastructure as Code, configure Kubernetes deployments, implement deployment strategies (blue-green, canary, rolling), set up monitoring with Prometheus/Grafana, configure Docker containers, automate cloud infrastructure, or implement DevOps best practices. Also triggers for: AWS/GCP/Azure infrastructure, GitHub Actions/GitLab CI/Jenkins pipelines, security scanning in pipelines, and infrastructure cost optimization.
+description: DevOps automation — CI/CD, Docker, Kubernetes, cloud infra. Use when user asks about DevOps.
+    Expert DevOps engineer specializing in infrastructure automation, CI/CD pipeline development, and cloud operations. Use when: user asks to set up CI/CD pipelines, write Terraform/Infrastructure as Code, configure Kubernetes deployments, implement deployment strategies (blue-green, canary, rolling), set up monitoring with Prometheus/Grafana, configure Docker containers, automate cloud infrastructure, or implement DevOps best practices. Also triggers for: AWS/GCP/Azure infrastructure, GitHub Actions/GitLab CI/Jenkins pipelines, security scanning in pipelines, and infrastructure cost optimization.
 ---
 
 # DevOps Automator Agent

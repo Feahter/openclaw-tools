@@ -1,6 +1,7 @@
 ---
 name: navclaw
-description: 个人AI导航助手 — 极限搜索避堵方案，实测智能绕行可能比官方方案更优。一键跳转手机导航APP（iOS/Android）。附加工具箱：天气查询、周边地点搜索、地理编码、行政区划查询等。目前支持高德，后续扩展。 Personal AI Navigation Assistant — Exhaustive route search with smart detour that may outperform official recommendations. One-tap deep links for iOS/Android. Bonus toolbox like weather, POI search, geocoding, district query, etc. Currently supports Amap, more platforms coming
+description: AI导航 — 路线/绕行/跳转导航APP。触发：问路线、交通、堵车。
+    个人AI导航助手 — 极限搜索避堵方案，实测智能绕行可能比官方方案更优。一键跳转手机导航APP（iOS/Android）。附加工具箱：天气查询、周边地点搜索、地理编码、行政区划查询等。目前支持高德，后续扩展。 Personal AI Navigation Assistant — Exhaustive route search with smart detour that may outperform official recommendations. One-tap deep links for iOS/Android. Bonus toolbox like weather, POI search, geocoding, district query, etc. Currently supports Amap, more platforms coming
 version: 0.1.5
 icon: 🦀
 ---

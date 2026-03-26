@@ -1,6 +1,7 @@
 ---
 name: attention-system
-description: "Attention analysis and capture positive feedback system based on metacognition and first principles. Use when the user needs trend sensing, attention capture strategy design, content strategy planning, or wants to understand attention economics and information entropy reduction."
+description: Attention analysis system based on metacognition. Use when user wants to analyze attention patterns or capture positive feedback.
+    "Attention analysis and capture positive feedback system based on metacognition and first principles. Use when the user needs trend sensing, attention capture strategy design, content strategy planning, or wants to understand attention economics and information entropy reduction."
 ---
 
 # Attention System Skills

@@ -1,6 +1,6 @@
 ---
 name: chinese-name-lookup
-description: Chinese name analysis and recommendation based on Eight Characters (八字) and Five-Gram numerology (五格剖象). Use when user wants to analyze a name's fortune, get name recommendations for a newborn based on birth date/time, check if a name fits the person's八字/喜用神, or evaluate a name's五格数理 and三才配置. Triggers on: "分析名字", "八字起名", "根据八字取名", "五格剖象", "这个名字怎么样", "帮我起个名字", "喜用神", "五行缺什么", "姓名推荐", "八字喜用神".
+description: Chinese name analysis and recommendation based on Eight Characters (八字) and Five-Gram numerology (五格剖象). Use when user wants to analyze a name's fortune, get name recommendations for a newborn based on birth date/time, check if a name fits the person's八字/喜用神, or evaluate a name's五格数理 and三才配置. Supports fallback mode when API is unavailable. Triggers on: "分析名字", "八字起名", "根据八字取名", "五格剖象", "这个名字怎么样", "帮我起个名字", "喜用神", "五行缺什么", "姓名推荐", "八字喜用神", "姓X名Y", "帮我起个姓X的宝宝名字".
 ---
 
 # Chinese Name Fortune Analysis & Recommendation
@@ -48,13 +48,16 @@ Step 5: 输出结构化报告
 
 ---
 
-## Step 2: 调用八字精算 API
+## Step 2: 调用八字精算 API（含 Fallback）
 
 **API 端点**：`https://api.yuanfenju.com/index.php/v1/Bazi/jingsuan`
 
-**请求方式**：GET（demo key 直接拼接参数）
+**配置说明**：将 `scripts/bazi_api.py` 中的 `DEFAULT_API_KEY` 替换为从 doc.yuanfenju.com 申请的 API Key。
 
-**Demo Key**：`FsF1CsVevk3N17w7oBkSydfSk`
+**Fallback 机制**：当 API Key 未配置或调用失败时，系统自动切换到 fallback 模式：
+- 使用默认喜用神（金、水）继续生成名字
+- 在输出中显示 ⚠️ 提示"喜用神为估算值"
+- 仍可正常生成五格数理分析
 
 **必填参数**：
 | 参数 | 说明 | 示例 |
@@ -204,15 +207,22 @@ GET https://api.yuanfenju.com/index.php/v1/Bazi/jingsuan?api_key=FsF1CsVevk3N17w
 
 > 注：这是简化判断，精确五行需要专业字典
 
-### 4.3 评分体系
+### 4.3 评分体系（V2）
 
-| 维度 | 权重 | 说明 |
+**核心原则**：人格和总格为凶数直接排除，三才为凶也排除
+
+**通过条件（必须全部满足）**：
+1. 人格数不在凶数列表（FORBIDDEN_NUMBERS）
+2. 总格数不在凶数列表（FORBIDDEN_NUMBERS）
+3. 三才配置为吉或半吉
+
+**分数构成**：
+| 维度 | 得分 | 说明 |
 |------|------|------|
-| 五格数理 | 30% | 人格吉凶最重要 |
-| 三才配置 | 25% | 相生/比和 > 相克 |
-| 喜用神匹配 | 25% | 匹配喜用神越多越好 |
-| 字义评分 | 10% | 字义正向程度 |
-| 音形义 | 10% | 读音流畅/字形平衡 |
+| 五格数理 | 50/0 | 人格+总格都为吉则50，否则0 |
+| 三才配置 | 25/15/0 | 吉25分，半吉15分，凶0分 |
+| 喜用神匹配 | 0-24 | 每匹配一个字+12分 |
+| 字义评分 | 10/6 | 全在常用好字表10分，否则6分 |
 
 ---
 
@@ -280,10 +290,10 @@ GET https://api.yuanfenju.com/index.php/v1/Bazi/jingsuan?api_key=FsF1CsVevk3N17w
 
 | 错误类型 | 处理方式 |
 |---------|---------|
-| API 调用失败 | 降级：使用本地简化八字推算（仅五行为主）|
-| 喜用神为空 | 返回"无法获取喜用神，请检查出生时间" |
-| 笔画数表中无该字 | 尝试偏旁推断，或标注"未收录" |
-| 候选字不足3个 | 放宽条件（允许1个半吉），直至凑满3个 |
+| API Key 未配置/失效 | 自动切换 fallback 模式，使用默认喜用神（金、水），输出带⚠️提示 |
+| 网络错误 | 重试1次，失败则 fallback |
+| 笔画数表中无该字 | 使用偏旁推断五行，默认笔画数8 |
+| 候选字不足3个 | 放宽三才要求（允许半吉），直至凑满3个 |
 
 ---
 

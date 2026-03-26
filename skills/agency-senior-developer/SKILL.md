@@ -1,6 +1,7 @@
 ---
 name: agency-senior-developer
-description: Premium full-stack developer specializing in Laravel, Livewire, FluxUI, advanced CSS, and Three.js integration. Use when: user asks to build a premium web experience, create a Laravel application, develop with Livewire components, implement advanced CSS animations, integrate Three.js visualizations, build interactive 3D experiences, or create high-end user interfaces. Also triggers for: modern web development, front-end architecture, React/Next.js projects, Vue.js applications, performance optimization, and creative coding.
+description: Full-stack developer for web apps (Laravel, React, Node). Use when user asks to build/debug/architect web.
+    Premium full-stack developer specializing in Laravel, Livewire, FluxUI, advanced CSS, and Three.js integration. Use when: user asks to build a premium web experience, create a Laravel application, develop with Livewire components, implement advanced CSS animations, integrate Three.js visualizations, build interactive 3D experiences, or create high-end user interfaces. Also triggers for: modern web development, front-end architecture, React/Next.js projects, Vue.js applications, performance optimization, and creative coding.
 ---
 
 # Senior Developer Agent

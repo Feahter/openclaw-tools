@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-八字精算 API 调用封装
+八字精算 API 调用封装（带 fallback 机制）
 API: https://api.yuanfenju.com/index.php/v1/Bazi/jingsuan
 """
 
@@ -9,9 +9,15 @@ import urllib.request
 import urllib.error
 from typing import Dict, Any, Optional
 
-# 默认 Demo Key (可用于测试)
-DEFAULT_API_KEY = "FsF1CsVevk3N17w7oBkSydfSk"
+DEFAULT_API_KEY = "YOUR_API_KEY_HERE"  # 用户需要自行配置
 API_URL = "https://api.yuanfenju.com/index.php/v1/Bazi/jingsuan"
+
+# Fallback 喜用神配置（API 不可用时使用）
+FALLBACK_XIYONGSHEN = {
+    "default": ["金", "水"],  # 最常见的喜用神组合
+    "male": ["金", "水"],
+    "female": ["木", "火"],
+}
 
 
 def call_bazi_api(
@@ -25,30 +31,17 @@ def call_bazi_api(
     province: str = "北京市",
     city: str = "北京",
     api_key: str = DEFAULT_API_KEY,
-    use_true_sun: int = 1,  # 1=考虑真太阳时
+    use_true_sun: int = 1,
 ) -> Dict[str, Any]:
     """
     调用八字精算 API 获取命盘信息
     
-    Args:
-        name: 姓名
-        sex: 性别 (1=男, 0=女)
-        year: 出生年 (公历)
-        month: 出生月
-        day: 出生日
-        hour: 出生时 (24小时制)
-        minute: 出生分 (默认0)
-        province: 省份
-        city: 城市
-        api_key: API密钥
-        use_true_sun: 是否考虑真太阳时 (1=是, 0=否)
-    
-    Returns:
-        API 返回的完整 JSON 数据
-        
-    Raises:
-        Exception: API 调用失败时抛出
+    API 调用失败时返回 fallback 数据，并在返回结果中标记 is_fallback=True
     """
+    # 如果是默认 key，尝试调用一次然后直接 fallback
+    if api_key == "YOUR_API_KEY_HERE" or api_key == DEFAULT_API_KEY:
+        return _fallback_response(sex, reason="API_KEY_NOT_CONFIGURED")
+    
     params = {
         "api_key": api_key,
         "name": name,
@@ -64,8 +57,10 @@ def call_bazi_api(
         "city": city,
     }
     
-    query_string = "&".join([f"{k}={urllib.parse.quote(str(v))}" 
-                              for k, v in params.items()])
+    query_string = "&".join([
+        f"{k}={urllib.parse.quote(str(v))}" 
+        for k, v in params.items()
+    ])
     url = f"{API_URL}?{query_string}"
     
     try:
@@ -73,45 +68,70 @@ def call_bazi_api(
             data = json.loads(response.read().decode("utf-8"))
             
         if data.get("errcode") != 0:
-            raise Exception(f"API Error: {data.get('errmsg', 'Unknown error')}")
+            # API 返回错误，fallback
+            return _fallback_response(sex, reason=f"API_ERROR: {data.get('errmsg', 'Unknown')}")
             
         return data
         
     except urllib.error.URLError as e:
-        raise Exception(f"Network Error: {str(e)}")
+        return _fallback_response(sex, reason=f"NETWORK_ERROR: {str(e)}")
     except json.JSONDecodeError as e:
-        raise Exception(f"JSON Parse Error: {str(e)}")
+        return _fallback_response(sex, reason=f"JSON_ERROR: {str(e)}")
+    except Exception as e:
+        return _fallback_response(sex, reason=f"UNKNOWN_ERROR: {str(e)}")
+
+
+def _fallback_response(sex: int, reason: str = "") -> Dict[str, Any]:
+    """
+    生成 fallback 响应
+    当 API 不可用时，使用默认喜用神
+    """
+    gender_key = "male" if sex == 1 else "female"
+    fallback_xiyong = FALLBACK_XIYONGSHEN.get(gender_key, FALLBACK_XIYONGSHEN["default"])
+    
+    return {
+        "is_fallback": True,
+        "fallback_reason": reason,
+        "data": {
+            "base_info": {
+                "sex": "乾造" if sex == 1 else "坤造",
+                "name": "",
+                "gongli": "",
+                "nongli": "",
+                "wuxing_wangdu": "（API 未配置，无法分析）",
+                "xiyongshen": {
+                    "qiangruo": "（API 未配置，无法分析）",
+                    "xiyongshen": "、".join(fallback_xiyong),
+                    "jishen": "（API 未配置，无法分析）",
+                    "xiyongshen_desc": f"【注意】八字喜用神为估算值（{fallback_xiyong}），仅供参考。建议配置真实 API_KEY 获取准确喜用神。",
+                    "jin_score": 50,
+                    "mu_score": 50,
+                    "shui_score": 50,
+                    "huo_score": 50,
+                    "tu_score": 50,
+                }
+            },
+            "sizhu_info": {
+                "year": {"tg": "?", "dz": "?", "wx": "?"},
+                "month": {"tg": "?", "dz": "?", "wx": "?"},
+                "day": {"tg": "?", "dz": "?", "wx": "?"},
+                "hour": {"tg": "?", "dz": "?", "wx": "?"},
+            }
+        }
+    }
 
 
 def parse_bazi_response(api_data: Dict[str, Any]) -> Dict[str, Any]:
     """
     解析八字 API 返回数据，提取关键信息
-    
-    Returns:
-        {
-            "birth_chart": "甲辰年 戊辰月 壬辰日 己酉时",
-            "sex": "乾造",  # 或 "坤造"
-            "wuxing_wangdu": "水旺 木相 金休 土囚 火死",
-            "xiyongshen": "金、水",
-            "jishen": "木",
-            "qiangruo": "八字偏弱",
-            "xiyongshen_desc": "身弱，需补助...",
-            "wuxing_scores": {
-                "金": 75, "木": 16, "水": 118, "火": 36, "土": 139
-            },
-            "sizhu": {
-                "year": {"tg": "甲", "dz": "辰"},
-                "month": {"tg": "戊", "dz": "辰"},
-                "day": {"tg": "壬", "dz": "辰"},
-                "hour": {"tg": "己", "dz": "酉"},
-            }
-        }
     """
+    is_fallback = api_data.get("is_fallback", False)
+    
     base = api_data.get("data", {}).get("base_info", {})
     xiyong = base.get("xiyongshen", {})
     sizhu = api_data.get("data", {}).get("sizhu_info", {})
     
-    # 解析喜用神 (可能是字符串如"金，水"或对象如{"xiyongshen": "金，水"})
+    # 解析喜用神
     if isinstance(xiyong, dict):
         xiyong_str = xiyong.get("xiyongshen", "")
         jishen = xiyong.get("jishen", "")
@@ -125,14 +145,13 @@ def parse_bazi_response(api_data: Dict[str, Any]) -> Dict[str, Any]:
             "土": xiyong.get("tu_score", 0),
         }
     else:
-        # 如果是字符串格式 "金，水"
-        xiyong_str = str(xiyong)
+        xiyong_str = str(xiyong) if xiyong else "金、水"
         jishen = ""
         qiangruo = ""
         desc = ""
         scores = {}
     
-    # 解析八字四柱
+    # 解析四柱
     sizhu_info = {}
     for key in ["year", "month", "day", "hour"]:
         if key in sizhu:
@@ -155,6 +174,7 @@ def parse_bazi_response(api_data: Dict[str, Any]) -> Dict[str, Any]:
     birth_chart = f"{year_tg}{year_dz}年 {month_tg}{month_dz}月 {day_tg}{day_dz}日 {hour_tg}{hour_dz}时"
     
     return {
+        "is_fallback": is_fallback,
         "birth_chart": birth_chart,
         "sex": base.get("sex", ""),
         "wuxing_wangdu": base.get("wuxing_wangdu", ""),
@@ -169,44 +189,20 @@ def parse_bazi_response(api_data: Dict[str, Any]) -> Dict[str, Any]:
 
 def main():
     """测试 API 调用"""
-    print("测试八字精算 API...")
+    print("=== 测试 API 调用（含 fallback） ===\n")
     
-    try:
-        # 示例：张三，男，1994年12月3日18:55
-        result = call_bazi_api(
-            name="张三",
-            sex=1,
-            year=1994,
-            month=12,
-            day=3,
-            hour=18,
-            minute=55,
-            province="北京市",
-            city="北京",
-        )
-        
-        parsed = parse_bazi_response(result)
-        
-        print("\n=== 命盘信息 ===")
-        print(f"八字：{parsed['birth_chart']}")
-        print(f"性别：{parsed['sex']}")
-        print(f"五行旺度：{parsed['wuxing_wangdu']}")
-        print(f"喜用神：{parsed['xiyongshen']}")
-        print(f"忌神：{parsed['jishen']}")
-        print(f"八字强弱：{parsed['qiangruo']}")
-        print(f"说明：{parsed['xiyongshen_desc']}")
-        
-        print("\n=== 五行能量 ===")
-        scores = parsed.get("wuxing_scores", {})
-        for wuxing, score in scores.items():
-            print(f"  {wuxing}: {score}")
-            
-        print("\n=== 四柱 ===")
-        for key, val in parsed.get("sizhu", {}).items():
-            print(f"  {key}: {val['tg']}{val['dz']}")
-        
-    except Exception as e:
-        print(f"Error: {e}")
+    # 测试1: 默认 key (应触发 fallback)
+    print("测试1: 使用默认 KEY (应触发 fallback)")
+    result1 = call_bazi_api("张三", 1, 2024, 5, 1, 10)
+    print(f"  is_fallback: {result1.get('is_fallback')}")
+    print(f"  fallback_reason: {result1.get('fallback_reason')}")
+    print()
+    
+    # 测试2: 解析
+    print("测试2: 解析 fallback 响应")
+    parsed = parse_bazi_response(result1)
+    print(f"  喜用神: {parsed['xiyongshen']}")
+    print(f"  描述: {parsed['xiyongshen_desc']}")
 
 
 if __name__ == "__main__":

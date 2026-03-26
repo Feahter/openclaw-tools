@@ -1,6 +1,7 @@
 ---
 name: zeroclaw-driver
-description: "Driver for ZeroClaw - a lightweight Rust-based AI agent runtime. Use this skill whenever: (1) User wants to run a lightweight AI assistant that uses minimal memory (under 5MB), (2) Need fast cold-start agent (under 10ms) for quick queries, (3) Running simple automated tasks in background with cron/heartbeat, (4) Using local AI models (Ollama, LM Studio, llama.cpp) for offline or cost-effective inference, (5) User mentions lightweight alternative to OpenClaw or wants to save resources, (6) Low-memory environment deployment like Raspberry Pi or edge devices, (7) User wants to test AI tasks without full OpenClaw overhead."
+description: Driver for ZeroClaw - lightweight Rust-based AI agent runtime. Use when user mentions ZeroClaw.
+    "Driver for ZeroClaw - a lightweight Rust-based AI agent runtime. Use this skill whenever: (1) User wants to run a lightweight AI assistant that uses minimal memory (under 5MB), (2) Need fast cold-start agent (under 10ms) for quick queries, (3) Running simple automated tasks in background with cron/heartbeat, (4) Using local AI models (Ollama, LM Studio, llama.cpp) for offline or cost-effective inference, (5) User mentions lightweight alternative to OpenClaw or wants to save resources, (6) Low-memory environment deployment like Raspberry Pi or edge devices, (7) User wants to test AI tasks without full OpenClaw overhead."
 ---
 
 # ZeroClaw Driver

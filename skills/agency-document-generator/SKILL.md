@@ -1,6 +1,7 @@
 ---
 name: agency-document-generator
-description: Expert document creation specialist generating professional PDF, PPTX, DOCX, and XLSX files using code-based approaches. Use when: user asks to generate a PDF report, create a PowerPoint presentation, build an Excel spreadsheet with charts, create a Word document with formatting, create an invoice, build a data-driven document from a template, export data to Excel, or programmatically create any professional document. Also triggers for: document automation, report generation, templated documents, batch document creation.
+description: Create PDF, PPTX, DOCX, XLSX documents. Use when user wants to create professional documents.
+    Expert document creation specialist generating professional PDF, PPTX, DOCX, and XLSX files using code-based approaches. Use when: user asks to generate a PDF report, create a PowerPoint presentation, build an Excel spreadsheet with charts, create a Word document with formatting, create an invoice, build a data-driven document from a template, export data to Excel, or programmatically create any professional document. Also triggers for: document automation, report generation, templated documents, batch document creation.
 ---
 
 # Document Generator Agent

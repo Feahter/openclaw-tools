@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """
-名字生成与评分器
+名字生成与评分器 V2
 结合八字喜用神 + 五格数理，生成名字推荐方案
+- 扩充候选字库（50+/五行）
+- 预过滤凶数组合
+- 完善输出格式
 """
 
 import json
 import random
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Tuple
 from datetime import datetime
 
-# 尝试导入依赖
 try:
     from bazi_api import call_bazi_api, parse_bazi_response
     from wuge_calculator import calculate_wuge, get_char_wuxing, get_char_stroke
@@ -21,76 +23,125 @@ except ImportError:
     from wuge_calculator import calculate_wuge, get_char_wuxing, get_char_stroke
 
 
-# 喜用神五行对应的常用起名字（精选）
-XIYONGSHEN_WORDS = {
+# 扩充版喜用神字库（50+/五行）
+XIYONGSHEN_WORDS_V2 = {
     "金": {
-        "常用字": ["铭", "锋", "锐", "锦", "钰", "铎", "锡", "钧", "鑫", "镇", "镕", "鎏", "铠", "铖", "钲", "钱", "锦", "镛", "镜", "钻"],
-        "寓意": ["坚硬、珍贵、锐利、财富"],
-        "五行属金": ["金", "银", "铜", "铁", "锡", "铝", "钢"],
+        "常用字": [
+            # 高频金
+            "铭", "锋", "锐", "锦", "鑫", "铎", "锡", "钧", "镇", "镕",
+            "铠", "钲", "钱", "锦", "镛", "镜", "钻", "铁", "铜", "银",
+            # 次常用
+            "锐", "锴", "锟", "锄", "锅", "链", "锁", "锈", "错", "锡",
+            "锣", "锤", "锥", "镀", "锰", "镖", "镐", "镍", "镂", "锡",
+            "钧", "钥", "钦", "钧", "钴", "钵", "钻", "铢", "铣", "铭",
+            "铮", "甥", "镔", "鉴", "銮", "鏖", "鏖",
+        ],
+        "寓意": "坚硬、珍贵、锐利、财富、权力",
     },
     "水": {
-        "常用字": ["泽", "涵", "润", "清", "澜", "洁", "淳", "泉", "波", "涛", "瀚", "溪", "泽", "沐", "润", "潮", "汐", "澜", "澔"],
-        "寓意": ["清澈、柔和、包容、流动"],
-        "五行属水": ["水", "冰", "江", "河", "湖", "海", "泉"],
+        "常用字": [
+            # 高频水
+            "泽", "涵", "润", "清", "澜", "洁", "淳", "泉", "波", "涛",
+            "瀚", "溪", "沐", "潮", "汐", "澔", "瀚", "渊", "漾", "溢",
+            # 次常用
+            "汝", "汐", "汲", "汪", "沛", "沙", "沃", "没", "沟", "沥",
+            "泉", "泊", "泌", "泣", "泳", "治", "法", "泛", "泸", "泣",
+            "沫", "泞", "泱", "波", "泣", "泳", "洁", "洪", "济", "浏",
+            "浪", "涌", "浚", "渔", "淑", "淌", "淡", "深", "温", "湾",
+            "满", "源", "潮", "澎", "澜", "澈", "潮",
+        ],
+        "寓意": "清澈、柔和、包容、流动、智慧",
     },
     "木": {
-        "常用字": ["森", "林", "松", "柏", "桐", "楷", "梓", "榆", "楠", "栋", "梁", "柱", "杨", "柳", "枫", "桂", "槐", "樱", "彬"],
-        "寓意": ["正直、向上、仁慈、坚韧"],
-        "五行属木": ["木", "竹", "藤", "花", "草", "树", "林"],
+        "常用字": [
+            # 高频木
+            "森", "林", "松", "柏", "桐", "楷", "梓", "榆", "楠", "栋",
+            "梁", "柱", "杨", "柳", "枫", "桂", "槐", "樱", "彬", "杉",
+            # 次常用
+            "札", "朴", "机", "权", "杞", "束", "杜", "束", "杭", "束",
+            "枚", "果", "枝", "枯", "柄", "栋", "橙", "桐", "桓", "桔",
+            "栩", "桂", "栖", "栗", "桑", "梢", "棕", "棺", "棉", "棋",
+            "棍", "椅", "植", "椰", "楠", "楷", "槐", "桦", "桢", "贤",
+        ],
+        "寓意": "正直、向上、仁慈、坚韧、生命力",
     },
     "火": {
-        "常用字": ["炎", "灿", "炜", "熠", "烽", "焕", "煌", "耀", "曦", "炫", "晟", "哲", "晔", "昊", "昌", "晖", "明", "旭", "辉"],
-        "寓意": ["热烈、光明、热情、积极"],
-        "五行属火": ["火", "光", "电", "热", "光", "炎", "焰"],
+        "常用字": [
+            # 高频火
+            "炎", "灿", "炜", "熠", "烽", "焕", "煌", "耀", "曦", "炫",
+            "晟", "哲", "晔", "昊", "昌", "晖", "明", "旭", "辉", "昭",
+            # 次常用
+            "灰", "灬", "灶", "灬", "灬", "灾", "灿", "灵", "灬", "炖",
+            "炒", "炙", "烈", "焚", "焓", "焕", "烽", "焖", "焰", "然",
+            "煌", "熔", "熙", "熊", "熟", "燎", "燊", "爔", "爔",
+            "炬", "炖", "炒", "烈", "焕", "辉", "耀", "显", "晃",
+        ],
+        "寓意": "热烈、光明、热情、积极、创造力",
     },
     "土": {
-        "常用字": ["城", "垣", "培", "基", "坚", "坤", "厚", "坦", "培", "增", "墨", "圣", "在", "均", "堪", "塘", "境", "增", "壁"],
-        "寓意": ["稳重、厚道、包容、诚信"],
-        "五行属土": ["土", "山", "石", "玉", "砂", "泥", "田"],
+        "常用字": [
+            # 高频土
+            "城", "垣", "培", "基", "坚", "坤", "厚", "坦", "增", "墨",
+            "圣", "在", "均", "堪", "塘", "境", "增", "壁", "壤", "垣",
+            # 次常用
+            "址", "阝", "坠", "坏", "坐", "坏", "坡", "坤", "坦", "坏",
+            "址", "垂", "垣", "城", "埂", "埔", "堤", "堰", "堵", "塑",
+            "墨", "增", "壁", "壤", "壑", "垢", "垣", "墟", "墓", "墙",
+            "坛", "坞", "坏", "培", "堆", "堪", "堰", "堵", "塑", "墨",
+        ],
+        "寓意": "稳重、厚道、包容、诚信、承载",
     },
 }
 
-# 常用好字（按拼音首字母，精选300+）
+# 绝对禁止的数理（凶数之凶）
+FORBIDDEN_NUMBERS = {2, 4, 9, 10, 12, 14, 19, 20, 22, 26, 28, 34, 36, 37, 43, 44, 46, 49, 50, 54, 56, 58, 59, 60, 64, 66, 69, 70, 72, 73, 74, 75, 76, 77, 78, 79, 80}
+
+# 需要谨慎使用的数理（半吉）
+CAUTION_NUMBERS = {6, 8, 17, 18, 27, 30, 36, 38, 39, 40, 42, 51, 52, 53, 55, 57, 58, 59, 60, 62, 64, 65, 66, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80}
+
+# 特别好听的组合（常见好名示例）
+GOOD_NAME_EXAMPLES = [
+    ("泽", "楷"), ("锦", "泽"), ("铭", "泽"), ("润", "泽"),
+    ("思", "远"), ("景", "行"), ("明", "德"), ("文", "礼"),
+    ("安", "然"), ("静", "好"), ("清", "欢"), ("时", "雨"),
+    ("栀", "晴"), ("望", "晴"), ("言", "蹊"), ("知", "意"),
+]
+
 COMMON_GOOD_CHARS = [
-    # A-H
+    # 常用好字（按拼音排序，精选100+）
     "安", "昂", "傲", "奥", "澳", "柏", "宝", "博", "才", "苍", "超",
     "琛", "晨", "成", "承", "诚", "城", "程", "弛", "崇", "川", "春",
     "慈", "聪", "丹", "道", "德", "鼎", "定", "东", "冬", "铎", "恩",
-    "发", "帆", "方", "芳", "飞", "风", "福", "辅", "刚", "高", "歌",
-    "根", "工", "功", "冠", "光", "广", "贵", "国", "海", "翰", "航",
-    "浩", "和", "河", "荷", "恒", "弘", "红", "宏", "华", "怀", "辉",
-    "汇", "慧", "嘉", "家", "建", "健", "洁", "金", "锦", "进", "晋",
-    "京", "经", "景", "静", "敬", "镜", "炯", "玖", "举", "聚", "军",
-    # J-Z
-    "俊", "峻", "康", "可", "克", "宽", "葵", "来", "岚", "蓝", "朗",
-    "乐", "磊", "理", "礼", "力", "立", "连", "良", "林", "临", "霖",
-    "灵", "凌", "龙", "隆", "楼", "露", "路", "洛", "洛", "洛", "洛",
-    "梅", "美", "孟", "民", "明", "鸣", "墨", "默", "沐", "娜", "宁",
-    "培", "鹏", "平", "启", "谦", "强", "勤", "清", "晴", "庆", "秋",
-    "全", "权", "泉", "然", "仁", "融", "如", "瑞", "睿", "润", "若",
-    "森", "山", "善", "绍", "深", "生", "盛", "石", "时", "实", "识",
-    "书", "抒", "舒", "树", "帅", "双", "顺", "思", "硕", "松", "涛",
-    "天", "亭", "通", "桐", "威", "文", "问", "西", "希", "悉", "惜",
-    "熙", "希", "夏", "先", "祥", "想", "向", "晓", "笑", "效", "新",
-    "心", "辛", "信", "兴", "星", "修", "旭", "栩", "轩", "宣", "学",
-    "雪", "勋", "循", "逊", "雅", "亚", "彦", "曜", "耀", "烨", "伊",
-    "依", "颐", "仪", "宜", "怡", "义", "艺", "易", "益", "逸", "毅",
-    "翼", "英", "盈", "永", "咏", "泳", "勇", "用", "优", "悠", "游",
-    "有", "于", "宇", "羽", "雨", "语", "玉", "裕", "预", "元", "圆",
-    "远", "月", "岳", "云", "允", "运", "韵", "在", "泽", "增", "昭",
-    "哲", "者", "振", "正", "政", "之", "知", "直", "植", "至", "致",
-    "治", "智", "中", "仲", "舟", "周", "州", "洲", "竹", "主", "卓",
-    "琢", "子", "紫", "自", "宗", "祖", "组", "左", "作", "坐", "座",
+    "帆", "方", "芳", "飞", "风", "福", "辅", "刚", "高", "歌", "根",
+    "工", "功", "冠", "光", "广", "贵", "国", "海", "翰", "航", "浩",
+    "和", "河", "荷", "恒", "弘", "红", "宏", "华", "怀", "辉", "汇",
+    "慧", "嘉", "家", "建", "健", "洁", "金", "锦", "进", "晋", "京",
+    "经", "景", "静", "敬", "镜", "炯", "玖", "举", "聚", "军", "俊",
+    "峻", "康", "可", "克", "宽", "葵", "来", "岚", "蓝", "朗", "乐",
+    "磊", "理", "礼", "力", "立", "连", "良", "林", "临", "霖", "灵",
+    "凌", "龙", "隆", "楼", "露", "路", "洛", "梅", "美", "孟", "民",
+    "明", "鸣", "墨", "默", "沐", "娜", "宁", "培", "鹏", "平", "启",
+    "谦", "强", "勤", "清", "晴", "庆", "秋", "全", "权", "泉", "然",
+    "仁", "融", "如", "瑞", "睿", "润", "若", "森", "山", "善", "绍",
+    "深", "生", "盛", "石", "时", "实", "识", "书", "抒", "舒", "树",
+    "帅", "双", "顺", "思", "硕", "松", "涛", "天", "亭", "通", "桐",
+    "威", "文", "问", "西", "希", "悉", "惜", "熙", "夏", "先", "祥",
+    "想", "向", "晓", "笑", "效", "新", "心", "辛", "信", "兴", "星",
+    "修", "旭", "栩", "轩", "宣", "学", "雪", "勋", "循", "逊", "雅",
+    "亚", "彦", "曜", "耀", "烨", "伊", "依", "颐", "仪", "宜", "怡",
+    "义", "艺", "易", "益", "逸", "毅", "翼", "英", "盈", "永", "咏",
+    "泳", "勇", "用", "优", "悠", "游", "有", "于", "宇", "羽", "雨",
+    "语", "玉", "裕", "预", "元", "圆", "远", "月", "岳", "云", "允",
+    "运", "韵", "泽", "增", "昭", "哲", "者", "振", "正", "政", "之",
+    "知", "直", "植", "至", "致", "治", "智", "中", "仲", "舟", "州",
+    "洲", "竹", "主", "卓", "琢", "子", "紫", "自", "宗", "祖", "组",
 ]
 
 
 def parse_xiyongshen(xiyongshen_str: str) -> List[str]:
-    """
-    解析喜用神字符串，返回五行列表
-    例如: "金，水" -> ["金", "水"]
-    """
+    """解析喜用神字符串"""
     if not xiyongshen_str:
-        return ["金", "水"]  # 默认
+        return ["金", "水"]
     
     result = []
     for char in xiyongshen_str:
@@ -99,104 +150,98 @@ def parse_xiyongshen(xiyongshen_str: str) -> List[str]:
     return result if result else ["金", "水"]
 
 
-def score_name(
+def is_good_wuge_number(n: int) -> Tuple[bool, str]:
+    """
+    判断数理是否吉利
+    Returns: (is_good, warning)
+    """
+    if n in FORBIDDEN_NUMBERS:
+        return False, f"数理{n}为大凶之数"
+    if n in CAUTION_NUMBERS:
+        return False, f"数理{n}需谨慎使用"
+    return True, ""
+
+
+def score_name_v2(
     surname: str,
     givenname: str,
     xiyongshen_list: List[str],
     wuge_result: Dict[str, Any]
 ) -> Dict[str, Any]:
     """
-    给名字打分
-    
-    评分维度:
-    - 五格数理 (30%): 人格必须为吉
-    - 三才配置 (25%): 相生/比和 > 相克
-    - 喜用神匹配 (25%): 字五行匹配喜用神
-    - 字义评分 (10%): 字义正向
-    - 音形义 (10%): 读音流畅/字形平衡
-    
-    Returns:
-        {
-            "total_score": 85,
-            "breakdown": {...},
-            "pass": True,
-            "issues": []
-        }
+    V2 评分函数
+    - 人格/总格/地格 为凶数直接禁止
+    - 三才为凶禁止
+    - 喜用神匹配加分
     """
-    score = 0
-    breakdown = {}
     issues = []
+    warnings = []
     pass_flag = True
     
-    # 1. 五格数理 (30%)
-    ren_ge = wuge_result["ren_ge"]
-    di_ge = wuge_result["di_ge"]
-    zong_ge = wuge_result["zong_ge"]
-    
-    wuge_score = 0
-    if ren_ge["jixiong"] == "吉":
-        wuge_score += 20
-    elif ren_ge["jixiong"] == "半吉":
-        wuge_score += 10
-    else:
-        wuge_score += 0
-        issues.append(f"人格{ren_ge['number']}为凶数")
+    # 1. 人格必须为吉
+    ren = wuge_result["ren_ge"]["number"]
+    ren_ok, ren_msg = is_good_wuge_number(ren)
+    if not ren_ok:
+        issues.append(f"人格{ren}{ren_msg}")
         pass_flag = False
     
-    if di_ge["jixiong"] == "吉":
-        wuge_score += 5
-    elif di_ge["jixiong"] == "半吉":
-        wuge_score += 2
+    # 2. 总格必须为吉
+    zong = wuge_result["zong_ge"]["number"]
+    zong_ok, zong_msg = is_good_wuge_number(zong)
+    if not zong_ok:
+        issues.append(f"总格{zong}{zong_msg}")
+        pass_flag = False
     
-    if zong_ge["jixiong"] == "吉":
-        wuge_score += 5
-    elif zong_ge["jixiong"] == "半吉":
-        wuge_score += 2
+    # 3. 天格参考
+    tian = wuge_result["tian_ge"]["number"]
+    tian_ok, tian_msg = is_good_wuge_number(tian)
+    if not tian_ok:
+        warnings.append(f"天格{tian}{tian_msg}")
     
-    breakdown["五格数理"] = wuge_score
+    # 4. 地格参考
+    di = wuge_result["di_ge"]["number"]
+    di_ok, di_msg = is_good_wuge_number(di)
+    if not di_ok:
+        warnings.append(f"地格{di}{di_msg}")
     
-    # 2. 三才配置 (25%)
+    # 5. 三才配置
     san_cai = wuge_result["san_cai"]
-    sancai_score = 0
-    if san_cai["jixiong"] == "吉":
-        sancai_score = 25
-    elif san_cai["jixiong"] == "半吉":
-        sancai_score = 15
-    else:
-        sancai_score = 0
+    if san_cai["jixiong"] not in ["吉", "半吉"]:
         issues.append(f"三才配置{san_cai['config']}为凶")
         pass_flag = False
     
-    breakdown["三才配置"] = sancai_score
-    
-    # 3. 喜用神匹配 (25%)
-    xiyong_score = 0
+    # 6. 喜用神匹配
     match_count = 0
     for char in givenname:
         char_wuxing = get_char_wuxing(char)
         if char_wuxing in xiyongshen_list:
-            xiyong_score += 12
             match_count += 1
-        else:
-            xiyong_score += 2  # 不匹配但也不冲突
     
-    # 额外分数：两个字都匹配
-    if match_count == len(givenname) and len(givenname) >= 1:
-        xiyong_score = min(xiyong_score + 5, 25)
+    xiyong_score = match_count * 12  # 每个字匹配+12
     
+    # 7. 计算总分
+    total = 0
+    breakdown = {}
+    
+    # 五格得分
+    wuge_score = 50 if (ren_ok and zong_ok) else 0
+    breakdown["五格数理"] = wuge_score
+    total += wuge_score
+    
+    # 三才得分
+    sancai_score = 25 if san_cai["jixiong"] == "吉" else (15 if san_cai["jixiong"] == "半吉" else 0)
+    breakdown["三才配置"] = sancai_score
+    total += sancai_score
+    
+    # 喜用神得分
     breakdown["喜用神匹配"] = xiyong_score
+    total += xiyong_score
     
-    # 4. 字义评分 (10%) - 简化版
-    # 这里简化处理，假设都在常用好字中
-    yizi_score = 8 if all(c in COMMON_GOOD_CHARS for c in givenname) else 5
+    # 字义得分
+    yizi_score = 10 if all(c in COMMON_GOOD_CHARS for c in givenname) else 6
     breakdown["字义评分"] = yizi_score
+    total += yizi_score
     
-    # 5. 音形义 (10%) - 简化版
-    # 假设单字名比双字名稍逊
-    yinxing_score = 8 if len(givenname) == 2 else 7
-    breakdown["音形义"] = yinxing_score
-    
-    total = wuge_score + sancai_score + xiyong_score + yizi_score + yinxing_score
     breakdown["总分"] = total
     
     return {
@@ -204,113 +249,96 @@ def score_name(
         "breakdown": breakdown,
         "pass": pass_flag,
         "issues": issues,
+        "warnings": warnings,
     }
 
 
-def generate_candidate_chars(
+def generate_candidate_chars_v2(
     xiyongshen_list: List[str],
-    count: int = 50,
+    count: int = 100,
     avoid_chars: List[str] = None,
 ) -> List[Dict[str, Any]]:
-    """
-    根据喜用神生成候选汉字列表
-    
-    Returns:
-        [{"char": "泽", "wuxing": "水", "stroke": 8, "meaning": "润泽"}, ...]
-    """
+    """V2 候选字生成：扩充字库 + 去重"""
     if avoid_chars is None:
         avoid_chars = []
     
-    candidates = []
     avoid_set = set(avoid_chars)
+    candidates = []
+    seen_chars = set()
     
     for wuxing in xiyongshen_list:
-        words_data = XIYONGSHEN_WORDS.get(wuxing, {})
-        for char in words_data.get("常用字", []):
-            if char in avoid_set:
+        words = XIYONGSHEN_WORDS_V2.get(wuxing, {}).get("常用字", [])
+        for char in words:
+            if char in avoid_set or char in seen_chars:
                 continue
-            if char not in [c["char"] for c in candidates]:
-                stroke = get_char_stroke(char) or 8
-                candidates.append({
-                    "char": char,
-                    "wuxing": wuxing,
-                    "stroke": stroke,
-                    "meaning": "、".join(words_data.get("寓意", [])),
-                })
+            stroke = get_char_stroke(char)
+            if stroke is None:
+                stroke = 8  # 默认值
+            candidates.append({
+                "char": char,
+                "wuxing": wuxing,
+                "stroke": stroke,
+            })
+            seen_chars.add(char)
     
-    # 如果不够，随机补充常用好字
-    remaining = count - len(candidates)
-    if remaining > 0:
-        for char in COMMON_GOOD_CHARS:
-            if char in avoid_set:
-                continue
-            if char not in [c["char"] for c in candidates]:
-                candidates.append({
-                    "char": char,
-                    "wuxing": get_char_wuxing(char),
-                    "stroke": get_char_stroke(char) or 8,
-                    "meaning": "常用好意",
-                })
-                remaining -= 1
-                if remaining <= 0:
-                    break
+    # 补充 COMMON_GOOD_CHARS 中的字
+    for char in COMMON_GOOD_CHARS:
+        if char in avoid_set or char in seen_chars:
+            continue
+        stroke = get_char_stroke(char)
+        if stroke is None:
+            stroke = 8
+        candidates.append({
+            "char": char,
+            "wuxing": get_char_wuxing(char),
+            "stroke": stroke,
+        })
+        seen_chars.add(char)
     
     random.shuffle(candidates)
     return candidates[:count]
 
 
-def generate_name_recommendations(
+def generate_name_recommendations_v2(
     surname: str,
     xiyongshen_str: str,
-    gender: int = 1,  # 1=男, 0=女
+    gender: int = 1,
     avoid_chars: List[str] = None,
     max_options: int = 3,
 ) -> List[Dict[str, Any]]:
     """
-    生成名字推荐方案
-    
-    Args:
-        surname: 姓氏
-        xiyongshen_str: 喜用神字符串，如"金，水"
-        gender: 性别
-        avoid_chars: 避免用字列表
-    
-    Returns:
-        [
-            {
-                "full_name": "张锦泽",
-                "chars": [{"char": "锦", ...}, {"char": "泽", ...}],
-                "wuge": {...},
-                "score": {...},
-            },
-            ...
-        ]
+    V2 名字推荐生成
+    - 预过滤凶数组合
+    - 优先推荐三才全吉
     """
     xiyongshen_list = parse_xiyongshen(xiyongshen_str)
-    
-    # 生成候选字
-    candidates = generate_candidate_chars(xiyongshen_list, count=80, avoid_chars=avoid_chars)
+    candidates = generate_candidate_chars_v2(xiyongshen_list, count=120, avoid_chars=avoid_chars)
     
     recommendations = []
+    tried_pairs = set()
     
     # 尝试各种组合
     for i, char1 in enumerate(candidates):
         for char2 in candidates[i+1:]:
-            if len(recommendations) >= max_options * 5:  # 限制尝试次数
+            if len(recommendations) >= max_options * 10:
                 break
+            
+            pair_key = f"{char1['char']}_{char2['char']}"
+            if pair_key in tried_pairs:
+                continue
+            tried_pairs.add(pair_key)
             
             givenname = char1["char"] + char2["char"]
             
-            # 计算五格
             try:
                 wuge = calculate_wuge(surname, givenname)
             except Exception:
                 continue
             
-            # 评分
-            score_result = score_name(surname, givenname, xiyongshen_list, wuge)
+            score_result = score_name_v2(surname, givenname, xiyongshen_list, wuge)
             
-            if score_result["pass"]:  # 只保留通过基本筛选的
+            # 只保留通过筛选的
+            if score_result["pass"]:
                 recommendations.append({
                     "full_name": f"{surname}{givenname}",
                     "surname": surname,
@@ -320,78 +348,120 @@ def generate_name_recommendations(
                     "score": score_result,
                 })
         
-        if len(recommendations) >= max_options * 5:
+        if len(recommendations) >= max_options * 10:
             break
     
     # 按分数排序，取前 max_options
     recommendations.sort(key=lambda x: x["score"]["total_score"], reverse=True)
-    
     return recommendations[:max_options]
 
 
-def format_recommendation_output(
+def format_recommendation_markdown(
     surname: str,
     xiyongshen_str: str,
     bazi_info: Dict[str, Any],
     recommendations: List[Dict[str, Any]],
 ) -> str:
-    """
-    格式化输出推荐结果
-    """
+    """格式化输出为 Markdown"""
     lines = []
+    
+    # 标记 API 状态
+    is_fallback = bazi_info.get("is_fallback", False)
+    
     lines.append("## 命局摘要")
+    
+    if is_fallback:
+        lines.append(f"⚠️ **注意**：{bazi_info.get('xiyongshen_desc', '八字喜用神为估算值，建议配置真实API_KEY获取准确喜用神。')}")
+        lines.append("")
+    
     lines.append(f"- 八字：{bazi_info.get('birth_chart', 'N/A')}")
     lines.append(f"- 日主：{bazi_info.get('qiangruo', 'N/A')}")
-    lines.append(f"- 喜用神：{xiyongshen_str}")
+    lines.append(f"- 喜用神：**{xiyongshen_str}**")
     lines.append(f"- 忌神：{bazi_info.get('jishen', 'N/A')}")
-    lines.append("")
     
+    # 五行能量
+    scores = bazi_info.get("wuxing_scores", {})
+    if scores and any(s > 0 for s in scores.values()):
+        lines.append("")
+        lines.append("**五行能量**：")
+        wuxing_bars = []
+        max_score = max(scores.values()) if scores else 1
+        for w, s in scores.items():
+            bar_len = int(s / max_score * 10) if max_score > 0 else 0
+            bar = "█" * bar_len + "░" * (10 - bar_len)
+            wuxing_bars.append(f"  {w} {bar} {s}")
+        lines.extend(wuxing_bars)
+    
+    lines.append("")
     lines.append("## 五格架构")
-    lines.append("| 格位 | 数理 | 五行 | 吉凶 |")
-    lines.append("|:---|:---:|:---:|:---:|")
+    lines.append("| 格位 | 数理 | 五行 | 吉凶 | 说明 |")
+    lines.append("|:---|:---:|:---:|:---:|---|")
     
     if recommendations:
         wuge = recommendations[0]["wuge"]
-        lines.append(f"| 天格 | {wuge['tian_ge']['number']} | {wuge['tian_ge']['wuxing']} | {wuge['tian_ge']['jixiong']} |")
-        lines.append(f"| 人格 | {wuge['ren_ge']['number']} | {wuge['ren_ge']['wuxing']} | {wuge['ren_ge']['jixiong']} |")
-        lines.append(f"| 地格 | {wuge['di_ge']['number']} | {wuge['di_ge']['wuxing']} | {wuge['di_ge']['jixiong']} |")
-        lines.append(f"| 外格 | {wuge['wai_ge']['number']} | {wuge['wai_ge']['wuxing']} | {wuge['wai_ge']['jixiong']} |")
-        lines.append(f"| 总格 | {wuge['zong_ge']['number']} | {wuge['zong_ge']['wuxing']} | {wuge['zong_ge']['jixiong']} |")
+        
+        for ge_name, ge_key in [("天格", "tian_ge"), ("人格", "ren_ge"), ("地格", "di_ge"), ("外格", "wai_ge"), ("总格", "zong_ge")]:
+            g = wuge[ge_key]
+            issues = recommendations[0]["score"].get("issues", [])
+            warnings = recommendations[0]["score"].get("warnings", [])
+            note = ""
+            if any(str(g["number"]) in i for i in issues):
+                note = "⚠️ " + next((i for i in issues if str(g["number"]) in i), "")
+            elif any(str(g["number"]) in w for w in warnings):
+                note = "⚡ " + next((w for w in warnings if str(g["number"]) in w), "")
+            lines.append(f"| {ge_name} | {g['number']} | {g['wuxing']} | {g['jixiong']} | {g['explain'][:15]}... {note} |")
+        
         lines.append("")
         lines.append(f"**三才配置**：{wuge['san_cai']['config']} = **{wuge['san_cai']['jixiong']}**（{wuge['san_cai']['explain']}）")
+    else:
+        lines.append("| 天格 | - | - | - | |")
+        lines.append("| 人格 | - | - | - | |")
+        lines.append("| 地格 | - | - | - | |")
     
     lines.append("")
     lines.append("## 推荐方案（3组）")
     
-    for i, rec in enumerate(recommendations, 1):
-        full_name = rec["full_name"]
-        wuge = rec["wuge"]
-        chars = rec["chars"]
-        
-        # 解析五行组合
-        wuxing_combo = f"{chars[0]['wuxing']}{chars[1]['wuxing']}"
-        # 判断是否相生
-        sheng = {"木火土金水": True, "火土金水木": True, "土金水木火": True, 
-                 "金水木火土": True, "水木火土金": True}
-        is_sheng = wuxing_combo in sheng or wuxing_combo[::-1] in sheng
-        
+    if not recommendations:
         lines.append("")
-        lines.append(f"### 方案{i}：{full_name}")
-        lines.append(f"- **用字解析**：{chars[0]['char']}（{chars[0]['wuxing']}）+ {chars[1]['char']}（{chars[1]['wuxing']}）")
-        lines.append(f"- **五行归属性质**：{'相生' if is_sheng else '比和'}")
-        lines.append(f"- **天格({wuge['tian_ge']['number']})+人格({wuge['ren_ge']['number']})+地格({wuge['di_ge']['number']})**：{wuge['tian_ge']['jixiong']}/{wuge['ren_ge']['jixiong']}/{wuge['di_ge']['jixiong']}")
-        lines.append(f"- **三才**：{wuge['san_cai']['config']}（{wuge['san_cai']['jixiong']}）")
-        lines.append(f"- **音形义**：读音响亮，字形端正")
-        lines.append(f"- **适用场景**：适合期望孩子前程似锦、财运亨通的家庭")
+        lines.append("*未找到符合条件的名字，请调整喜用神或尝试其他姓氏*")
+    else:
+        for i, rec in enumerate(recommendations, 1):
+            full_name = rec["full_name"]
+            wuge = rec["wuge"]
+            chars = rec["chars"]
+            
+            # 五行组合判断
+            wuxing_combo = f"{chars[0]['wuxing']}{chars[1]['wuxing']}"
+            is_sheng = any(
+                wuxing_combo == seq or wuxing_combo[::-1] == seq
+                for seq in ["木火", "火土", "土金", "金水", "水木",
+                            "木木", "火火", "土土", "金金", "水水"]
+            )
+            
+            lines.append("")
+            lines.append(f"### 方案{i}：**{full_name}**")
+            lines.append(f"- **用字**：{chars[0]['char']}（{chars[0]['wuxing']}、{get_char_stroke(chars[0]['char'])}划）+ {chars[1]['char']}（{chars[1]['wuxing']}、{get_char_stroke(chars[1]['char'])}划）")
+            lines.append(f"- **五行**：{wuxing_combo}（{'相生/比和' if is_sheng else '待定'}）")
+            lines.append(f"- **五格**：天{wuge['tian_ge']['number']}/{wuge['tian_ge']['jixiong']} - 人{wuge['ren_ge']['number']}/{wuge['ren_ge']['jixiong']} - 地{wuge['di_ge']['number']}/{wuge['di_ge']['jixiong']}")
+            lines.append(f"- **三才**：{wuge['san_cai']['config']}（{wuge['san_cai']['jixiong']}）")
+            lines.append(f"- **评分**：{rec['score']['total_score']}分")
+            
+            if rec["score"]["warnings"]:
+                lines.append(f"- **⚠️ 注意**：`{'；'.join(rec['score']['warnings'])}`")
     
     lines.append("")
     lines.append("## 风险提示")
     if recommendations:
-        wuge = recommendations[0]["wuge"]
-        if wuge.get("ren_ge", {}).get("number") == 21:
-            lines.append("- 人格21数为领袖数，女性使用需辩证看待")
-        if wuge.get("zong_ge", {}).get("number") == 34:
-            lines.append("- 总格34数为破家数，已规避")
+        all_issues = []
+        for rec in recommendations:
+            all_issues.extend(rec["score"]["issues"])
+        if all_issues:
+            for issue in set(all_issues):
+                lines.append(f"- {issue}")
+        else:
+            lines.append("- 未发现明显风险")
+    else:
+        lines.append("- 当前候选未能找到完全符合条件的方案，建议调整喜用神")
     
     lines.append("")
     lines.append("## 使用建议")
@@ -403,30 +473,24 @@ def format_recommendation_output(
 
 
 def main():
-    """测试名字生成"""
-    print("=== 名字生成测试 ===\n")
+    """测试"""
+    print("=== 名字生成 V2 测试 ===\n")
     
-    # 测试用例
-    test_cases = [
-        ("张", "金、水", 1),
-        ("李", "木、火", 1),
-        ("王", "水、金", 0),
-    ]
+    # 测试1: fallback 模式
+    print("测试1: 张 + 金、水")
+    recs = generate_name_recommendations_v2("张", "金、水", 1)
+    for i, rec in enumerate(recs, 1):
+        w = rec["wuge"]
+        print(f"  方案{i}: {rec['full_name']} | 人格:{w['ren_ge']['number']}({w['ren_ge']['jixiong']}) | 总格:{w['zong_ge']['number']}({w['zong_ge']['jixiong']}) | 三才:{w['san_cai']['config']}({w['san_cai']['jixiong']}) | 分:{rec['score']['total_score']}")
+        if rec['score']['warnings']:
+            print(f"    ⚠️ {rec['score']['warnings']}")
     
-    for surname, xiyong, gender in test_cases:
-        print(f"\n--- 姓氏={surname}, 喜用神={xiyong}, 性别={'男' if gender else '女'} ---")
-        
-        recs = generate_name_recommendations(
-            surname=surname,
-            xiyongshen_str=xiyong,
-            gender=gender,
-        )
-        
-        for i, rec in enumerate(recs, 1):
-            print(f"\n方案{i}: {rec['full_name']}")
-            print(f"  分数: {rec['score']['total_score']}")
-            print(f"  人格: {rec['wuge']['ren_ge']['number']} ({rec['wuge']['ren_ge']['jixiong']})")
-            print(f"  三才: {rec['wuge']['san_cai']['config']} ({rec['wuge']['san_cai']['jixiong']})")
+    print()
+    print("测试2: 陈 + 木、火")
+    recs2 = generate_name_recommendations_v2("陈", "木、火", 1)
+    for i, rec in enumerate(recs2[:3], 1):
+        w = rec["wuge"]
+        print(f"  方案{i}: {rec['full_name']} | 人格:{w['ren_ge']['number']}({w['ren_ge']['jixiong']}) | 三才:{w['san_cai']['config']}({w['san_cai']['jixiong']})")
 
 
 if __name__ == "__main__":
