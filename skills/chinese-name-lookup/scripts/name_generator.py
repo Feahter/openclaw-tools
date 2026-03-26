@@ -233,6 +233,11 @@ def _get_local_bazi(year: int, month: int, day: int, hour: int) -> Dict[str, Any
             "wx_counts": bazi["xiyongshen"]["wx_counts"],
             "analysis": bazi["xiyongshen"]["analysis"],
         },
+        # 新增：穷通宝鉴调候 + 月令藏干 + 格局
+        "tiao_hou": bazi.get("tiao_hou", {}),
+        "yueling_canggan": bazi.get("yueling_canggan", {}),
+        "pattern": bazi.get("pattern", {}),
+        "pattern_cheng": bazi.get("pattern_cheng", {}),
     }
 
 

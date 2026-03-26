@@ -202,16 +202,21 @@ def get_lunar_date(year: int, month: int, day: int) -> dict:
 
     lunar_month = 1
     lunar_day = 1
+    # ends[i] = cumulative days through month (i+1)
+    # month 1: offset 0 to ends[0]-1 (days 1 to ends[0])
+    # month 2: offset ends[0] to ends[1]-1 (days 1 to ends[1]-ends[0])
     if offset < ends[0]:
         lunar_month, lunar_day = 1, offset + 1
-    elif offset >= ends[-1]:
-        lunar_month, lunar_day = 12, offset - ends[-2] + 1 if len(ends) > 1 else offset + 1
     else:
         for i in range(len(ends) - 1):
-            if offset >= ends[i] and offset < ends[i + 1]:
+            if offset < ends[i + 1]:
                 lunar_month = i + 2
-                lunar_day = offset - ends[i - 1] + 1 if i > 0 else offset + 1
+                lunar_day = offset - ends[i] + 1
                 break
+        else:
+            # offset >= last cumulative → last month
+            lunar_month = 12
+            lunar_day = offset - ends[-1] + 1
 
     return {
         "year": lunar_year,

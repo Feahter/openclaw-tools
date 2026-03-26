@@ -12,6 +12,7 @@ from lunar_calendar import (
 from tiao_hou import get_tiao_hou as _get_tiao_hou_raw, get_tiao_hou_xiyong, get_tiao_hou_jibi, get_tiao_hou_principle
 from shier_changsheng import get_changsheng_state as _get_changsheng_raw, get_changsheng_state_idx
 from yueling_canggan import get_yueling_canggan as _get_yueling_canggan_raw
+from pattern_method import determine_pattern, judge_pattern_cheng, analyze_pattern
 
 
 # ============================================================
@@ -599,6 +600,9 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int) -> Dict[str, 
     tiao_hou = get_tiao_hou(month_stem, month_branch)
     yueling = _get_yueling_canggan_raw(month_branch)
 
+    # 格局分析（子平格局法）
+    pattern_result = analyze_pattern(bazi)
+
     return {
         "birth_chart": bazi_result["birth_chart"],
         "bazi": bazi,
@@ -612,6 +616,8 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int) -> Dict[str, 
         "hour_name": bazi_result["hour_name"],
         "tiao_hou": tiao_hou,
         "yueling_canggan": yueling,
+        "pattern": pattern_result["pattern_info"],
+        "pattern_cheng": pattern_result["cheng_info"],
     }
 
 
