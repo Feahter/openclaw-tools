@@ -9,6 +9,9 @@ from lunar_calendar import (
     HEAVENLY_STEMS, EARTHLY_BRANCHES, ZODIAC_ANIMALS,
     get_lunar_date, get_zodiac
 )
+from tiao_hou import get_tiao_hou as _get_tiao_hou_raw, get_tiao_hou_xiyong, get_tiao_hou_jibi, get_tiao_hou_principle
+from shier_changsheng import get_changsheng_state as _get_changsheng_raw, get_changsheng_state_idx
+from yueling_canggan import get_yueling_canggan as _get_yueling_canggan_raw
 
 
 # ============================================================
@@ -591,6 +594,11 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int) -> Dict[str, 
     xiyong = determine_xiyongshen(bazi, rizhu)
     nayin = get_nayin(bazi["year"]["stem_idx"], bazi["year"]["branch_idx"])
 
+    month_stem = HEAVENLY_STEMS[bazi["month"]["stem_idx"]]
+    month_branch = EARTHLY_BRANCHES[bazi["month"]["branch_idx"]]
+    tiao_hou = get_tiao_hou(month_stem, month_branch)
+    yueling = _get_yueling_canggan_raw(month_branch)
+
     return {
         "birth_chart": bazi_result["birth_chart"],
         "bazi": bazi,
@@ -602,6 +610,8 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int) -> Dict[str, 
         "zodiac": bazi_result["zodiac"],
         "lunar": bazi_result["lunar"],
         "hour_name": bazi_result["hour_name"],
+        "tiao_hou": tiao_hou,
+        "yueling_canggan": yueling,
     }
 
 
@@ -659,3 +669,72 @@ if __name__ == "__main__":
 
     lunar2 = get_lunar_date(2024, 3, 15)
     print(f"  2024-03-15 → {format_lunar_date(lunar2['year'], lunar2['month'], lunar2['day'], lunar2['is_leap'])}")
+
+
+# ============================================================
+# 6. 穷通宝鉴调候喜忌（新增）
+# ============================================================
+
+def get_tiao_hou(tian_gan: str, yue_zhi: str) -> dict:
+    """
+    查调候喜忌（穷通宝鉴）
+    
+    Args:
+        tian_gan: 日干（甲、乙、丙、丁、戊、己、庚、辛、壬、癸）
+        yue_zhi: 月令地支（寅、卯、辰、巳、午、未、申、酉、戌、亥、子、丑）
+    
+    Returns:
+        dict: {"喜用": [...], "忌避": [...], "原则": str}
+        若组合不存在返回空字典
+    """
+    return _get_tiao_hou_raw(tian_gan, yue_zhi)
+
+
+def get_tiao_hou_xiyong(tian_gan: str, yue_zhi: str) -> list:
+    """查调候喜用神列表"""
+    return get_tiao_hou(tian_gan, yue_zhi).get("喜用", [])
+
+
+def get_tiao_hou_jibi(tian_gan: str, yue_zhi: str) -> list:
+    """查调候忌避神列表"""
+    return get_tiao_hou(tian_gan, yue_zhi).get("忌避", [])
+
+
+def get_tiao_hou_principle(tian_gan: str, yue_zhi: str) -> str:
+    """查调候原则"""
+    return get_tiao_hou(tian_gan, yue_zhi).get("原则", "")
+
+
+# ============================================================
+# 7. 十二长生状态（新增字符串版）
+# ============================================================
+
+def get_changsheng_state(tian_gan: str, branch: str) -> str:
+    """
+    查十二长生状态（字符串接口）
+    
+    Args:
+        tian_gan: 天干（甲、乙、丙、丁、戊、己、庚、辛、壬、癸）
+        branch: 地支（子、丑、寅、卯、辰、巳、午、未、申、酉、戌、亥）
+    
+    Returns:
+        str: 长生、沐浴、冠带、临官、帝旺、衰、病、死、墓、绝、胎、养
+    """
+    return _get_changsheng_raw(tian_gan, branch)
+
+
+# ============================================================
+# 8. 月令藏干（新增）
+# ============================================================
+
+def get_yueling_canggan(yue_zhi: str) -> dict:
+    """
+    查月令藏干
+    
+    Args:
+        yue_zhi: 月令地支（子、丑、寅、卯、辰、巳、午、未、申、酉、戌、亥）
+    
+    Returns:
+        dict: {"本气": str, "中气": str, "余气": str or None}
+    """
+    return _get_yueling_canggan_raw(yue_zhi)

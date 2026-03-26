@@ -14,8 +14,10 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from bazi_engine import (
     full_bazi_analysis, get_rizhu_strength, get_shishen_list, get_shierzhang,
-    STEM_ELEMENTS, ELEMENT_NAMES, HEAVENLY_STEMS
+    STEM_ELEMENTS, ELEMENT_NAMES, HEAVENLY_STEMS,
+    get_tiao_hou_xiyong, get_tiao_hou_jibi
 )
+from tiao_hou import get_tiao_hou as _tiao_hou_lookup
 from zodiac_preferences import score_name_for_zodiac, get_zodiac_preferences
 from wuge_calculator import calculate_wuge, get_char_wuxing, get_char_stroke
 
@@ -182,6 +184,83 @@ def score_by_shishen(bazi_info: Dict[str, Any], name_chars: str) -> Dict[str, An
 
 
 # ============================================================
+# 调候喜忌评分 (0-30分)
+# ============================================================
+
+def score_by_tiao_hou(name_chars: str, tian_gan: str, yue_zhi: str) -> dict:
+    """
+    调候喜忌评分：0-30分
+    基于穷通宝鉴调候喜忌表进行评分
+    - 名字中含调候喜用神 +8分/字（最高24分）
+    - 名字中含调候忌避神 -5分/字（最低-15分）
+    - 同时满足调候原则描述 - bonus +6分
+    - 最高30分，最低0分
+    """
+    info = _tiao_hou_lookup(tian_gan, yue_zhi)
+    if not info:
+        return {"score": 0, "reason": f"未找到 {tian_gan}_{yue_zhi} 的调候数据"}
+
+    xiyong = info.get("喜用", [])
+    jibi = info.get("忌避", [])
+    principle = info.get("原则", "")
+
+    score = 0
+    matched_xiyong = []
+    matched_jibi = []
+
+    # 五行属性表（用于匹配）
+    WUXING_MAP = {"甲": "木", "乙": "木", "丙": "火", "丁": "火",
+                  "戊": "土", "己": "土", "庚": "金", "辛": "金",
+                  "壬": "水", "癸": "水"}
+
+    for char in name_chars:
+        # 直接匹配喜用神中的天干
+        if char in xiyong:
+            score += 8
+            matched_xiyong.append(char)
+        # 直接匹配忌避神中的天干
+        elif char in jibi:
+            score -= 5
+            matched_jibi.append(char)
+
+    # 计算调候匹配比例（用于bonus评估）
+    # 如果名字中包含所有喜用神的核心字，+6 bonus
+    xiyong_bonus = 0
+    if matched_xiyong and len(matched_xiyong) >= min(2, len(xiyong)):
+        xiyong_bonus = 6
+
+    score = score + xiyong_bonus
+    score = max(0, min(score, 30))  # 截断到 0-30
+
+    # 构建理由
+    reasons = []
+    if matched_xiyong:
+        reasons.append(f"含调候喜用「{','.join(matched_xiyong)}」+{len(matched_xiyong)*8}分")
+    if matched_jibi:
+        reasons.append(f"含调候忌避「{','.join(matched_jibi)}」{len(matched_jibi)*(-5)}分")
+    if xiyong_bonus:
+        reasons.append(f"调候匹配良好+{xiyong_bonus}分")
+
+    reason_str = "; ".join(reasons) if reasons else f"无调候喜用/忌避匹配"
+    reason_str += f"（{tian_gan}月{yue_zhi}，原则:{principle}）"
+
+    return {
+        "score": score,
+        "xiyong_matched": matched_xiyong,
+        "jibi_matched": matched_jibi,
+        "xiyong_bonus": xiyong_bonus,
+        "reason": reason_str,
+        "detail": {
+            "tian_gan": tian_gan,
+            "yue_zhi": yue_zhi,
+            "喜用": xiyong,
+            "忌避": jibi,
+            "原则": principle,
+        },
+    }
+
+
+# ============================================================
 # 五格评分 (辅助)
 # ============================================================
 
@@ -252,17 +331,23 @@ def score_name_v3(
     shishen_result = score_by_shishen(bazi_info, name_chars)
     wuge_result = score_by_wuge(surname, name_chars)
 
+    # 调候喜忌评分（新增维度）
+    day_stem = bazi_info.get("bazi", {}).get("day", {}).get("stem", "")
+    month_branch = bazi_info.get("bazi", {}).get("month", {}).get("branch", "")
+    tiao_hou_result = score_by_tiao_hou(name_chars, day_stem, month_branch)
+
     # 各维度得分
     dim_scores = {
         "喜用神匹配": xiyong_result["score"],
         "生肖宜忌": zodiac_result["score"],
         "十神/长生": shishen_result["score"],
         "五格数理": wuge_result["score"],
+        "调候喜忌": tiao_hou_result["score"],
     }
 
     total_raw = sum(dim_scores.values())
-    # 标准化到100分
-    total_score = int(total_raw * 100 / 125)
+    # 标准化到100分（原来125分制，现在155分制）
+    total_score = int(total_raw * 100 / 155)
 
     # ============================================================
     # 冲突检测与调整
@@ -307,17 +392,18 @@ def score_name_v3(
         "生肖宜忌": adj_zodiac,
         "十神/长生": shishen_result["score"],
         "五格数理": wuge_result["score"],
+        "调候喜忌": tiao_hou_result["score"],
     }
     adj_total_raw = sum(adj_dim_scores.values())
-    adj_total = int(adj_total_raw * 100 / 125)
+    adj_total = int(adj_total_raw * 100 / 155)
 
     # 判断是否通过
-    # 条件：总分≥42 且 五格无大凶（人格/总格为凶数）
+    # 条件：总分≥45 且 五格无大凶（人格/总格为凶数）
     has_big_wuge_issue = any("人格" in i and "凶数" in i for i in wuge_result.get("issues", [])) or \
                          any("总格" in i and "凶数" in i for i in wuge_result.get("issues", []))
 
-    # 有冲突时更宽松：总分≥38即可
-    pass_threshold = 38 if zodiac_conflict else 45
+    # 有冲突时更宽松：总分≥40即可
+    pass_threshold = 40 if zodiac_conflict else 48
     pass_flag = adj_total >= pass_threshold and not has_big_wuge_issue
 
     total_score = adj_total
@@ -331,6 +417,8 @@ def score_name_v3(
         reasons.append(f"生肖「{zodiac}」{'宜' if zodiac_result['score'] >= 15 else '欠'}佳")
     if shishen_result.get("details"):
         reasons.append("十神配置良好")
+    if tiao_hou_result.get("xiyong_matched"):
+        reasons.append(f"调候喜忌匹配：{','.join(tiao_hou_result['xiyong_matched'])}")
     if wuge_result.get("issues"):
         reasons.extend(wuge_result["issues"])
 
@@ -345,6 +433,7 @@ def score_name_v3(
             "生肖": zodiac_result,
             "十神": shishen_result,
             "五格": wuge_result,
+            "调候": tiao_hou_result,
         },
         "pass": pass_flag,
         "reasons": reasons,
@@ -481,7 +570,7 @@ def format_v3_markdown(
             lines.append(f"### 方案{i}：**{rec['full_name']}** ({rec['total_score']}分)")
 
             dim = rec["dim_scores"]
-            lines.append(f"- 喜用神: {dim['喜用神匹配']}/40 | 生肖: {dim['生肖宜忌']}/30 | 十神: {dim['十神/长生']}/30 | 五格: {dim['五格数理']}/25")
+            lines.append(f"- 喜用神: {dim['喜用神匹配']}/40 | 生肖: {dim['生肖宜忌']}/30 | 十神: {dim['十神/长生']}/30 | 五格: {dim['五格数理']}/25 | 调候: {dim['调候喜忌']}/30")
 
             # 用字分析
             details = rec["details"]
@@ -492,6 +581,9 @@ def format_v3_markdown(
                 lines.append(f"- 生肖宜忌：{'；'.join(details['生肖']['details'])}")
             if details["十神"].get("details"):
                 lines.append(f"- 十神补益：{'；'.join(details['十神']['details'])}")
+            if details["调候"].get("xiyong_matched"):
+                t = details["调候"]["detail"]
+                lines.append(f"- 调候喜忌：「{t['tian_gan']}月{t['yue_zhi']}」喜用{t['喜用']}，匹配{','.join(details['调候']['xiyong_matched'])}，{t['原则']}")
             if details["五格"].get("wuge"):
                 wuge = details["五格"]["wuge"]
                 lines.append(f"- 五格：人{wuge['ren_ge']['number']}({wuge['ren_ge']['jixiong']})/总{wuge['zong_ge']['number']}({wuge['zong_ge']['jixiong']})/三才{wuge['san_cai']['config']}({wuge['san_cai']['jixiong']})")
