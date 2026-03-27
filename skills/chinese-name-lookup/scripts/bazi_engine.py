@@ -20,6 +20,124 @@ from rizhu_strength_v2 import get_rizhu_strength_v2
 
 
 # ============================================================
+# 0. 真太阳时矫正
+# ============================================================
+
+# 主要城市经度表（东经，度）
+CITY_LONGITUDES = {
+    # 四川
+    "成都": 104.06, "天府新区": 104.0, "天府": 104.0, "绵阳": 104.68, "德阳": 104.4,
+    "自贡": 104.78, "泸州": 105.44, "宜宾": 104.63, "内江": 105.06,
+    # 北京
+    "北京": 116.4,
+    # 上海
+    "上海": 121.47, "浦东": 121.54,
+    # 广东
+    "深圳": 114.05, "广州": 113.27, "东莞": 113.75, "佛山": 113.12,
+    # 重庆
+    "重庆": 106.55,
+    # 浙江
+    "杭州": 120.19, "宁波": 121.55, "温州": 120.67, "义乌": 120.07,
+    # 湖北
+    "武汉": 114.29, "宜昌": 111.28, "襄阳": 112.12,
+    # 陕西
+    "西安": 108.93, "咸阳": 108.71,
+    # 江苏
+    "南京": 118.78, "苏州": 120.62, "无锡": 120.29,
+    # 天津
+    "天津": 117.2,
+    # 河南
+    "郑州": 113.65, "洛阳": 112.45,
+    # 湖南
+    "长沙": 112.93,
+    # 山东
+    "济南": 116.98, "青岛": 120.38,
+    # 安徽
+    "合肥": 117.28,
+    # 云南
+    "昆明": 102.83,
+    # 辽宁
+    "沈阳": 123.43, "大连": 121.62,
+    # 黑龙江
+    "哈尔滨": 125.73,
+    # 福建
+    "福州": 119.3, "厦门": 118.08,
+    # 江西
+    "南昌": 115.85,
+    # 贵州
+    "贵阳": 106.71,
+    # 山西
+    "太原": 112.53,
+    # 河北
+    "石家庄": 114.48,
+    # 甘肃
+    "兰州": 103.82,
+    # 西藏
+    "拉萨": 91.17,
+    # 新疆
+    "乌鲁木齐": 87.62,
+    # 青海
+    "西宁": 101.78,
+    # 宁夏
+    "银川": 106.23,
+    # 内蒙古
+    "呼和浩特": 111.65,
+    # 海南
+    "海口": 110.35,
+    # 广西
+    "南宁": 108.31, "桂林": 110.28,
+    # 四川全省
+    "四川省": 104.0,
+}
+
+# 北京时间标准经度
+BEIJING_STANDARD_LONGITUDE = 120.0  # 东经120度
+
+
+def get_true_solar_hour(beijing_hour: int, province: str = "", city: str = "") -> float:
+    """
+    将北京时间转换为真太阳时
+
+    Args:
+        beijing_hour: 北京时间（小时，0-23）
+        province: 省份/直辖市名称（用于精确匹配）
+        city: 城市名称
+
+    Returns:
+        真太阳时小时数（float，可为小数）
+        精度约±2分钟
+    """
+    # 如果用户未提供地点，返回北京时间（不矫正）
+    if not province and not city:
+        return float(beijing_hour)
+
+    # 优先用城市名匹配
+    lookup_city = city if city else province
+    lon = CITY_LONGITUDES.get(lookup_city, None)
+
+    # 尝试省份名
+    if lon is None and province:
+        lon = CITY_LONGITUDES.get(province, None)
+
+    # 未知城市，用默认经度（104°E，约成都）
+    if lon is None:
+        lon = 104.0  # 默认值
+
+    # 真太阳时 = 北京时间 - (120° - 当地经度) × 4分钟
+    # 简化：忽略均令时（均令时最大误差约±16分钟，对时辰判定影响仅在边界情况）
+    offset_hours = (BEIJING_STANDARD_LONGITUDE - lon) * 4.0 / 60.0
+    true_hour = beijing_hour - offset_hours
+
+    # 约束在0-24范围内
+    if true_hour < 0:
+        true_hour += 24
+    elif true_hour >= 24:
+        true_hour -= 24
+
+    return true_hour
+
+
+# ============================================================
 # 1. 八字干支计算
 # ============================================================
 
@@ -98,14 +216,23 @@ def get_hour_stem_branch(day_stem: int, hour: int) -> Tuple[int, int]:
     return stem_idx, branch_idx
 
 
-def get_bazi(year: int, month: int, day: int, hour: int) -> Dict[str, Any]:
+def get_bazi(year: int, month: int, day: int, hour: int,
+             province: str = "", city: str = "") -> Dict[str, Any]:
     """
     完整八字排盘
+
+    Args:
+        province: 出生省份/直辖市（如"四川"）
+        city: 出生城市（如"成都"）
+        真太阳时矫正：自动根据城市经度计算，默认北京时间
     """
     year_stem, year_branch = get_year_stem_branch(year)
     month_stem, month_branch = get_month_stem_branch(year, month)
     day_stem, day_branch = get_day_stem_branch(year, month, day)
-    hour_stem, hour_branch = get_hour_stem_branch(day_stem, hour)
+
+    # 真太阳时矫正
+    true_hour = get_true_solar_hour(hour, province, city)
+    hour_stem, hour_branch = get_hour_stem_branch(day_stem, int(true_hour))
 
     # 转换为中文字符
     bazi = {
@@ -587,11 +714,16 @@ def determine_xiyongshen(bazi: Dict[str, Any], rizhu_strength: Dict[str, Any]) -
 # 综合排盘
 # ============================================================
 
-def full_bazi_analysis(year: int, month: int, day: int, hour: int) -> Dict[str, Any]:
+def full_bazi_analysis(year: int, month: int, day: int, hour: int,
+                       province: str = "", city: str = "") -> Dict[str, Any]:
     """
     完整八字分析
+
+    Args:
+        province: 出生省份/直辖市
+        city: 出生城市（用于真太阳时矫正）
     """
-    bazi_result = get_bazi(year, month, day, hour)
+    bazi_result = get_bazi(year, month, day, hour, province, city)
     bazi = bazi_result["bazi"]  # Extract inner bazi dict
     rizhu = get_rizhu_strength(bazi)  # V1 旧版
     rizhu_v2 = get_rizhu_strength_v2(bazi)  # V2 权重量化版

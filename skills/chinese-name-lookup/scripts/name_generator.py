@@ -64,6 +64,8 @@ def generate_name_recommendations(
     avoid_chars: Optional[List[str]] = None,
     max_options: int = 3,
     use_local_engine: bool = True,
+    province: str = "",
+    city: str = "",
 ) -> Dict[str, Any]:
     """
     名字推荐主入口
@@ -77,6 +79,8 @@ def generate_name_recommendations(
         avoid_chars: 避免使用的字列表
         max_options: 返回推荐数量
         use_local_engine: 是否使用本地引擎（无API时）
+        province: 出生省份（用于真太阳时矫正，如"四川"）
+        city: 出生城市（用于真太阳时矫正，如"成都"）
 
     Returns:
         {
@@ -107,6 +111,8 @@ def generate_name_recommendations(
         api_key=api_key,
         prefer_xiyongshen=prefer_xiyongshen,
         use_local_engine=use_local_engine,
+        province=province,
+        city=city,
     )
 
     result["bazi_info"] = bazi_info
@@ -158,12 +164,14 @@ def _get_bazi_info(
     api_key: str,
     prefer_xiyongshen: Optional[List[str]],
     use_local_engine: bool,
+    province: str = "",
+    city: str = "",
 ) -> Dict[str, Any]:
-    """获取八字信息（API优先，本地备用）"""
+    """获取八字信息（API优先，本地备用，支持真太阳时矫正）"""
 
     # 如果用户指定了喜用神，直接使用
     if prefer_xiyongshen:
-        local_bazi = _get_local_bazi(birth_year, birth_month, birth_day, birth_hour)
+        local_bazi = _get_local_bazi(birth_year, birth_month, birth_day, birth_hour, province, city)
         return {
             **local_bazi,
             "is_fallback": False,
@@ -192,8 +200,8 @@ def _get_bazi_info(
 
             if not api_result.get("is_fallback", True):
                 parsed = parse_bazi_response(api_result)
-                # 补充本地八字信息
-                local_bazi = _get_local_bazi(birth_year, birth_month, birth_day, birth_hour)
+                # 补充本地八字信息（含真太阳时）
+                local_bazi = _get_local_bazi(birth_year, birth_month, birth_day, birth_hour, province, city)
                 return {
                     **local_bazi,
                     **parsed,
@@ -205,7 +213,7 @@ def _get_bazi_info(
 
     # Fallback到本地引擎
     if use_local_engine:
-        local_bazi = _get_local_bazi(birth_year, birth_month, birth_day, birth_hour)
+        local_bazi = _get_local_bazi(birth_year, birth_month, birth_day, birth_hour, province, city)
         return {
             **local_bazi,
             "is_fallback": True,
@@ -225,9 +233,10 @@ def _get_bazi_info(
     }
 
 
-def _get_local_bazi(year: int, month: int, day: int, hour: int) -> Dict[str, Any]:
-    """使用本地引擎计算八字"""
-    bazi = full_bazi_analysis(year, month, day, hour)
+def _get_local_bazi(year: int, month: int, day: int, hour: int,
+                   province: str = "", city: str = "") -> Dict[str, Any]:
+    """使用本地引擎计算八字（支持真太阳时矫正）"""
+    bazi = full_bazi_analysis(year, month, day, hour, province, city)
 
     lunar = get_lunar_date(year, month, day)
     lunar_str = format_lunar_date(lunar["year"], lunar["month"], lunar["day"], lunar["is_leap"])
@@ -553,12 +562,14 @@ def quick_generate(
     hour: int,
     gender: int = 1,
     api_key: str = "",
+    province: str = "",
+    city: str = "",
 ) -> str:
     """
     快速生成名字推荐（返回Markdown格式）
 
     Example:
-        result = quick_generate("张", 2024, 3, 15, 10, gender=1)
+        result = quick_generate("张", 2024, 3, 15, 10, gender=1, city="成都")
         print(result)
     """
     result = generate_name_recommendations(
@@ -570,6 +581,8 @@ def quick_generate(
         gender=gender,
         api_key=api_key,
         use_local_engine=True,
+        province=province,
+        city=city,
     )
     return result.get("markdown", result.get("error", "生成失败"))
 
