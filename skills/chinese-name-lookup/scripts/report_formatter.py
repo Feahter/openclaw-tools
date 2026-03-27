@@ -31,6 +31,7 @@ from dayun_liunian import (
 )
 from shen_sha import get_shen_sha_summary, get_tianyi_guiren, get_wenchang, get_yima, get_huagai, get_taohua
 from zodiac_preferences import get_zodiac_preferences
+from liushen_xinxing import get_full_xinxing_report
 
 
 # ============================================================
@@ -300,6 +301,12 @@ def _format_mingju_analysis(bazi_info: Dict[str, Any]) -> List[str]:
         reason_text = pattern.get("reason", "")
         if reason_text:
             lines.append(f"  - 分析：{reason_text[:60]}...")
+
+    # 十神心性解读
+    xinxing = bazi_info.get("xinxing", [])
+    if xinxing:
+        lines.append("")
+        lines.append(get_full_xinxing_report(xinxing))
 
     return lines
 

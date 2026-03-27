@@ -15,6 +15,8 @@ from yueling_canggan import get_yueling_canggan as _get_yueling_canggan_raw
 from pattern_method import determine_pattern, judge_pattern_cheng, analyze_pattern
 from shen_sha import get_shen_sha_summary as _get_shen_sha_summary
 from xiyongshen_v2 import determine_xiyongshen_v2
+from liushen_xinxing import build_shishen_xinxing_from_bazi, get_shishen_xinxing
+from rizhu_strength_v2 import get_rizhu_strength_v2
 
 
 # ============================================================
@@ -591,7 +593,8 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int) -> Dict[str, 
     """
     bazi_result = get_bazi(year, month, day, hour)
     bazi = bazi_result["bazi"]  # Extract inner bazi dict
-    rizhu = get_rizhu_strength(bazi)
+    rizhu = get_rizhu_strength(bazi)  # V1 旧版
+    rizhu_v2 = get_rizhu_strength_v2(bazi)  # V2 权重量化版
     shishen = get_shishen_list(bazi)
     shierzhang = get_shierzhang(bazi)
     xiyong_v1 = determine_xiyongshen(bazi, rizhu)
@@ -620,10 +623,16 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int) -> Dict[str, 
     # 神煞分析
     shen_sha = _get_shen_sha_summary(bazi)
 
+    # 十神心性（来自《千里命稿》映射表）
+    shishen_xinxing = build_shishen_xinxing_from_bazi(
+        {"shishen": shishen}, xiyong_v2
+    )
+
     return {
         "birth_chart": bazi_result["birth_chart"],
         "bazi": bazi,
-        "rizhu_strength": rizhu,
+        "rizhu_strength": rizhu_v2,       # V2 量化结果（默认）
+        "_rizhu_strength_v1": rizhu,       # V1 旧版结果（保留对比）
         "shishen": shishen,
         "shierzhang": shierzhang,
         "xiyongshen": xiyong_v2,          # V2 判定结果
@@ -637,6 +646,7 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int) -> Dict[str, 
         "pattern": pattern_result["pattern_info"],
         "pattern_cheng": pattern_result["cheng_info"],
         "shen_sha": shen_sha,
+        "xinxing": shishen_xinxing,       # 六神心性速查
     }
 
 
