@@ -152,15 +152,35 @@ def get_year_stem_branch(year: int) -> Tuple[int, int]:
     return stem_idx, branch_idx
 
 
-def get_month_stem_branch(year: int, month: int) -> Tuple[int, int]:
+def get_month_stem_branch(year_stem: int, lunar_month: int) -> Tuple[int, int]:
     """
     月干支计算（五虎遁）
-    月支: (month + 1) % 12（正月=寅）
-    月干: (年干索引 * 2 + month) % 10
+
+    参数:
+        year_stem: 年干索引 (0-9)
+        lunar_month: 农历月份 (1-12, 1=正月=寅月)
+
+    五虎遁年起诀:
+      甲己起甲 → offset=0 (甲)
+      乙庚起丙 → offset=2 (丙)
+      丙辛起戊 → offset=4 (戊)
+      丁壬起庚 → offset=6 (庚)
+      戊癸起壬 → offset=8 (壬)
+
+    月干 = (offset + 月份 - 1) % 10
+    月支 = (月份 + 1) % 12 (正月=寅=2, 二月=卯=3, 三月=辰=4, ...)
+
+    offset表: {0:0, 1:2, 2:4, 3:6, 4:8, 5:0, 6:2, 7:4, 8:6, 9:8}
+             (即: stem<5 → stem*2; stem>=5 → (stem-5)*2)
     """
-    year_stem, _ = get_year_stem_branch(year)
-    branch_idx = (month + 1) % 12  # 正月=寅, index=2
-    stem_idx = (year_stem * 2 + month) % 10
+    # offset = (年干 % 5) * 2 % 10  # 简化为: stem<5 → stem*2; stem>=5 → (stem-5)*2
+    if year_stem < 5:
+        offset = year_stem * 2
+    else:
+        offset = (year_stem - 5) * 2
+
+    branch_idx = (lunar_month + 1) % 12  # 正月=寅(2), 二月=卯(3), 三月=辰(4)
+    stem_idx = (offset + lunar_month - 1) % 10
     return stem_idx, branch_idx
 
 
@@ -179,13 +199,15 @@ def _julian_day_number(year: int, month: int, day: int) -> int:
 def get_day_stem_branch(year: int, month: int, day: int) -> Tuple[int, int]:
     """
     日干支计算
-    已知: 2000年1月1日 = 庚辰（日干6，日支5，0-indexed）
     通过JDN差值计算
+
+    基准: 2000-01-01 = 乙亥年十一月廿五戊午日
+    → 日柱 = 戊午 (stem=4, branch=6, 0-indexed)
+    验证: 2026-03-23 = 丙申 ✓, 2026-03-22 = 乙未 ✓
     """
-    # 基准: 2000-01-01 = JDN 2451545, 庚辰 (stem=6, branch=5)
     BASE_JDN = 2451545
-    BASE_STEM = 6  # 庚
-    BASE_BRANCH = 5  # 辰
+    BASE_STEM = 4   # 戊
+    BASE_BRANCH = 6  # 午
 
     jdn = _julian_day_number(year, month, day)
     diff = jdn - BASE_JDN
@@ -227,7 +249,9 @@ def get_bazi(year: int, month: int, day: int, hour: int,
         真太阳时矫正：自动根据城市经度计算，默认北京时间
     """
     year_stem, year_branch = get_year_stem_branch(year)
-    month_stem, month_branch = get_month_stem_branch(year, month)
+    # 使用农历月份计算月柱（需先获取农历信息）
+    lunar = get_lunar_date(year, month, day)
+    month_stem, month_branch = get_month_stem_branch(year_stem, lunar["month"])
     day_stem, day_branch = get_day_stem_branch(year, month, day)
 
     # 真太阳时矫正
