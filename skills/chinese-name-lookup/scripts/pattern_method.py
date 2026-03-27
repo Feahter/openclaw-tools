@@ -684,16 +684,24 @@ def judge_pattern_cheng(geku_name: str, bazi: Dict[str, Any],
             is_cheng = False
 
     # ============================================================
-    # 4. 建议
+    # 4. 建议 & 破格原因
     # ============================================================
     if level == "上等":
         suggestion = f"{geku_name}成格，宜保护格局不被破坏，名字宜辅佐格局"
+        poge_reason = ""
     elif level == "中等":
         suggestion = f"{geku_name}中等成格，名字宜补足短板助益格局"
+        poge_reason = ""
     elif level == "下等":
         suggestion = f"{geku_name}格局较弱，名字宜扶助格局核心用神"
+        poge_reason = ""
     else:
         suggestion = f"{geku_name}破格，需化解破格因素，名字宜补足关键用神"
+        # 构造破格原因描述
+        if po_factors:
+            poge_reason = "；".join(po_factors)
+        else:
+            poge_reason = f"{geku_name}格局被破坏"
 
     return {
         "is_cheng": is_cheng,
@@ -702,6 +710,8 @@ def judge_pattern_cheng(geku_name: str, bazi: Dict[str, Any],
         "cheng_count": len(cheng_factors),
         "po_count": len(po_factors),
         "suggestion": suggestion,
+        "poge_reason": poge_reason,
+        "pattern": geku_name,
     }
 
 
@@ -725,9 +735,13 @@ def analyze_pattern(bazi: Dict[str, Any]) -> Dict[str, Any]:
     pattern_info = determine_pattern(bazi)
     cheng_info = judge_pattern_cheng(pattern_info["pattern"], bazi, pattern_info)
 
+    # 合并结果（方便外部直接传入 merged_result 给 analyze_poge_reasons）
+    merged_result = {**cheng_info, **pattern_info}
+
     return {
         "pattern_info": pattern_info,
         "cheng_info": cheng_info,
+        "merged_result": merged_result,
     }
 
 
