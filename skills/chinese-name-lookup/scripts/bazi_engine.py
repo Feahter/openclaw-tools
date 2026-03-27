@@ -14,6 +14,7 @@ from shier_changsheng import get_changsheng_state as _get_changsheng_raw, get_ch
 from yueling_canggan import get_yueling_canggan as _get_yueling_canggan_raw
 from pattern_method import determine_pattern, judge_pattern_cheng, analyze_pattern
 from shen_sha import get_shen_sha_summary as _get_shen_sha_summary
+from xiyongshen_v2 import determine_xiyongshen_v2
 
 
 # ============================================================
@@ -593,7 +594,7 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int) -> Dict[str, 
     rizhu = get_rizhu_strength(bazi)
     shishen = get_shishen_list(bazi)
     shierzhang = get_shierzhang(bazi)
-    xiyong = determine_xiyongshen(bazi, rizhu)
+    xiyong_v1 = determine_xiyongshen(bazi, rizhu)
     nayin = get_nayin(bazi["year"]["stem_idx"], bazi["year"]["branch_idx"])
 
     month_stem = HEAVENLY_STEMS[bazi["month"]["stem_idx"]]
@@ -604,6 +605,18 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int) -> Dict[str, 
     # 格局分析（子平格局法）
     pattern_result = analyze_pattern(bazi)
 
+    # V2 喜用神判定（调候优先/格局已成/月令司令）
+    xiyong_v2 = determine_xiyongshen_v2(
+        bazi=bazi,
+        rizhu_strength=rizhu,
+        tiao_hou=tiao_hou,
+        yueling_canggan=yueling,
+        pattern_result=pattern_result,
+    )
+
+    # 补充 V2 缺失的字段（从 V1 或直接计算）
+    xiyong_v2["wx_counts"] = xiyong_v1.get("wx_counts", {})
+
     # 神煞分析
     shen_sha = _get_shen_sha_summary(bazi)
 
@@ -613,7 +626,8 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int) -> Dict[str, 
         "rizhu_strength": rizhu,
         "shishen": shishen,
         "shierzhang": shierzhang,
-        "xiyongshen": xiyong,
+        "xiyongshen": xiyong_v2,          # V2 判定结果
+        "_xiyongshen_v1": xiyong_v1,      # V1 判定结果（保留对比）
         "year_nayin": nayin,
         "zodiac": bazi_result["zodiac"],
         "lunar": bazi_result["lunar"],

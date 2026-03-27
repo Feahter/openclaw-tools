@@ -247,8 +247,17 @@ def _get_local_bazi(year: int, month: int, day: int, hour: int) -> Dict[str, Any
             "xiyongshen": bazi["xiyongshen"]["xiyongshen"],
             "jishen": bazi["xiyongshen"]["jishen"],
             "qiangruo": bazi["xiyongshen"]["qiangruo"],
-            "wx_counts": bazi["xiyongshen"]["wx_counts"],
+            "wx_counts": bazi.get("xiyongshen", {}).get("wx_counts", {}),  # v2可能无此字段
             "analysis": bazi["xiyongshen"]["analysis"],
+            # v2 新增字段
+            "tiao_hou_urgent": bazi["xiyongshen"].get("tiao_hou_urgent"),
+            "pattern_cheng": bazi["xiyongshen"].get("pattern_cheng"),
+            "pattern_level": bazi["xiyongshen"].get("pattern_level"),
+            "tou_level": bazi["xiyongshen"].get("tou_level"),
+            "method": bazi["xiyongshen"].get("method", "v2_local"),
+            "confidence": bazi["xiyongshen"].get("confidence"),
+            # v1 结果（对比用）
+            "_v1": bazi.get("_xiyongshen_v1", {}),
         },
         # 新增：穷通宝鉴调候 + 月令藏干 + 格局
         "tiao_hou": bazi.get("tiao_hou", {}),
