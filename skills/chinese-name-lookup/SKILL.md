@@ -1,6 +1,7 @@
 ---
 name: chinese-name-lookup
-description: Chinese name analysis and recommendation based on Eight Characters (八字喜用神) + zodiac (生肖属相) + Ten Gods (十神) + Twelve Changsheng (十二长生). True Chinese traditional name analysis - no Japanese 五格剖象法. Use when user wants to analyze a name's fortune, get name recommendations for a newborn, check喜用神, or evaluate a name. Triggers: "分析名字", "八字起名", "根据八字取名", "帮我起个名字", "喜用神", "五行缺什么", "姓名推荐", "姓X名Y", "帮我起个姓X的宝宝名字", "名字测试", "八字排盘".
+description: Chinese name analysis and recommendation based on Eight Characters (八字喜用神) + zodiac (生肖属相) + Ten Gods (十神) + Twelve Changsheng (十二长生) + ShenSha (神煞) + Dayun/Liunian (大运流年). True Chinese traditional name analysis - no Japanese 五格剖象法. Use when user wants to: analyze a name's fortune, get name recommendations for a newborn based on八字, check喜用神 for a birth chart, evaluate a name's命理特质, or get a full八字报告. Triggers: "分析名字", "八字起名", "根据八字取名", "帮我起个名字", "喜用神", "五行缺什么", "姓名推荐", "姓X名Y", "帮我起个姓X的宝宝名字", "名字测试", "八字排盘", "八字报告", "帮我做个八字分析", "生成八字命盘", "分析下这个名字", "八字神煞", "大运流年".
+compatibility: Python 3.8+; no external API required (fully local); optional八字API for precise喜用神.
 ---
 
 # Chinese Name Fortune Analysis & Recommendation
@@ -145,55 +146,101 @@ score_by_wuge(name_chars)                           # 0-10（参考）
 
 ## Step 6: 输出格式
 
-### 标准响应模板
+### Phase 9 完整报告格式
 
 ```markdown
-## 命局分析
+# 八字分析报告
 
-### 八字排盘
-- 农历：甲辰年 二月初六 辰时
-- 八字：甲辰年 丁卯月 庚午日 辛巳时
-- 日主：庚金（身旺）
-- 喜用神：金、水
-- 忌神：木、火
-
-### 十神组合
-- 年干甲木 → 偏印
-- 月支卯木 → 羊刃
-- 日支午火 → 伤官
-- 时干辛金 → 比肩
-
-### 十二长生
-- 日干庚金在年支辰：养
-- 日干庚金在月支卯：死
-- 日干庚金在日支午：胎
-- 日干庚金在时支巳：长生
-
-### 生肖属相
+## 基本信息
+- 姓名：张
+- 性别：男
+- 出生时间：甲辰年 丁辰月 庚丑日 辛午时
+- 农历：农历2024年2月6日
 - 生肖：龙
-- 宜用：辰、龙、申、酉、氵、三、君
-- 慎用：寅、卯、戌、狗、冲、刑
 
-## 推荐方案（3组）
+---
 
-### 方案一：张<u>铭</u><u>泽</u>
-- **喜用神**：铭（金）+ 泽（水）= 金水相生 ✅
-- **生肖宜忌**：铭（无吉偏旁）泽（氵=龙宜用）✅
-- **五行归属性质**：金水相生
-- **十神补救**：铭补金，泽补水
-- **十二长生**：日主庚金，得铭泽助
-- **评分**：92分
-- **适用场景**：助命局平衡，适合期望孩子前程似锦、财运亨通的家庭
+## 八字命盘
+| 年柱 | 月柱 | 日柱 | 时柱 |
+|:---|:---|:---|:---|
+| **甲辰** | **丁辰** | **庚丑** | **辛午** |
 
-### 方案二：张<u>锦","泉</u>
-- **喜用神**：锦（金）+ 泉（水）= 金水相生 ✅
-- **生肖宜忌**：锦（金偏旁）✅ 泉（氵）✅
+---
+
+## 命局分析
+- **日主**：庚金，**弱**，失令
+- **用神**：**土、金**
+- **忌神**：木、火、水
+
+**五行分布**：
+  木 `███░░░░░░░` 1个
+  火 `██████░░░░` 2个
+  土 `██████████` 3个
+  金 `██████░░░░` 2个
+  水 `░░░░░░░░░░` 0个
+
+- **格局**：偏印格（内格），破格/未成
+
+---
+
+## 神煞一览
+- **天乙贵人**：天乙贵人落在丑、未
+- **文昌**：文昌在巳
+- **驿马**：驿马在寅
+- **华盖**：华盖在辰
+- **桃花**：桃花在酉
+
+---
+
+## 大运流年
+### 大运序列
+1. 0-9岁：丁辰 顺行 【平】
+2. 10-19岁：戊巳 顺行 【平】
+...
+
+### 近5年流年
+- 2024（甲辰）：【小吉】偏财流年
+- 2025（乙巳）：【大吉】偏财流年
+...
+
+---
+
+## 姓名分析
+### 推荐候选名
+1. 张勇云（人格16/总格21/三才土木土）
+   - 五行：喜用神「土、金」匹配
+   - 生肖：「云」(含云，宜)
+
+### 候选名详细评分
+| 姓名 | 总分 | 喜用神 | 生肖 | 十神 | 五格 |
+|:---|:---:|:---:|:---:|:---:|:---:|
+| 张勇云 | **48** | 0/40 | 22/30 | 16/30 | 15/25 |
+
+---
+
+## 命理建议
+- **职业方向**：金融、法律、工程；房地产、建筑
+- **幸运方位**：南、东南、西
+- **注意事项**：忌神为「木、火、水」
+
+---
+
+*本报告由本地八字引擎生成，仅供参考。*
+```
+
+**报告模块** (`scripts/report_formatter.py`)：
+- `format_full_report()` - 生成完整 Markdown 报告
+- `format_bazi_table()` - 八字命盘表格
+- `format_dayun_summary()` - 大运摘要
+- `format_liunian_recent()` - 近5年流年
+- `format_shen_sha_list()` - 神煞一览
+- `generate_full_report()` - 一键生成完整报告
 - **五行归属性质**：金水相生
 - **十神补救**：锦补金，泉补水
 - **评分**：88分
 - **适用场景**：聪慧、财运稳定
 
-### 方案三：张<u>钧","涵</u>
+### 方案三：张钧、涵
 - **喜用神**：钧（金）+ 涵（水）= 金水相生 ✅
 - **生肖宜忌**：钧（金）✅ 涵（氵）✅
 - **五行归属性质**：金水相生
@@ -216,19 +263,23 @@ score_by_wuge(name_chars)                           # 0-10（参考）
 
 ### 方式一：快速调用（推荐）
 ```python
-from scripts.name_generator import quick_generate, generate_name_recommendations
+from scripts.name_generator import quick_generate
 
 # 纯本地引擎，无需 API
-result = quick_generate(
+# quick_generate 返回 str（Markdown 报告）
+markdown = quick_generate(
     surname="张",
     year=2024, month=3, day=15, hour=10,
     gender=1  # 1=男
 )
-print(result["markdown"])
+print(markdown)
 ```
 
-### 方式二：完整调用
+### 方式二：完整调用（返回 dict）
 ```python
+from scripts.name_generator import generate_name_recommendations
+
+# 返回 dict，包含 markdown/bazi_info/recommendations 字段
 result = generate_name_recommendations(
     surname="张",
     birth_year=2024, birth_month=3, birth_day=15, birth_hour=10,
@@ -237,11 +288,15 @@ result = generate_name_recommendations(
     prefer_xiyongshen=["金", "水"],  # 可选
     use_local_engine=True,
 )
-print(result["markdown"])
+print(result["markdown"])      # Markdown 报告
+print(result["bazi_info"])    # 八字详细信息 dict
+print(result["recommendations"])  # 推荐名字列表
 ```
 
 ### 方式三：只分析已有名字
 ```python
+from scripts.name_generator import analyze_existing_name
+
 result = analyze_existing_name("陈浩然")
 print(result["markdown"])
 ```
@@ -267,6 +322,9 @@ print(result["markdown"])
 | `scripts/bazi_engine.py` | 八字排盘 + 十神 + 十二长生 |
 | `scripts/zodiac_preferences.py` | 十二生肖用字宜忌 |
 | `scripts/name_scorer_v3.py` | 三维评分引擎 |
+| `scripts/dayun_liunian.py` | 大运流年推算 |
+| `scripts/shen_sha.py` | 神煞查询系统 |
+| `scripts/report_formatter.py` | Phase 9 完整报告格式化器 |
 | `scripts/name_generator.py` | 主入口，整合所有模块 |
 | `references/stroke_table.json` | 汉字笔画数表 |
 | `references/wuge_rules.json` | 五格数理吉凶（仅供参考）|

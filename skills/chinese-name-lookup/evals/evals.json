@@ -1,27 +1,87 @@
 {
   "skill_name": "chinese-name-lookup",
-  "description": "基于八字喜用神和五格剖象法的中文姓名分析与推荐",
+  "description": "基于八字喜用神、生肖属相、十神十二长生、神煞、大运流年的传统中国姓名分析与推荐。本地引擎无需API，五格仅作参考。",
   "evals": [
     {
       "id": 1,
       "prompt": "帮宝宝起个名字，姓张，2025年3月15日上午10点出生，男孩",
-      "expected_output": "应输出包含八字分析、五格数理、3组推荐方案的完整报告，格式符合命局摘要+五格架构+推荐方案的模板",
+      "expected_output": "应输出完整八字分析报告，包含：八字命盘（年柱/月柱/日柱/时柱）、喜用神、大运序列、近5年流年、3组推荐名字",
       "files": [],
-      "notes": "测试起名场景，需要调用八字API获取喜用神"
+      "notes": "测试起名场景，本地引擎 + 新功能（神煞/大运流年/Phase 9报告）",
+      "assertions": [
+        {
+          "type": "contains",
+          "text": "八字命盘",
+          "description": "报告包含八字命盘"
+        },
+        {
+          "type": "contains",
+          "description": "报告包含喜用神"
+        },
+        {
+          "type": "contains",
+          "text": "大运",
+          "description": "报告包含大运序列"
+        },
+        {
+          "type": "contains",
+          "text": "流年",
+          "description": "报告包含近5年流年"
+        },
+        {
+          "type": "contains",
+          "text": "推荐",
+          "description": "报告包含推荐名字"
+        }
+      ]
     },
     {
       "id": 2,
-      "prompt": "姓陈名浩然怎么样？请分析一下这个名字的八字和五格",
-      "expected_output": "应输出五格数理分析（天格/人格/地格/外格/总格）以及三才配置判定，标注吉凶",
+      "prompt": "姓陈名浩然怎么样？请从八字神煞角度分析一下这个名字",
+      "expected_output": "应输出八字命盘 + 神煞信息（天乙贵人/文昌/驿马/华盖/桃花 等）",
       "files": [],
-      "notes": "测试现有名字分析场景"
+      "notes": "测试神煞分析功能",
+      "assertions": [
+        {
+          "type": "contains",
+          "text": "天乙贵人",
+          "description": "输出包含天乙贵人"
+        },
+        {
+          "type": "contains",
+          "text": "文昌",
+          "description": "输出包含文昌"
+        },
+        {
+          "type": "contains",
+          "text": "桃花",
+          "description": "输出包含桃花"
+        }
+      ]
     },
     {
       "id": 3,
-      "prompt": "我想要个女孩名字，姓林，预产期2026年6月，帮推荐几个",
-      "expected_output": "应输出基于八字分析的女儿名字推荐，包含五格数理和喜用神匹配说明",
+      "prompt": "我想要个女孩名字，姓林，预产期2026年6月，帮推荐几个，要有八字报告和大运分析",
+      "expected_output": "应输出完整八字报告，包含大运流年分析和女儿名字推荐",
       "files": [],
-      "notes": "测试女儿起名场景"
+      "notes": "测试女儿起名 + 大运流年",
+      "assertions": [
+        {
+          "type": "contains",
+          "text": "大运",
+          "description": "报告包含大运信息"
+        },
+        {
+          "type": "contains",
+          "text": "流年",
+          "description": "报告包含流年分析"
+        },
+        {
+          "type": "contains",
+          "text": "推荐",
+          "description": "报告包含推荐名字"
+        }
+      ]
     }
   ]
 }
