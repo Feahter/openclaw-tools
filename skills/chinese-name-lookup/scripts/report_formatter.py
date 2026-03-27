@@ -598,7 +598,7 @@ def _format_name_section(
         total_score = rec.get("total_score", 0)
         dim_scores = rec.get("dim_scores", {})
 
-        xiyong_score = dim_scores.get("喜用神", 0)
+        xiyong_score = dim_scores.get("喜用神匹配", dim_scores.get("喜用神", 0))
         zodiac_score = dim_scores.get("生肖宜忌", dim_scores.get("生肖", 0))
         shishen_score = dim_scores.get("十神/长生", dim_scores.get("十神", 0))
         wuge_score = dim_scores.get("五格数理", dim_scores.get("五格", 0))

@@ -16,6 +16,7 @@
         },
         {
           "type": "contains",
+          "text": "用神",
           "description": "报告包含喜用神"
         },
         {
@@ -38,24 +39,34 @@
     {
       "id": 2,
       "prompt": "姓陈名浩然怎么样？请从八字神煞角度分析一下这个名字",
-      "expected_output": "应输出八字命盘 + 神煞信息（天乙贵人/文昌/驿马/华盖/桃花 等）",
+      "expected_output": "⚠️ 缺少出生时间，不得生成虚假八字报告。应输出基础名字分析（含姓氏五行、名字用字分析），并明确提示需要出生时间",
       "files": [],
-      "notes": "测试神煞分析功能",
+      "notes": "测试无出生时间时的正确行为：不应生成虚假八字，应要求用户补充",
       "assertions": [
         {
           "type": "contains",
+          "text": "缺少出生时间",
+          "description": "报告明确提示缺少出生时间"
+        },
+        {
+          "type": "contains",
+          "text": "陈",
+          "description": "包含姓氏分析"
+        },
+        {
+          "type": "contains",
+          "text": "浩然",
+          "description": "包含名字用字分析"
+        },
+        {
+          "type": "not_contains",
+          "text": "甲辰年",
+          "description": "不得捏造八字年份"
+        },
+        {
+          "type": "not_contains",
           "text": "天乙贵人",
-          "description": "输出包含天乙贵人"
-        },
-        {
-          "type": "contains",
-          "text": "文昌",
-          "description": "输出包含文昌"
-        },
-        {
-          "type": "contains",
-          "text": "桃花",
-          "description": "输出包含桃花"
+          "description": "无出生时间不应输出神煞（需要八字才能计算）"
         }
       ]
     },

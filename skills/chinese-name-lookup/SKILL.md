@@ -36,9 +36,16 @@ Step 7: 输出结构化报告
 
 **输入格式**（自然语言解析）：
 - "帮宝宝起个名字，姓张，2025年3月15日上午10点出生，男孩"
-- "姓陈名浩然怎么样"
+- "姓陈名浩然怎么样"（⚠️ 需要询问出生时间，如未提供则只输出基础名字分析）
 - "我想要个女孩名字，姓林，预产期2026年6月"
 - "2024年3月15日10点，姓张"
+
+**⚠️ 重要约束：出生时间必须完整**
+如果用户只提供姓名但未提供出生时间，必须先询问出生时间。**不得在缺少出生时间的情况下生成虚假的八字报告。**
+
+**缺失出生时间时的处理**：
+- 如果用户只提供姓名 → 调用 `analyze_existing_name()` → 输出基础名字分析（含姓氏五行、名字用字分析），并明确提示"请提供出生时间以获取完整命理报告"
+- 不得捏造出生时间或生成不完整的八字命盘
 
 **提取字段**：
 - `surname`: 姓氏
@@ -320,12 +327,21 @@ print(result["markdown"])
 |------|------|
 | `scripts/lunar_calendar.py` | 农历转换（1900-2100年）|
 | `scripts/bazi_engine.py` | 八字排盘 + 十神 + 十二长生 |
+| `scripts/xiyongshen_v2.py` | 本地喜用神v2判定（调候优先+格局已成）|
+| `scripts/rizhu_strength_v2.py` | 日主强弱v2量化（权重算法）|
+| `scripts/pattern_method.py` | 格局取用法 + 成败判定 + 破格分析 |
+| `scripts/poge_analyzer.py` | 破格原因识别（6种破格类型）|
+| `scripts/tiao_hou.py` | 穷通宝鉴120格调候喜忌表 |
+| `scripts/tiao_hou_judge.py` | 调候优先级判定 |
+| `scripts/yueling_canggan.py` | 月令藏干表 |
+| `scripts/shier_changsheng.py` | 十二长生表 |
 | `scripts/zodiac_preferences.py` | 十二生肖用字宜忌 |
+| `scripts/liushen_xinxing.py` | 六神心性速查（性格/职业/六亲）|
 | `scripts/name_scorer_v3.py` | 三维评分引擎 |
 | `scripts/dayun_liunian.py` | 大运流年推算 |
 | `scripts/shen_sha.py` | 神煞查询系统 |
 | `scripts/report_formatter.py` | Phase 9 完整报告格式化器 |
-| `scripts/name_generator.py` | 主入口，整合所有模块 |
+| `scripts/name_generator.py` | 主入口，整合所有模块（含 analyze_existing_name）|
 | `references/stroke_table.json` | 汉字笔画数表 |
 | `references/wuge_rules.json` | 五格数理吉凶（仅供参考）|
 

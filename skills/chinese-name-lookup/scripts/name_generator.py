@@ -440,6 +440,107 @@ def format_recommendation_markdown(
     return "\n".join(lines)
 
 
+def analyze_existing_name(
+    full_name: str,
+    birth_year: Optional[int] = None,
+    birth_month: Optional[int] = None,
+    birth_day: Optional[int] = None,
+    birth_hour: Optional[int] = None,
+    gender: int = 1,
+    api_key: str = "",
+) -> str:
+    """
+    分析已有名字（可提供或不提供出生时间）
+
+    Args:
+        full_name: 完整姓名（含姓）
+        birth_year/month/day/hour: 出生时间（可选，如果缺失则只能做基础分析）
+        gender: 性别
+        api_key: 八字API密钥
+
+    Returns:
+        如果出生时间完整 → 完整八字分析报告
+        如果出生时间缺失 → 基础名字分析 + 明确提示需要出生时间
+    """
+    import re
+
+    # 提取姓氏（单姓取第1字，复姓取前2字）
+    surname_match = re.match(r'^([\u4e00-\u9fa5])', full_name)
+    if not surname_match:
+        return "【错误】无法识别的姓名格式，请提供中文姓名（如：陈浩然）"
+
+    surname = surname_match.group(1)
+    givenname = full_name[1:]  # 名字为剩余部分
+
+    # 检查出生时间是否完整
+    has_birth_info = all(v is not None for v in [birth_year, birth_month, birth_day, birth_hour])
+
+    if not has_birth_info:
+        # 基础名字分析（不需要出生时间）
+        return _basic_name_analysis(surname, givenname, gender)
+
+    # 完整八字分析
+    result = generate_name_recommendations(
+        surname=surname,
+        birth_year=birth_year,
+        birth_month=birth_month,
+        birth_day=birth_day,
+        birth_hour=birth_hour,
+        gender=gender,
+        api_key=api_key,
+        use_local_engine=True,
+    )
+    return result.get("markdown", result.get("error", "分析失败"))
+
+
+def _basic_name_analysis(surname: str, givenname: str, gender: int) -> str:
+    """
+    基础名字分析（不需要出生时间）
+    只分析姓氏五行、名字寓意、字形结构，不涉及八字喜用神
+    """
+    from wuge_calculator import get_char_wuxing
+
+    lines = []
+    lines.append("# 名字基础分析报告\n")
+    lines.append(f"⚠️ **提示**：缺少出生时间，八字喜用神分析需要完整出生年月日时。")
+    lines.append("以下为基础名字信息，如需完整命理分析，请提供出生时间。\n")
+    lines.append("---")
+    lines.append("")
+    lines.append("## 基础信息")
+    lines.append("")
+    lines.append(f"| 项目 | 内容 |")
+    lines.append(f"|:---|:---|")
+    lines.append(f"| 姓名 | {surname}{givenname} |")
+    lines.append(f"| 姓氏 | {surname} |")
+    lines.append(f"| 名字 | {givenname} |")
+    lines.append(f"| 性别 | {'男' if gender == 1 else '女'} |")
+    lines.append("")
+    lines.append("## 姓氏五行")
+    lines.append("")
+
+    # 姓氏五行
+    surname_wuxing = get_char_wuxing(surname)
+    lines.append(f"- **{surname}** 属 **{surname_wuxing}** 行的字\n")
+
+    lines.append("## 名字用字分析")
+    lines.append("")
+    for char in givenname:
+        char_wuxing = get_char_wuxing(char)
+        lines.append(f"- **{char}**：**{char_wuxing}** 行\n")
+
+    # 名字总五行倾向
+    givenname_wuxings = [get_char_wuxing(c) for c in givenname]
+    lines.append(f"- 名字整体五行倾向：{'、'.join(givenname_wuxings)}\n")
+
+    lines.append("---")
+    lines.append("")
+    lines.append("**如需八字喜用神分析和完整命理报告，请提供：**")
+    lines.append("- 出生年月日时（如：2025年3月15日上午10点）")
+    lines.append("- 出生地点（省/市，可选，用于真太阳时矫正）")
+
+    return "\n".join(lines)
+
+
 # ============================================================
 # 简化调用接口
 # ============================================================
