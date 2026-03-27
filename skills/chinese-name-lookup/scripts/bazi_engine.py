@@ -749,3 +749,100 @@ def get_yueling_canggan(yue_zhi: str) -> dict:
         dict: {"本气": str, "中气": str, "余气": str or None}
     """
     return _get_yueling_canggan_raw(yue_zhi)
+
+
+# ============================================================
+# 9. 大运流年分析（Phase 8 新增）
+# ============================================================
+
+def full_liunian_analysis(
+    year: int,
+    month: int,
+    day: int,
+    hour: int,
+    gender: str,
+    birth_timestamp: float = None,
+    birth_year: int = None,
+    birth_month: int = None
+) -> Dict[str, Any]:
+    """
+    完整大运流年分析
+    
+    Args:
+        year, month, day, hour: 出生时间
+        gender: 性别 ("男" 或 "女")
+        birth_timestamp: 出生时间戳（可选）
+        birth_year: 出生年份（可选）
+        birth_month: 出生月份（可选）
+    
+    Returns:
+        完整分析结果，包含：
+        - 八字基础信息
+        - 大运列表（每步运：岁数、干支、概述）
+        - 近5年流年简析
+        - 驿马运信息
+    """
+    import time
+    from dayun_liunian import (
+        full_dayun_analysis,
+        get_dayun_sequence,
+        get_recent_liunian,
+        get_yima_dayun,
+        analyze_liunian_by_year
+    )
+    
+    # 基础八字分析
+    bazi_result = full_bazi_analysis(year, month, day, hour)
+    bazi = bazi_result["bazi"]
+    rizhu = bazi_result["rizhu_strength"]
+    xiyong = bazi_result["xiyongshen"]
+    
+    bazi_with_xiyong = {
+        "bazi": bazi,
+        "rizhu_strength": rizhu,
+        "xiyongshen": xiyong,
+    }
+    
+    # 设置默认值
+    if birth_timestamp is None:
+        birth_timestamp = time.mktime((year, month, day, hour, 0, 0, 0, 0, 0))
+    if birth_year is None:
+        birth_year = year
+    if birth_month is None:
+        birth_month = month
+    
+    # 完整大运流年分析
+    dayun_result = full_dayun_analysis(
+        bazi_with_xiyong,
+        gender,
+        birth_timestamp,
+        birth_year,
+        birth_month
+    )
+    
+    return {
+        # 基础八字信息
+        "birth_chart": bazi_result["birth_chart"],
+        "bazi": bazi,
+        "gender": gender,
+        "zodiac": bazi_result["zodiac"],
+        "lunar": bazi_result["lunar"],
+        "rizhu_strength": rizhu,
+        "xiyongshen": xiyong,
+        
+        # 大运信息
+        "dayun_direction_rule": dayun_result["direction_rule"],
+        "dayun_year_stem": dayun_result["year_stem"],
+        "dayun_month_branch": dayun_result["month_branch"],
+        "dayun_count": dayun_result["dayun_count"],
+        "dayun_list": dayun_result["dayun_list"],
+        "yima": dayun_result["yima"],
+        
+        # 近5年流年
+        "recent_liunian": dayun_result["recent_liunian"],
+        
+        # 其他参考信息
+        "tiao_hou": bazi_result.get("tiao_hou"),
+        "pattern": bazi_result.get("pattern"),
+        "shen_sha": bazi_result.get("shen_sha"),
+    }
