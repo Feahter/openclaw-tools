@@ -13,6 +13,7 @@ from tiao_hou import get_tiao_hou as _get_tiao_hou_raw, get_tiao_hou_xiyong, get
 from shier_changsheng import get_changsheng_state as _get_changsheng_raw, get_changsheng_state_idx
 from yueling_canggan import get_yueling_canggan as _get_yueling_canggan_raw
 from pattern_method import determine_pattern, judge_pattern_cheng, analyze_pattern
+from shen_sha import get_shen_sha_summary as _get_shen_sha_summary
 
 
 # ============================================================
@@ -597,11 +598,14 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int) -> Dict[str, 
 
     month_stem = HEAVENLY_STEMS[bazi["month"]["stem_idx"]]
     month_branch = EARTHLY_BRANCHES[bazi["month"]["branch_idx"]]
-    tiao_hou = get_tiao_hou(month_stem, month_branch)
+    tiao_hou = _get_tiao_hou_raw(month_stem, month_branch)
     yueling = _get_yueling_canggan_raw(month_branch)
 
     # 格局分析（子平格局法）
     pattern_result = analyze_pattern(bazi)
+
+    # 神煞分析
+    shen_sha = _get_shen_sha_summary(bazi)
 
     return {
         "birth_chart": bazi_result["birth_chart"],
@@ -618,6 +622,7 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int) -> Dict[str, 
         "yueling_canggan": yueling,
         "pattern": pattern_result["pattern_info"],
         "pattern_cheng": pattern_result["cheng_info"],
+        "shen_sha": shen_sha,
     }
 
 
