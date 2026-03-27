@@ -38,6 +38,15 @@ from name_scorer_v3 import (
     XIYONGSHEN_WORDS, COMMON_GOOD_CHARS, GOOD_NAME_EXAMPLES,
 )
 
+# 导入报告格式化器（Phase 9）
+from report_formatter import (
+    format_full_report as _format_full_report,
+    format_bazi_table,
+    format_shen_sha_list,
+    format_dayun_summary,
+    format_liunian_recent,
+)
+
 
 # ============================================================
 # 主入口函数
@@ -122,11 +131,19 @@ def generate_name_recommendations(
         result["error"] = f"生成推荐失败: {str(e)}"
         return result
 
-    # Step 3: 生成Markdown
+    # Step 3: 生成Markdown（使用新的报告格式化器）
     try:
-        result["markdown"] = format_recommendation_markdown(surname, bazi_info, recommendations)
+        full_name = surname if surname else "待输入"
+        result["markdown"] = _format_full_report(
+            bazi_info=bazi_info,
+            name_candidates=recommendations,
+            gender=gender,
+            surname=surname,
+            full_name=full_name,
+        )
     except Exception as e:
-        result["markdown"] = f"# 错误\n生成报告失败: {str(e)}"
+        # Fallback to old format
+        result["markdown"] = format_recommendation_markdown(surname, bazi_info, recommendations)
 
     return result
 
