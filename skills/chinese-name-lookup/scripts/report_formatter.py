@@ -252,7 +252,7 @@ def _format_mingju_analysis(bazi_info: Dict[str, Any]) -> List[str]:
     jishen_list = xiyongshen.get("jishen", [])
     qiangruo = xiyongshen.get("qiangruo", "未知")
 
-    # 日主强弱
+    # 日主强弱（优先使用v2量化结果）
     rizhu_strength = bazi_info.get("rizhu_strength", {})
     strength = rizhu_strength.get("strength", qiangruo)
     reason = rizhu_strength.get("reason", xiyongshen.get("analysis", ""))
@@ -260,7 +260,21 @@ def _format_mingju_analysis(bazi_info: Dict[str, Any]) -> List[str]:
     day_stem = rizhu_strength.get("day_stem", "")
     day_element = rizhu_strength.get("day_element", "")
 
-    lines.append(f"- **日主**：{day_stem}{day_element}，**{strength}**，{reason}")
+    # v2 量化结果显示
+    v2_score = rizhu_strength.get("score", None)
+    v2_breakdown = rizhu_strength.get("breakdown", None)
+    if v2_score is not None:
+        lines.append(f"- **日主**：{day_stem}{day_element}，**{strength}**（量化评分：{v2_score}/100）")
+        if v2_breakdown:
+            yueling_state = v2_breakdown.get("yueling", {}).get("state", "")
+            yueling_score = v2_breakdown.get("yueling", {}).get("score", 0)
+            tonggen_score = v2_breakdown.get("tonggen", {}).get("score", 0)
+            bijie_count = v2_breakdown.get("bijie", {}).get("count", 0)
+            bijie_score = v2_breakdown.get("bijie", {}).get("score", 0)
+            yinxing_score = v2_breakdown.get("yinxing", {}).get("score", 0)
+            lines.append(f"  - 月令{yueling_state} {yueling_score}分 + 通根 {tonggen_score}分 + 比劫×{bijie_count} {bijie_score}分 + 印星 {yinxing_score}分")
+    else:
+        lines.append(f"- **日主**：{day_stem}{day_element}，**{strength}**，{reason}")
     lines.append("")
 
     # 喜用神
@@ -298,6 +312,12 @@ def _format_mingju_analysis(bazi_info: Dict[str, Any]) -> List[str]:
             cheng_level = pattern_cheng.get("level", "未知")
             cheng_str = "成格" if is_cheng else "破格/未成"
             lines.append(f"  - 成败：**{cheng_str}**（{cheng_level}）")
+            poge_reason = pattern_cheng.get("poge_reason", "")
+            if poge_reason:
+                lines.append(f"  - 破格原因：{poge_reason}")
+            suggestion = pattern_cheng.get("suggestion", "")
+            if suggestion:
+                lines.append(f"  - 建议：{suggestion}")
         reason_text = pattern.get("reason", "")
         if reason_text:
             lines.append(f"  - 分析：{reason_text[:60]}...")
