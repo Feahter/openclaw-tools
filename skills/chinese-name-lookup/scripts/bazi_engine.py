@@ -160,24 +160,30 @@ def get_month_stem_branch(year_stem: int, lunar_month: int) -> Tuple[int, int]:
         year_stem: 年干索引 (0-9)
         lunar_month: 农历月份 (1-12, 1=正月=寅月)
 
-    五虎遁年起诀:
-      甲己起甲 → offset=0 (甲)
-      乙庚起丙 → offset=2 (丙)
-      丙辛起戊 → offset=4 (戊)
-      丁壬起庚 → offset=6 (庚)
-      戊癸起壬 → offset=8 (壬)
+    五虎遁口诀（据百度百科）：
+      甲己之年丙作首 → 正月=丙寅
+      乙庚之岁戊为头 → 正月=戊寅
+      丙辛必定寻庚起 → 正月=庚寅
+      丁壬壬位顺行流 → 正月=壬寅
+      戊癸何方发，甲寅之上好追求 → 正月=甲寅
 
     月干 = (offset + 月份 - 1) % 10
     月支 = (月份 + 1) % 12 (正月=寅=2, 二月=卯=3, 三月=辰=4, ...)
 
-    offset表: {0:0, 1:2, 2:4, 3:6, 4:8, 5:0, 6:2, 7:4, 8:6, 9:8}
-             (即: stem<5 → stem*2; stem>=5 → (stem-5)*2)
+    offset公式: offset = ((year_stem + 1) % 5) * 2
+    验证:
+      甲(0): ((0+1)%5)*2 = 2 → 正月=丙寅 ✓
+      乙(1): ((1+1)%5)*2 = 4 → 正月=戊寅 ✓
+      丙(2): ((2+1)%5)*2 = 6 → 正月=庚寅 ✓
+      丁(3): ((3+1)%5)*2 = 8 → 正月=壬寅 ✓
+      戊(4): ((4+1)%5)*2 = 0 → 正月=甲寅 ✓
+      己(5): ((5+1)%5)*2 = 2 → 正月=丙寅 ✓
+      庚(6): ((6+1)%5)*2 = 4 → 正月=戊寅 ✓
+      辛(7): ((7+1)%5)*2 = 6 → 正月=庚寅 ✓
+      壬(8): ((8+1)%5)*2 = 8 → 正月=壬寅 ✓
+      癸(9): ((9+1)%5)*2 = 0 → 正月=甲寅 ✓
     """
-    # offset = (年干 % 5) * 2 % 10  # 简化为: stem<5 → stem*2; stem>=5 → (stem-5)*2
-    if year_stem < 5:
-        offset = year_stem * 2
-    else:
-        offset = (year_stem - 5) * 2
+    offset = ((year_stem + 1) % 5) * 2
 
     branch_idx = (lunar_month + 1) % 12  # 正月=寅(2), 二月=卯(3), 三月=辰(4)
     stem_idx = (offset + lunar_month - 1) % 10
@@ -221,18 +227,21 @@ def get_day_stem_branch(year: int, month: int, day: int) -> Tuple[int, int]:
 def get_hour_stem_branch(day_stem: int, hour: int) -> Tuple[int, int]:
     """
     时干支计算（五鼠遁）
-    时支: (hour // 2 + 1) % 12
-        子时=23-1, 丑时=1-3, 寅时=3-5, 卯时=5-7,
-        辰时=7-9, 巳时=9-11, 午时=11-13, 未时=13-15,
-        申时=15-17, 酉时=17-19, 戌时=19-21, 亥时=21-23
-    时干: (day_stem * 2 + hour // 2) % 10
-    """
-    # hour // 2: 子时=11(0), 丑时=0, 寅=1, 卯=2, 辰=3, 巳=4...
-    hour_index = (hour + 1) // 2  # 23点->12->0(子时)
-    if hour == 23:
-        hour_index = 0
 
-    branch_idx = (hour_index + 1) % 12  # 子时=0, 丑=1, ...
+    时支: 23-1点=子(0), 1-3点=丑(1), 3-5点=寅(2), 5-7点=卯(3)...
+      (hour + 1) // 2 对 0 点错(得1应为0), 对23点错(得12应为0)
+      修正: hour==0 or hour==23 → branch=0 (子), 否则 (hour+1)//2
+    时干: (day_stem * 2 + hour_index) % 10
+
+    五鼠遁口诀: 甲己还加甲, 乙庚丙作初, 丙辛从戊起, 丁壬庚子居, 戊癸起壬子
+    """
+    # 时支: 23-1点=子, 1-3点=丑, 3-5点=寅, 5-7点=卯...
+    if hour == 0 or hour == 23:
+        hour_index = 0  # 子时
+    else:
+        hour_index = (hour + 1) // 2
+
+    branch_idx = hour_index % 12
     stem_idx = (day_stem * 2 + hour_index) % 10
 
     return stem_idx, branch_idx
