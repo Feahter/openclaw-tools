@@ -252,54 +252,87 @@ def _format_mingju_analysis(bazi_info: Dict[str, Any]) -> List[str]:
     jishen_list = xiyongshen.get("jishen", [])
     qiangruo = xiyongshen.get("qiangruo", "未知")
 
-    # 日主强弱（优先使用v2量化结果）
+    # 判断主推方法
+    primary_method_info = bazi_info.get("primary_method", {})
+    primary = primary_method_info.get("primary", "千里命稿")
+    secondary = primary_method_info.get("secondary", "滴天髓")
+    pm_analysis = primary_method_info.get("analysis", "")
+    pm_reasons = primary_method_info.get("reasons", [])
+
+    # 日主强弱
     rizhu_strength = bazi_info.get("rizhu_strength", {})
     strength = rizhu_strength.get("strength", qiangruo)
-    reason = rizhu_strength.get("reason", xiyongshen.get("analysis", ""))
-
     day_stem = rizhu_strength.get("day_stem", "")
     day_element = rizhu_strength.get("day_element", "")
 
-    # v2 量化结果显示（子平真诠派）
-    v2_score = rizhu_strength.get("score", None)
-    v2_breakdown = rizhu_strength.get("breakdown", None)
-    if v2_score is not None:
-        lines.append(f"- **日主**：{day_stem}{day_element}，**{strength}**（子平法：{v2_score}/100）")
-        if v2_breakdown:
-            yueling_state = v2_breakdown.get("yueling", {}).get("state", "")
-            yueling_score = v2_breakdown.get("yueling", {}).get("score", 0)
-            tonggen_score = v2_breakdown.get("tongen", {}).get("tongen_score", 0)
-            lg_score = v2_breakdown.get("tongen", {}).get("linggong_score", 0)
-            bijie_count = v2_breakdown.get("bijie", {}).get("count", 0)
-            bijie_score = v2_breakdown.get("bijie", {}).get("score", 0)
-            yinxing_score = v2_breakdown.get("yinxing", {}).get("score", 0)
-            lg_info = f"+临宫{lg_score}分" if lg_score > 0 else ""
-            lines.append(f"  - 月令{yueling_state} {yueling_score}分 + 通根 {tonggen_score}分{lg_info} + 比劫×{bijie_count} {bijie_score}分 + 印星 {yinxing_score}分")
+    # 根据主推方法决定显示顺序
+    if primary == "千里命稿":
+        # 主推千里命稿，参考滴天髓
+        lines.append(f"**【主推】千里命稿法**（适合常规命盘）")
+        v2_score = rizhu_strength.get("score", None)
+        v2_breakdown = rizhu_strength.get("breakdown", None)
+        if v2_score is not None:
+            lines.append(f"- **日主**：{day_stem}{day_element}，**{strength}**（{v2_score}/100）")
+            if v2_breakdown:
+                yueling_state = v2_breakdown.get("yueling", {}).get("state", "")
+                yueling_score = v2_breakdown.get("yueling", {}).get("score", 0)
+                tonggen_score = v2_breakdown.get("tongen", {}).get("tongen_score", 0)
+                lg_score = v2_breakdown.get("tongen", {}).get("linggong_score", 0)
+                bijie_count = v2_breakdown.get("bijie", {}).get("count", 0)
+                bijie_score = v2_breakdown.get("bijie", {}).get("score", 0)
+                yinxing_score = v2_breakdown.get("yinxing", {}).get("score", 0)
+                lg_info = f"+临宫{lg_score}分" if lg_score > 0 else ""
+                lines.append(f"  - 月令{yueling_state} {yueling_score}分 + 通根 {tonggen_score}分{lg_info} + 比劫×{bijie_count} {bijie_score}分 + 印星 {yinxing_score}分")
+            lines.append(f"  - {pm_analysis}")
+        lines.append("")
+        lines.append(f"**【参考】滴天髓法**（适合特殊命盘）")
+        rizhu_by_count = bazi_info.get("rizhu_by_count", None)
+        if rizhu_by_count:
+            wx_counts = rizhu_by_count.get("wx_counts", {})
+            lines.append(f"- 日主{day_element}，{rizhu_by_count.get('strength')}（比例{rizhu_by_count.get('score_ratio')}）")
+            lines.append(f"  - 五行：木{wx_counts.get('木',0)} 火{wx_counts.get('火',0)} 土{wx_counts.get('土',0)} 金{wx_counts.get('金',0)} 水{wx_counts.get('水',0)}")
+            lines.append(f"  - 喜用：{'、'.join(rizhu_by_count.get('xiyongshen_by_count',[]))}，忌：{'、'.join(rizhu_by_count.get('jishen_by_count',[]))}")
+            lines.append(f"  - {rizhu_by_count.get('analysis', '')}")
     else:
-        lines.append(f"- **日主**：{day_stem}{day_element}，**{strength}**，{reason}")
+        # 主推滴天髓，参考千里命稿
+        lines.append(f"**【主推】滴天髓法**（适合特殊命盘）")
+        rizhu_by_count = bazi_info.get("rizhu_by_count", None)
+        if rizhu_by_count:
+            wx_counts = rizhu_by_count.get("wx_counts", {})
+            lines.append(f"- 日主{day_element}，{rizhu_by_count.get('strength')}（比例{rizhu_by_count.get('score_ratio')}）")
+            lines.append(f"  - 五行：木{wx_counts.get('木',0)} 火{wx_counts.get('火',0)} 土{wx_counts.get('土',0)} 金{wx_counts.get('金',0)} 水{wx_counts.get('水',0)}")
+            lines.append(f"  - 喜用：{'、'.join(rizhu_by_count.get('xiyongshen_by_count',[]))}，忌：{'、'.join(rizhu_by_count.get('jishen_by_count',[]))}")
+            lines.append(f"  - {rizhu_by_count.get('analysis', '')}")
+        lines.append("")
+        lines.append(f"**【参考】千里命稿法**（适合常规命盘）")
+        v2_score = rizhu_strength.get("score", None)
+        if v2_score is not None:
+            lines.append(f"- **日主**：{day_stem}{day_element}，**{strength}**（{v2_score}/100）")
+            lines.append(f"  - {pm_analysis}")
 
-    # 全藏干计数法结果（滴天髓派）
-    rizhu_by_count = bazi_info.get("rizhu_by_count", None)
-    if rizhu_by_count:
-        count_strength = rizhu_by_count.get("strength", "")
-        count_ratio = rizhu_by_count.get("score_ratio", 0)
-        count_xiyong = rizhu_by_count.get("xiyongshen_by_count", [])
-        count_ji = rizhu_by_count.get("jishen_by_count", [])
-        count_analysis = rizhu_by_count.get("analysis", "")
-        wx_counts = rizhu_by_count.get("wx_counts", {})
-        lines.append(f"- **日主**（滴天髓法）：{count_strength}（比例 {count_ratio}，同类7 vs 克泄耗7）")
-        lines.append(f"  - 五行分布：木{wx_counts.get('木',0)} 火{wx_counts.get('火',0)} 土{wx_counts.get('土',0)} 金{wx_counts.get('金',0)} 水{wx_counts.get('水',0)}")
-        lines.append(f"  - 喜用神：{'、'.join(count_xiyong) if count_xiyong else '待定'}，忌神：{'、'.join(count_ji) if count_ji else '无'}")
-        lines.append(f"  - 注：{count_analysis}")
+    # 特殊命盘原因
+    if pm_reasons:
+        lines.append(f"- 特殊命盘原因：{'；'.join(pm_reasons)}")
+
     lines.append("")
 
-    # 喜用神
-    xiyong_str = "、".join(xiyong_list) if xiyong_list else "待定"
-    lines.append(f"- **用神**：**{xiyong_str}**")
+    # 喜用神（根据主推方法决定用哪套）
+    if primary == "千里命稿":
+        xiyong_str = "、".join(xiyong_list) if xiyong_list else "待定"
+    else:
+        rc = bazi_info.get("rizhu_by_count", {})
+        xiyong_str = "、".join(rc.get("xiyongshen_by_count", [])) if rc.get("xiyongshen_by_count") else "待定"
+
+    lines.append(f"- **用神**（{primary}）：**{xiyong_str}**")
     lines.append("")
 
     # 忌神
-    jishen_str = "、".join(jishen_list) if jishen_list else "待定"
+    if primary == "千里命稿":
+        jishen_str = "、".join(jishen_list) if jishen_list else "待定"
+    else:
+        rc = bazi_info.get("rizhu_by_count", {})
+        jishen_str = "、".join(rc.get("jishen_by_count", [])) if rc.get("jishen_by_count") else "待定"
+
     lines.append(f"- **忌神**：{jishen_str}")
     lines.append("")
 

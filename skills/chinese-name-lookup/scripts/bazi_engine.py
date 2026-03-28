@@ -16,7 +16,7 @@ from pattern_method import determine_pattern, judge_pattern_cheng, analyze_patte
 from shen_sha import get_shen_sha_summary as _get_shen_sha_summary
 from xiyongshen_v2 import determine_xiyongshen_v2
 from liushen_xinxing import build_shishen_xinxing_from_bazi, get_shishen_xinxing
-from rizhu_strength_v2 import get_rizhu_strength_v2, get_strength_by_count
+from rizhu_strength_v2 import get_rizhu_strength_v2, get_strength_by_count, determine_primary_method
 
 
 # ============================================================
@@ -794,12 +794,21 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int,
         {"shishen": shishen}, xiyong_v2
     )
 
+    # 判断主推方法（在 xiyong_v2 和 pattern_result 都已知之后）
+    primary_method = determine_primary_method({
+        "pattern": pattern_result["pattern_info"],
+        "pattern_cheng": pattern_result["cheng_info"],
+        "xiyongshen": xiyong_v2,
+        "rizhu_strength": rizhu_v2,
+    })
+
     return {
         "birth_chart": bazi_result["birth_chart"],
         "bazi": bazi,
         "rizhu_strength": rizhu_v2,       # V2 量化结果（默认）
         "_rizhu_strength_v1": rizhu,       # V1 旧版结果（保留对比）
         "rizhu_by_count": rizhu_by_count,  # 全藏干计数法（滴天髓派）
+        "primary_method": primary_method,  # 主推方法判断
         "shishen": shishen,
         "shierzhang": shierzhang,
         "xiyongshen": xiyong_v2,          # V2 判定结果

@@ -250,6 +250,7 @@ def _get_local_bazi(year: int, month: int, day: int, hour: int,
         "hour_name": bazi["hour_name"],
         "rizhu_strength": bazi["rizhu_strength"],
         "rizhu_by_count": bazi.get("rizhu_by_count"),  # 全藏干计数法
+        "primary_method": bazi.get("primary_method"),  # 主推方法
         "shishen": bazi["shishen"],
         "shierzhang": bazi["shierzhang"],
         "year_nayin": bazi["year_nayin"],

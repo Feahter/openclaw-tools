@@ -779,5 +779,79 @@ def get_strength_by_count(bazi: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+# ============================================================
+# 判断主推方法：常规命盘 vs 特殊命盘
+# ============================================================
+
+def determine_primary_method(bazi_full: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    判断命盘类型，决定主推方法
+
+    规则：
+    - 特殊格局（从格/专旺/化气/建禄/月刃）→ 滴天髓为主（动态辩证）
+    - 日主极强/极弱 → 滴天髓为主（需辩证）
+    - 调候极急 → 两者皆可，但优先参考滴天髓
+    - 普通正格 → 千里命稿为主（格局法稳定）
+
+    Returns:
+        {
+            "primary": "千里命稿" | "滴天髓",
+            "is_special": bool,
+            "reasons": list[str],
+            "analysis": str,
+        }
+    """
+    pattern = bazi_full.get("pattern", {}).get("pattern", "")
+    pattern_type = bazi_full.get("pattern", {}).get("pattern_type", "")
+    is_cheng = bazi_full.get("pattern_cheng", {}).get("is_cheng", False)
+    tiao_hou_urgent = bazi_full.get("xiyongshen", {}).get("tiao_hou_urgent", False)
+    rizhu_strength = bazi_full.get("rizhu_strength", {}).get("strength", "中")
+    rizhu_score = bazi_full.get("rizhu_strength", {}).get("score", 50)
+
+    SPECIAL_PATTERNS = ["从杀格", "从财格", "从印格", "从儿格",
+                       "专旺格", "化气格", "建禄格", "月刃格"]
+
+    is_special = False
+    reasons = []
+
+    # 1. 格局是否为特殊格局
+    if pattern in SPECIAL_PATTERNS:
+        is_special = True
+        reasons.append(f"格局「{pattern}」属于特殊格局，需动态辩证")
+
+    # 2. 日主是否极强/极弱
+    if rizhu_strength in ["极强", "极弱"]:
+        is_special = True
+        reasons.append(f"日主{rizhu_strength}，需滴天髓动态辩证")
+
+    # 3. 从格判断（进一步检查）
+    # 如果格局名称包含"从"字
+    if "从" in pattern and pattern_type == "内格":
+        is_special = True
+        reasons.append(f"「{pattern}」需弃日主从强神")
+
+    # 4. 专旺/化气
+    if pattern in ["专旺格", "化气格"]:
+        is_special = True
+        reasons.append(f"「{pattern}」日主极旺，需从强神论断")
+
+    primary = "滴天髓" if is_special else "千里命稿"
+    secondary = "千里命稿" if is_special else "滴天髓"
+
+    analysis = (
+        f"格局「{pattern}」{'已' if is_cheng else '未'}成，"
+        f"日主{rizhu_strength}({rizhu_score}分)，"
+        f"{'调候极急' if tiao_hou_urgent else '调候不急'}。"
+    )
+
+    return {
+        "primary": primary,
+        "secondary": secondary,
+        "is_special": is_special,
+        "reasons": reasons,
+        "analysis": analysis,
+    }
+
+
 if __name__ == "__main__":
     run_tests()
