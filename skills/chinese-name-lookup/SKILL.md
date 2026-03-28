@@ -1,6 +1,6 @@
 ---
 name: chinese-name-lookup
-description: Chinese name analysis and recommendation based on Eight Characters (八字喜用神) + zodiac (生肖属相) + Ten Gods (十神) + Twelve Changsheng (十二长生) + ShenSha (神煞) + Dayun/Liunian (大运流年). True Chinese traditional name analysis - no Japanese 五格剖象法. Use when user wants to: analyze a name's fortune, get name recommendations for a newborn based on八字, check喜用神 for a birth chart, evaluate a name's命理特质, or get a full八字报告. Triggers: "分析名字", "八字起名", "根据八字取名", "帮我起个名字", "喜用神", "五行缺什么", "姓名推荐", "姓X名Y", "帮我起个姓X的宝宝名字", "名字测试", "八字排盘", "八字报告", "帮我做个八字分析", "生成八字命盘", "分析下这个名字", "八字神煞", "大运流年".
+description: Chinese name analysis and recommendation based on Eight Characters (八字喜用神) + zodiac (生肖属相) + Ten Gods (十神) + Twelve Changsheng (十二长生) + ShenSha (神煞) + Dayun/Liunian (大运流年). True Chinese traditional name analysis - no Japanese 五格剖象法. Uses dual-method system: (1)千里命稿派-权重法(month-lord+通根+临宫+比劫,适合常规命盘), (2)任铁樵·滴天髓阐微派-计数法(全藏干五行数量,适合特殊命盘). Auto-selects primary method based on命盘类型. Use when user wants to: analyze a name's fortune, get name recommendations for a newborn based on八字, check喜用神 for a birth chart, evaluate a name's命理特质, or get a full八字报告. Triggers: "分析名字", "八字起名", "根据八字取名", "帮我起个名字", "喜用神", "五行缺什么", "姓名推荐", "姓X名Y", "帮我起个姓X的宝宝名字", "名字测试", "八字排盘", "八字报告", "帮我做个八字分析", "生成八字命盘", "分析下这个名字", "八字神煞", "大运流年".
 compatibility: Python 3.8+; no external API required (fully local); optional八字API for precise喜用神.
 ---
 
@@ -104,9 +104,29 @@ quick_generate(surname='李', year=2026, month=3, day=23, hour=5, gender=1,
 
 **优先级**：
 1. 有八字 API_KEY → 调用 `bazi_api.py` 获取精确喜用神
-2. 无 API_KEY → 本地 `bazi_engine.py` 估算喜用神
-   - 判断日主强弱（得令/失令）
-   - 配合忌神反推喜用神
+2. 无 API_KEY → 本地双轨估算
+
+**两套方法（自动判断主推）：**
+
+| 方法 | 体系 | 适用场景 | 判断依据 |
+|------|------|---------|---------|
+| **千里命稿法**（权重法） | 《千里命稿》韦千里 + 《子平真诠》沈孝瞻 | 常规命盘（正格） | 月令权重40%+通根30%+临宫15%+比劫20%+印星10% |
+| **滴天髓法**（计数法） | 《滴天髓阐微》任铁樵（简化版） | 特殊命盘（从格/专旺/极强/极弱） | 全藏干五行数量统计 |
+
+**自动判断逻辑** (`determine_primary_method`)：
+- 格局为从格/专旺/化气/建禄/月刃 → 主推**滴天髓**
+- 日主极强/极弱 → 主推**滴天髓**
+- 普通正格 + 调候不急 → 主推**千里命稿**
+
+**报告输出**：
+```
+**【主推】千里命稿法**（适合常规命盘）
+  - 日主强弱：46.8/100（中）
+  - 喜用神：水、木、金
+**【参考】滴天髓法**（适合特殊命盘）
+  - 比例1.17（日主偏旺）
+  - 喜用神：水、金
+```
 
 **喜用神字库** (`name_scorer_v3.py`):
 ```python
@@ -193,8 +213,18 @@ score_by_wuge(name_chars)                           # 0-10（参考）
 ---
 
 ## 命局分析
-- **日主**：庚金，**弱**，失令
-- **用神**：**土、金**
+
+**【主推】千里命稿法**（适合常规命盘）
+- **日主**：庚金，**弱**（46.8/100）
+  - 月令长生 28.0分 + 通根 0分 + 比劫×0 0分 + 印星 0分
+  - 格局「偏印格」未成，日主弱(46.8分)，调候不急。
+
+**【参考】滴天髓法**（适合特殊命盘）
+- 日主金，弱（比例0.67）
+  - 五行：木1 火2 土3 金2 水0
+  - 喜用：土、金，忌：木、火、水
+
+- **用神**（千里命稿）：**土、金**
 - **忌神**：木、火、水
 
 **五行分布**：
@@ -346,7 +376,7 @@ print(result["markdown"])
 | `scripts/lunar_calendar.py` | 农历转换（1900-2100年）|
 | `scripts/bazi_engine.py` | 八字排盘 + 十神 + 十二长生 |
 | `scripts/xiyongshen_v2.py` | 本地喜用神v2判定（调候优先+格局已成）|
-| `scripts/rizhu_strength_v2.py` | 日主强弱v2量化（权重算法）|
+| `scripts/rizhu_strength_v2.py` | 日主强弱v2量化（权重法+计数法）+ determine_primary_method（命盘类型判断）|
 | `scripts/pattern_method.py` | 格局取用法 + 成败判定 + 破格分析 |
 | `scripts/poge_analyzer.py` | 破格原因识别（6种破格类型）|
 | `scripts/tiao_hou.py` | 穷通宝鉴120格调候喜忌表 |
@@ -369,6 +399,20 @@ print(result["markdown"])
 
 ### 为什么不用五格剖象法？
 五格剖象法（81数理）由**日本崛起（崛）**于20世纪初创立，民国时期才传入中国，并非传统中国取名方法。本 skill 以**八字喜用神**为核心，配合生肖属相和十神系统，更贴近真正的中国传统命理。
+
+### 两套喜用神体系
+
+| 体系 | 经典来源 | 核心原理 | 适用场景 |
+|------|---------|---------|---------|
+| 千里命稿派（权重法） | 《千里命稿》韦千里 + 《子平真诠》沈孝瞻 | 月令格局为经，调候优先 | 常规命盘 |
+| 滴天髓派（计数法） | 《滴天髓阐微》任铁樵（简化版） | 气势平衡，动态辩证 | 特殊命盘（从格/专旺/极强极弱）|
+
+**为什么无法统一？**
+- 判定基准不同：千里命稿以月令格局为经，滴天髓以气势平衡为经
+- 中和态处理不同：千里命稿偏弱取扶抑，滴天髓平衡忌偏
+- 传统命理非精密科学，同一命盘由不同宗师可得出截然不同的喜忌结论
+
+**本 skill 的处理**：两套方法并列显示，自动判断命盘类型后主推一套，供参考一套。
 
 ### 各方法的权重
 | 方法 | 权重 | 备注 |
