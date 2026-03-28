@@ -88,8 +88,26 @@ YUELING_WEIGHT_MAP = {
 
 YUELING_MAX_SCORE = 40
 TONGEN_MAX_SCORE = 30
+LINGGONG_MAX_SCORE = 15  # 临宫bonus：帝旺临宫额外加分
 BIJIE_MAX_SCORE = 20
 YINXING_MAX_SCORE = 10
+
+# 临宫权重表（十二长生状态 → 临宫加成系数，仅在无通根时生效）
+# 帝旺=最强临宫位（给满分），临官/长生次之，其余不给分
+LINGGONG_WEIGHT_MAP = {
+    "帝旺": 1.0,
+    "临官": 0.8,
+    "长生": 0.5,
+    "沐浴": 0.2,
+    "冠带": 0.2,
+    "衰": 0.1,
+    "病": 0.0,
+    "死": 0.0,
+    "墓": 0.0,
+    "绝": 0.0,
+    "胎": 0.0,
+    "养": 0.0,
+}
 
 
 # ============================================================
@@ -127,9 +145,9 @@ BRANCH_HIDDEN_STEMS = {
 }
 
 
-def _get_branch_tongen(day_stem_idx: int, branch_idx: int) -> Dict[str, Any]:
+def _get_branch_tongen(day_stem: str, branch_idx: int) -> Dict[str, Any]:
     """
-    判断日干在某地支的通根强度
+    判断日干在某地支的通根强度 + 临宫状态
 
     通根判定（比较天干索引）：
     - 日干天干 == 地支本气天干 → 完全通根(×1.0)
@@ -137,11 +155,16 @@ def _get_branch_tongen(day_stem_idx: int, branch_idx: int) -> Dict[str, Any]:
     - 日干天干 == 地支余气天干 → 微弱通根(×0.25)
     - 否则 → 无通根
 
+    临宫判定：即使无通根，也按十二长生状态给临宫加成
+    （滴天髓：临官/帝旺本身就是强，不依赖藏干）
+
     Returns:
         {
             "tongen": "full" | "half" | "weak" | "none",
             "score_mult": 1.0 | 0.5 | 0.25 | 0,
-            "detail": str
+            "detail": str,
+            "linggong_state": str,   # 临宫状态（帝旺/长生等）
+            "linggong_mult": float,  # 临宫加成系数
         }
     """
     hidden = BRANCH_HIDDEN_STEMS.get(branch_idx, [None, None, None])
@@ -150,19 +173,36 @@ def _get_branch_tongen(day_stem_idx: int, branch_idx: int) -> Dict[str, Any]:
     yuzhi = hidden[2]    # 余气天干索引
 
     # 本气通根
-    if benqi is not None and benqi == day_stem_idx:
-        return {"tongen": "full", "score_mult": 1.0,
-                "detail": f"本气{STEM_NAMES[benqi]}"}
+    if benqi is not None and STEM_NAMES[benqi] == day_stem:
+        tongen = "full"
+        score_mult = 1.0
+        detail = f"本气{STEM_NAMES[benqi]}"
     # 中气半通根
-    if zhongqi is not None and zhongqi == day_stem_idx:
-        return {"tongen": "half", "score_mult": 0.5,
-                "detail": f"中气{STEM_NAMES[zhongqi]}"}
+    elif zhongqi is not None and STEM_NAMES[zhongqi] == day_stem:
+        tongen = "half"
+        score_mult = 0.5
+        detail = f"中气{STEM_NAMES[zhongqi]}"
     # 余气微弱通根
-    if yuzhi is not None and yuzhi == day_stem_idx:
-        return {"tongen": "weak", "score_mult": 0.25,
-                "detail": f"余气{STEM_NAMES[yuzhi]}"}
+    elif yuzhi is not None and STEM_NAMES[yuzhi] == day_stem:
+        tongen = "weak"
+        score_mult = 0.25
+        detail = f"余气{STEM_NAMES[yuzhi]}"
+    else:
+        tongen = "none"
+        score_mult = 0.0
+        detail = ""
 
-    return {"tongen": "none", "score_mult": 0.0, "detail": ""}
+    # 临宫状态（独立于通根）
+    linggong_state = get_changsheng_state(day_stem, BRANCH_NAMES[branch_idx])
+    linggong_mult = LINGGONG_WEIGHT_MAP.get(linggong_state, 0.0)
+
+    return {
+        "tongen": tongen,
+        "score_mult": score_mult,
+        "detail": detail,
+        "linggong_state": linggong_state,
+        "linggong_mult": linggong_mult,
+    }
 
 
 def _calc_yueling_score(day_stem: str, month_branch: str) -> Dict[str, Any]:
@@ -185,13 +225,17 @@ def _calc_yueling_score(day_stem: str, month_branch: str) -> Dict[str, Any]:
     }
 
 
-def _calc_tongen_score(day_stem_idx: int, bazi: Dict) -> Dict[str, Any]:
+def _calc_tongen_score(day_stem: str, bazi: Dict) -> Dict[str, Any]:
     """
-    计算通根得分（30%权重）
-    检查四柱地支是否有日干天干
+    计算通根得分（30%权重）+ 临宫bonus
+    检查四柱地支是否有日干天干通根，以及各柱临宫状态
 
-    得分 = 30 × min(总通根强度, 4.0) / 4.0
-    最多4个地支通根，每通根强度叠加，满分30分
+    通根得分 = 30 × min(总通根强度, 4.0) / 4.0
+    临宫bonus：每个地支的临宫状态额外加权（帝旺/临官/长生等）
+    临宫加分 = 15 × min(总临宫加成, 3.0) / 3.0（满分15分）
+
+    临宫逻辑（滴天髓）：日干临帝旺/临官/长生等位置，本身就强，
+    不依赖藏干里有没有同气天干。
     """
     branch_indices = [
         bazi["year"]["branch_idx"],
@@ -201,15 +245,18 @@ def _calc_tongen_score(day_stem_idx: int, bazi: Dict) -> Dict[str, Any]:
     ]
 
     total_mult = 0.0
+    total_linggong = 0.0
     details = []
+    linggong_details = []
     full_count = 0
     half_count = 0
     weak_count = 0
 
     for branch_idx in branch_indices:
-        result = _get_branch_tongen(day_stem_idx, branch_idx)
+        result = _get_branch_tongen(day_stem, branch_idx)
+        branch_name = BRANCH_NAMES[branch_idx]
+
         if result["tongen"] != "none":
-            branch_name = BRANCH_NAMES[branch_idx]
             details.append(f"{branch_name}({result['detail']},{result['tongen']})")
             total_mult += result["score_mult"]
             if result["tongen"] == "full":
@@ -219,8 +266,16 @@ def _calc_tongen_score(day_stem_idx: int, bazi: Dict) -> Dict[str, Any]:
             else:
                 weak_count += 1
 
-    raw_score = TONGEN_MAX_SCORE * min(total_mult, 4.0) / 4.0
-    score = round(raw_score, 1)
+        # 临宫加成（仅在无通根或通根极弱时生效，防止与通根重叠）
+        # 例如：甲木在寅=临官(0.8)且本气通根(full=1.0)，只取max(0.8,1.0)=1.0
+        # 例如：丙火在午=帝旺(1.0)但无通根，取临宫0.8=8.0分
+        if result["linggong_mult"] > 0 and result["score_mult"] < 0.5:
+            linggong_details.append(f"{branch_name}({result['linggong_state']},{result['linggong_mult']})")
+            total_linggong += result["linggong_mult"]
+
+    tongen_score = round(TONGEN_MAX_SCORE * min(total_mult, 4.0) / 4.0, 1)
+    linggong_score = round(LINGGONG_MAX_SCORE * min(total_linggong, 3.0) / 3.0, 1)
+    total_score = round(tongen_score + linggong_score, 1)
 
     return {
         "count": len(details),
@@ -228,8 +283,11 @@ def _calc_tongen_score(day_stem_idx: int, bazi: Dict) -> Dict[str, Any]:
         "half_count": half_count,
         "weak_count": weak_count,
         "total_mult": round(total_mult, 2),
-        "score": score,
-        "max": TONGEN_MAX_SCORE,
+        "tongen_score": tongen_score,
+        "linggong_score": linggong_score,
+        "linggong_details": linggong_details,
+        "score": total_score,
+        "max": TONGEN_MAX_SCORE + LINGGONG_MAX_SCORE,
         "details": details,
     }
 
@@ -246,11 +304,13 @@ def _calc_bijie_score(day_stem_idx: int, day_element: int, bazi: Dict) -> Dict[s
         bazi["day"]["stem_idx"],
         bazi["hour"]["stem_idx"],
     ]
+    pillar_names = ["year", "month", "day", "hour"]
 
-    # 排除日干自身，只计算其他三柱
+    # 排除日柱自身（仅位置判断，不排除同名天干）
+    # 年干=日干 → 算比劫；月干=日干 → 算比劫
     bijie_count = sum(
-        1 for si in stem_indices
-        if si != day_stem_idx and STEM_ELEMENTS[si] == day_element
+        1 for p, si in zip(pillar_names, stem_indices)
+        if p != "day" and STEM_ELEMENTS[si] == day_element
     )
 
     # 每比劫5分，最多4个，满分20分
@@ -361,7 +421,7 @@ def get_rizhu_strength_v2(bazi: Dict) -> Dict[str, Any]:
     yueling = _calc_yueling_score(day_stem_name, month_branch_name)
 
     # 2. 通根得分（30%）
-    tongen = _calc_tongen_score(day_stem_idx, bazi)
+    tongen = _calc_tongen_score(day_stem_name, bazi)
 
     # 3. 比劫得分（20%）
     bijie = _calc_bijie_score(day_stem_idx, day_element, bazi)
@@ -381,9 +441,11 @@ def get_rizhu_strength_v2(bazi: Dict) -> Dict[str, Any]:
     reason_parts = []
     if yueling["score"] > 0:
         reason_parts.append(f"月令{yueling['state']}{yueling['score']}分")
-    if tongen["count"] > 0:
+    if tongen["count"] > 0 or tongen.get("linggong_details"):
         tongen_details = ",".join(tongen["details"]) if tongen["details"] else "无"
-        reason_parts.append(f"通根{tongen_details}{tongen['score']}分")
+        lg_details = ",".join(tongen["linggong_details"]) if tongen.get("linggong_details") else ""
+        lg_str = f"[临宫{lg_details}(+{tongen['linggong_score']})]" if lg_details else ""
+        reason_parts.append(f"通根{tongen_details}({tongen['tongen_score']}){lg_str}")
     if bijie["count"] > 0:
         reason_parts.append(f"比劫×{bijie['count']}个({bijie['score']}分)")
     if yinxing["stem_count"] > 0 or yinxing["branch_count"] > 0:
@@ -405,6 +467,9 @@ def get_rizhu_strength_v2(bazi: Dict) -> Dict[str, Any]:
             },
             "tongen": {
                 "score": tongen["score"],
+                "tongen_score": tongen["tongen_score"],
+                "linggong_score": tongen["linggong_score"],
+                "linggong_details": tongen.get("linggong_details", []),
                 "weight": 0.3,
                 "count": tongen["count"],
                 "full_count": tongen["full_count"],
