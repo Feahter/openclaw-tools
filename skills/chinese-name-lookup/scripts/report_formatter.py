@@ -530,8 +530,10 @@ def _format_dayun_section(bazi_info: Dict[str, Any], gender: int) -> List[str]:
     lines.append("### 近5年流年")
     lines.append("")
 
+    lunar = bazi_info.get("lunar", {})
+    birth_year = lunar.get("year", 2026)
     current_year = 2026
-    recent_liunian = get_recent_liunian(bazi_info, dayun_list, current_year, 5)
+    recent_liunian = get_recent_liunian(bazi_info, dayun_list, current_year, 5, birth_year)
 
     if recent_liunian:
         for liunian in recent_liunian:

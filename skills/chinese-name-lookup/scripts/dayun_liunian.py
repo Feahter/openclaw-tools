@@ -806,34 +806,42 @@ def get_recent_liunian(
     bazi_info: Dict[str, Any],
     dayun_list: List[Dict[str, Any]],
     current_year: int = None,
-    count: int = 5
+    count: int = 5,
+    birth_year: int = None
 ) -> List[Dict[str, Any]]:
     """
     获取近N年流年简析
-    
+
     Args:
         bazi_info: 八字信息
         dayun_list: 大运列表
         current_year: 当前年份（默认2026）
         count: 返回数量
-    
+        birth_year: 出生年份（用于过滤，只显示出生后的流年）
+
     Returns:
         流年分析列表
     """
     if current_year is None:
         current_year = 2026
-    
+    if birth_year is None:
+        # 从 bazi_info 尝试获取
+        lunar = bazi_info.get("lunar", {})
+        birth_year = lunar.get("year", 2026)
+
     # 确定当前所在大运
     current_dayun = None
     if dayun_list:
         current_dayun = dayun_list[0]  # 默认第一步大运
-    
+
     results = []
     for year in range(current_year - count + 1, current_year + 1):
+        if year < birth_year:
+            continue  # 跳过出生前的流年
         analysis = analyze_liunian_by_year(year, bazi_info, current_dayun)
         analysis["year"] = year
         results.append(analysis)
-    
+
     return results
 
 
