@@ -632,5 +632,139 @@ def run_tests():
     print("=" * 60)
 
 
+# ============================================================
+# 全藏干计数法（兼容派系1：滴天髓/气势派）
+# ============================================================
+
+def get_strength_by_count(bazi: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    全藏干计数法 - 统计八字中所有五行的数量来判断身强身弱
+
+    方法来源：滴天髓"气势"思维，网络平台（卜知排盘、好赞易学等）常用简化版
+    原理：计算日主同类（五行相同）总数量 vs 克泄耗日主的五行数量
+
+    评分标准：
+    - 同类 > 克泄耗 → 身强
+    - 同类 < 克泄耗 → 身弱
+    - 接近平衡 → 中和
+
+    Args:
+        bazi: 八字字典，包含 year/month/day/hour 四柱，每柱有 stem_idx 和 branch_idx
+
+    Returns:
+        {
+            "method": "全藏干计数法",
+            "method_desc": "统计天干+地支藏干（本气+中气+余气）的五行数量",
+            "strength": "强/中/弱",
+            "day_element_count": int,   # 日主同类数量
+            "oppose_count": int,       # 克日主数量
+            "drain_count": int,        # 泄日主数量
+            "restrict_count": int,     # 耗日主数量
+            "wx_counts": {"木":0,"火":0,"土":0,"金":0,"水":0},
+            "analysis": str,
+            "xiyongshen_by_count": [str],  # 此方法下的喜用神
+            "jishen_by_count": [str],        # 此方法下的忌神
+        }
+    """
+    day_stem_idx = bazi["day"]["stem_idx"]
+    day_elem_idx = STEM_ELEMENTS[day_stem_idx]
+    day_elem = ELEMENT_NAMES[day_elem_idx]
+
+    # 五行相生相克关系（按index: 木0 火1 土2 金3 水4）
+    # 生我者(印枭)：(idx+4)%5，如火(1)+4=5%5=0=木
+    # 我生者(食伤)：(idx+1)%5，如火(1)+1=2=土
+    # 我克者(财)：  (idx+2)%5，如火(1)+2=3=金
+    # 克我者(官鬼)：(idx+3)%5，如火(1)+3=4=水
+    sheng_idx = (day_elem_idx + 4) % 5  # 生我者（印枭）
+    xie_idx = (day_elem_idx + 1) % 5    # 我生者（食伤）
+    hao_idx = (day_elem_idx + 2) % 5    # 我克者（财）
+    ke_idx = (day_elem_idx + 3) % 5     # 克我者（官鬼）
+
+    # 统计
+    wx_counts = {"木": 0, "火": 0, "土": 0, "金": 0, "水": 0}
+    details = []
+
+    # 处理四柱（天干 + 地支藏干）
+    for pillar_name, pillar in [("年", bazi["year"]), ("月", bazi["month"]),
+                                 ("日", bazi["day"]), ("时", bazi["hour"])]:
+        stem_idx = pillar["stem_idx"]
+        branch_idx = pillar["branch_idx"]
+
+        # 天干
+        stem_elem_idx = STEM_ELEMENTS[stem_idx]
+        stem_elem = ELEMENT_NAMES[stem_elem_idx]
+        wx_counts[stem_elem] += 1
+
+        # 地支藏干（本气+中气+余气）
+        hidden = BRANCH_HIDDEN_STEMS.get(branch_idx, [None, None, None])
+        for h in hidden:
+            if h is not None:
+                h_elem = ELEMENT_NAMES[STEM_ELEMENTS[h]]
+                wx_counts[h_elem] += 1
+
+        details.append(f"{pillar_name}:{stem_elem}")
+
+    day_elem_count = wx_counts[day_elem]
+    sheng_count = wx_counts[ELEMENT_NAMES[sheng_idx]]  # 印星（生我）
+    xie_count = wx_counts[ELEMENT_NAMES[xie_idx]]       # 食伤（我生）
+    hao_count = wx_counts[ELEMENT_NAMES[hao_idx]]      # 财（我克）
+    ke_count = wx_counts[ELEMENT_NAMES[ke_idx]]        # 官（克我）
+
+    # 同类：天干同五行 + 印星（生助日主）
+    tonglei_count = day_elem_count + sheng_count
+    # 克泄耗：食伤 + 财 + 官
+    ke_xie_hao_count = xie_count + hao_count + ke_count
+
+    # 强弱判定（简化版）
+    ratio = tonglei_count / max(ke_xie_hao_count, 1)
+    if ratio >= 1.3:
+        strength = "强"
+    elif ratio >= 0.8:
+        strength = "中"
+    else:
+        strength = "弱"
+
+    # 喜忌判断
+    if strength == "强":
+        # 身强喜克泄：官、财、食伤
+        xiyong = [ELEMENT_NAMES[ke_idx], ELEMENT_NAMES[hao_idx], ELEMENT_NAMES[xie_idx]]
+        ji = [day_elem, ELEMENT_NAMES[sheng_idx]]
+    elif strength == "弱":
+        # 身弱喜生扶：印、比劫
+        xiyong = [ELEMENT_NAMES[sheng_idx], day_elem]
+        ji = [ELEMENT_NAMES[ke_idx], ELEMENT_NAMES[hao_idx], ELEMENT_NAMES[xie_idx]]
+    else:
+        # 中和（7:7平衡）：不宜加强日主，喜克抑为主
+        # 金克木（抑印），水克火（抑日主），土泄火（泄日主）
+        # 取金（财）为喜用（水为官克日主太直接，土为泄可兼顾）
+        xiyong = [ELEMENT_NAMES[hao_idx]]  # 财（金）
+        ji = [day_elem, ELEMENT_NAMES[sheng_idx]]  # 日主+印（同类为忌）
+
+    xiyong = list(dict.fromkeys(xiyong))
+    ji = list(dict.fromkeys(ji))
+
+    return {
+        "method": "全藏干计数法",
+        "method_desc": "统计天干+地支藏干（本气+中气+余气）的五行数量",
+        "strength": strength,
+        "score_ratio": round(ratio, 2),
+        "day_element": day_elem,
+        "day_element_count": day_elem_count,
+        "tonglei_count": tonglei_count,
+        "ke_xie_hao_count": ke_xie_hao_count,
+        "sheng_count": sheng_count,
+        "xie_count": xie_count,
+        "hao_count": hao_count,
+        "ke_count": ke_count,
+        "wx_counts": wx_counts,
+        "details": details,
+        "analysis": (f"日主{day_elem}共{day_elem_count}个，印星{sheng_count}个，"
+                    f"同类{tonglei_count}；食伤{xie_count}个，财{hao_count}个，官{ke_count}个，"
+                    f"克泄耗{ke_xie_hao_count}个。比例{tonglei_count}:{ke_xie_hao_count}={ratio:.2f}"),
+        "xiyongshen_by_count": xiyong,
+        "jishen_by_count": ji,
+    }
+
+
 if __name__ == "__main__":
     run_tests()

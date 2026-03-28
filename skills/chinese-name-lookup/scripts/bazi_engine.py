@@ -16,7 +16,7 @@ from pattern_method import determine_pattern, judge_pattern_cheng, analyze_patte
 from shen_sha import get_shen_sha_summary as _get_shen_sha_summary
 from xiyongshen_v2 import determine_xiyongshen_v2
 from liushen_xinxing import build_shishen_xinxing_from_bazi, get_shishen_xinxing
-from rizhu_strength_v2 import get_rizhu_strength_v2
+from rizhu_strength_v2 import get_rizhu_strength_v2, get_strength_by_count
 
 
 # ============================================================
@@ -760,6 +760,7 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int,
     bazi = bazi_result["bazi"]  # Extract inner bazi dict
     rizhu = get_rizhu_strength(bazi)  # V1 旧版
     rizhu_v2 = get_rizhu_strength_v2(bazi)  # V2 权重量化版
+    rizhu_by_count = get_strength_by_count(bazi)  # 全藏干计数法（滴天髓派）
     shishen = get_shishen_list(bazi)
     shierzhang = get_shierzhang(bazi)
     xiyong_v1 = determine_xiyongshen(bazi, rizhu)
@@ -798,6 +799,7 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int,
         "bazi": bazi,
         "rizhu_strength": rizhu_v2,       # V2 量化结果（默认）
         "_rizhu_strength_v1": rizhu,       # V1 旧版结果（保留对比）
+        "rizhu_by_count": rizhu_by_count,  # 全藏干计数法（滴天髓派）
         "shishen": shishen,
         "shierzhang": shierzhang,
         "xiyongshen": xiyong_v2,          # V2 判定结果
