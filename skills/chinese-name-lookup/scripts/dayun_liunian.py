@@ -23,6 +23,11 @@ from bazi_engine import (
     STEM_ELEMENTS, ELEMENT_NAMES, BRANCH_ELEMENTS,
     get_shishen, STEM_LING_DEFU
 )
+try:
+    from shier_changsheng import get_changsheng_state, CHANGSHENG_ORDER
+except ImportError:
+    get_changsheng_state = None
+    CHANGSHENG_ORDER = ["长生","沐浴","冠带","临官","帝旺","衰","病","死","墓","绝","胎","养"]
 
 
 # ============================================================
@@ -303,42 +308,36 @@ def get_dayun_with_exact_age(
 ) -> List[Dict[str, Any]]:
     """
     获取精确起始年龄的大运序列
-    
+
     根据出生月份计算第一步大运的起始年龄
+    大运起始年龄公式（传统《千里命稿》）：
+    - 第一步大运起始年龄 ≈ (12 - 出生农历月) ÷ 3 ≈ 3岁（以月令为起点）
+    - 每10年走一步大运
     """
     bazi = bazi_info.get("bazi", bazi_info)
     year_stem_idx = bazi["year"]["stem_idx"]
     month_stem_idx = bazi["month"]["stem_idx"]
     month_branch_idx = bazi["month"]["branch_idx"]
-    
+    day_stem_idx = bazi["day"]["stem_idx"]
+
     shun = is_shun(year_stem_idx, gender)
     direction_str = "顺行" if shun else "逆行"
-    
+
     dayun_branches = _calc_dayun_branch_sequence(month_branch_idx, year_stem_idx, gender)
     dayun_stems = _calc_dayun_stem_sequence(month_stem_idx, year_stem_idx, gender)
-    
-    # 计算第一步大运的起始年龄
-    # 从月柱开始，按顺逆方向
-    # 简化：每3年走一运（传统）或每10年走一步运
-    # 《千里命稿》采用每10年一步运
-    # 起始年龄 = (12 - 月份) 岁（近似）
-    
+
+    # 第一步大运起始年龄：
+    # 传统公式: (12 - 农历月) ÷ 3，向上取整
+    # 出生农历月通常从1(寅月)到12(丑月)
+    # 例如：月2(卯月) → (12-2)÷3 = 3.3 → 取整为3岁
+    import math
+    first_start_age = max(0, math.ceil((12 - birth_month) / 3))
+
     dayuns = []
     for i in range(12):
-        # 精确起始年龄：第一步大运从大约几岁开始
-        # 根据大运方向和月令位置
-        if shun:
-            # 顺行：向未来方向走
-            # 第一个大运大约在 0-9 岁
-            start_age = 0
-        else:
-            # 逆行：向过去方向走
-            # 第一个大运大约在 0-9 岁
-            start_age = 0
-        
-        start_age = i * 10
-        end_age = (i + 1) * 10 - 1
-        
+        start_age = first_start_age + i * 10
+        end_age = start_age + 9
+
         dayun_info = {
             "index": i,
             "start_age": start_age,
@@ -351,8 +350,16 @@ def get_dayun_with_exact_age(
             "direction": direction_str,
             "shun": shun,
         }
+
+        # 计算大运地支的十二长生状态（日干在该地支的长生状态）
+        if get_changsheng_state is not None:
+            dayun_branch_name = EARTHLY_BRANCHES[dayun_branches[i]]
+            dayun_stem_name = HEAVENLY_STEMS[day_stem_idx]  # 日干名
+            state = get_changsheng_state(dayun_stem_name, dayun_branch_name)
+            dayun_info["changsheng"] = state
+
         dayuns.append(dayun_info)
-    
+
     return dayuns
 
 

@@ -26,8 +26,9 @@ from lunar_calendar import (
     get_chinese_year_name,
 )
 from dayun_liunian import (
-    get_dayun_sequence, get_dayun_summary, get_recent_liunian,
-    analyze_liunian_by_year, full_dayun_analysis, is_shun, is_yang_stem,
+    get_dayun_sequence, get_dayun_with_exact_age, get_dayun_summary,
+    get_recent_liunian, analyze_liunian_by_year, full_dayun_analysis,
+    is_shun, is_yang_stem,
 )
 from shen_sha import get_shen_sha_summary, get_tianyi_guiren, get_wenchang, get_yima, get_huagai, get_taohua
 from zodiac_preferences import get_zodiac_preferences
@@ -493,12 +494,14 @@ def _format_dayun_section(bazi_info: Dict[str, Any], gender: int) -> List[str]:
     year_stem_idx = bazi.get("year", {}).get("stem_idx", 0)
     gender_str = "男" if gender == 1 else "女"
 
-    # 出生时间戳（简化处理，使用默认值）
-    birth_year = 2024  # 默认
-    birth_month = 3
+    # 从bazi_info获取出生年月（农历）
+    lunar = bazi_info.get("lunar", {})
+    birth_year = lunar.get("year", 2024)
+    birth_month = lunar.get("month", 1)
     birth_timestamp = time.mktime((birth_year, birth_month, 15, 10, 0, 0, 0, 0, 0))
 
-    dayun_list = get_dayun_sequence(bazi_info, gender_str, birth_timestamp)
+    # 使用精确起始年龄的大运计算（含十二长生轮转）
+    dayun_list = get_dayun_with_exact_age(bazi_info, gender_str, birth_year, birth_month)
 
     # ===== 大运序列 =====
     lines.append("### 大运序列")
@@ -506,18 +509,18 @@ def _format_dayun_section(bazi_info: Dict[str, Any], gender: int) -> List[str]:
 
     if dayun_list:
         for i, dayun in enumerate(dayun_list[:8]):  # 只显示前8步大运
-            start_age = dayun.get("start_age", 0)
-            end_age = dayun.get("end_age", 0)
+            start_age = dayun.get("start_age", i * 10)
+            end_age = dayun.get("end_age", i * 10 + 9)
             ganzhi = dayun.get("ganzhi", "")
             direction = dayun.get("direction", "")
+            changsheng = dayun.get("changsheng", "")
 
             # 获取大运概述
-            summary = get_dayun_summary(dayun, bazi_info)
-            # 简化摘要
             analysis = analyze_dayun(dayun.get("stem_idx", 0), dayun.get("branch_idx", 0), bazi_info)
             luck = analysis.get("luck", "")
 
-            lines.append(f"{i+1}. **{start_age}-{end_age}岁**：{ganzhi} {direction} 【{luck}】")
+            cs_part = f"（{changsheng}）" if changsheng else ""
+            lines.append(f"{i+1}. **{start_age}-{end_age}岁**：{ganzhi} {direction} {cs_part}【{luck}】")
     else:
         lines.append("*大运信息不可用*")
 
