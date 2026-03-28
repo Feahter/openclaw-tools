@@ -734,11 +734,19 @@ def get_strength_by_count(bazi: Dict[str, Any]) -> Dict[str, Any]:
         xiyong = [ELEMENT_NAMES[sheng_idx], day_elem]
         ji = [ELEMENT_NAMES[ke_idx], ELEMENT_NAMES[hao_idx], ELEMENT_NAMES[xie_idx]]
     else:
-        # 中和（7:7平衡）：不宜加强日主，喜克抑为主
-        # 金克木（抑印），水克火（抑日主），土泄火（泄日主）
-        # 取金（财）为喜用（水为官克日主太直接，土为泄可兼顾）
-        xiyong = [ELEMENT_NAMES[hao_idx]]  # 财（金）
-        ji = [day_elem, ELEMENT_NAMES[sheng_idx]]  # 日主+印（同类为忌）
+        # 中和态细分（比例~1.0）：
+        # - 比例>1.1：同类明显偏强 → 日主偏旺 → 忌同类，喜克抑（水+金）
+        # - 比例<0.9：克泄耗明显偏强 → 日主偏弱 → 喜扶抑（木+火+水），忌克泄（土+金）
+        # - 比例0.9-1.1：严格平衡 → 喜忌温和，取财（金泄土克木）为主
+        if ratio > 1.1:
+            xiyong = [ELEMENT_NAMES[hao_idx], ELEMENT_NAMES[ke_idx]]  # 财+官
+            ji = [day_elem, ELEMENT_NAMES[sheng_idx]]  # 日主+印
+        elif ratio < 0.9:
+            xiyong = [day_elem, ELEMENT_NAMES[sheng_idx], ELEMENT_NAMES[hao_idx]]  # 日主+印+财
+            ji = [ELEMENT_NAMES[ke_idx], ELEMENT_NAMES[xie_idx]]  # 官+食伤
+        else:
+            xiyong = [ELEMENT_NAMES[hao_idx]]  # 财（金）
+            ji = [day_elem, ELEMENT_NAMES[sheng_idx]]  # 日主+印
 
     xiyong = list(dict.fromkeys(xiyong))
     ji = list(dict.fromkeys(ji))
