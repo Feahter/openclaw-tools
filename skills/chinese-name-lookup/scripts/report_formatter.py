@@ -316,24 +316,29 @@ def _format_mingju_analysis(bazi_info: Dict[str, Any]) -> List[str]:
 
     lines.append("")
 
-    # 喜用神（根据主推方法决定用哪套）
-    if primary == "千里命稿":
+    # 喜用神/忌神（根据主推方法 + 从格翻转）
+    con_pattern = primary_method_info.get("con_pattern")
+    is_con = con_pattern.get("is_con", False) if con_pattern else False
+
+    if is_con and con_pattern:
+        # 从格喜忌翻转
+        xiyong_str = "、".join(con_pattern.get("xiyongshen_flip", [])) if con_pattern.get("xiyongshen_flip") else "待定"
+        jishen_str = "、".join(con_pattern.get("jishen_flip", [])) if con_pattern.get("jishen_flip") else "待定"
+        con_reason = con_pattern.get("reason", "")
+        lines.append(f"- **用神**（从格翻转）：**{xiyong_str}**")
+        lines.append(f"  - {con_reason}")
+        lines.append(f"- **忌神**：{jishen_str}")
+    elif primary == "千里命稿":
         xiyong_str = "、".join(xiyong_list) if xiyong_list else "待定"
+        jishen_str = "、".join(jishen_list) if jishen_list else "待定"
+        lines.append(f"- **用神**（{primary}）：**{xiyong_str}**")
+        lines.append(f"- **忌神**：{jishen_str}")
     else:
         rc = bazi_info.get("rizhu_by_count", {})
         xiyong_str = "、".join(rc.get("xiyongshen_by_count", [])) if rc.get("xiyongshen_by_count") else "待定"
-
-    lines.append(f"- **用神**（{primary}）：**{xiyong_str}**")
-    lines.append("")
-
-    # 忌神
-    if primary == "千里命稿":
-        jishen_str = "、".join(jishen_list) if jishen_list else "待定"
-    else:
-        rc = bazi_info.get("rizhu_by_count", {})
         jishen_str = "、".join(rc.get("jishen_by_count", [])) if rc.get("jishen_by_count") else "待定"
-
-    lines.append(f"- **忌神**：{jishen_str}")
+        lines.append(f"- **用神**（{primary}）：**{xiyong_str}**")
+        lines.append(f"- **忌神**：{jishen_str}")
     lines.append("")
 
     # 五行分布

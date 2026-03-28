@@ -800,6 +800,8 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int,
         "pattern_cheng": pattern_result["cheng_info"],
         "xiyongshen": xiyong_v2,
         "rizhu_strength": rizhu_v2,
+        "bazi": bazi,                  # 用于从格自动检测
+        "rizhu_by_count": rizhu_by_count,  # 用于从格自动检测
     })
 
     return {

@@ -780,6 +780,122 @@ def get_strength_by_count(bazi: Dict[str, Any]) -> Dict[str, Any]:
 
 
 # ============================================================
+# 从格/专旺检测 + 喜忌翻转（任铁樵·滴天髓核心）
+# ============================================================
+
+def detect_con_pattern(bazi: Dict[str, Any], rizhu_by_count: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    检测是否属于从格或专旺格，并返回翻转后的喜忌
+
+    从格判断核心（任铁樵·滴天髓）：
+    - 日主是否无根/极弱（日干同类数量少）
+    - 是否有某一神极旺
+
+    五行关系（五行索引: 木0 火1 土2 金3 水4）：
+    - 生我者 = (elem_idx + 4) % 5 → 木←水, 火←木, 土←火, 金←土, 水←金
+    - 克我者 = (elem_idx + 3) % 5 → 木←金, 火←水, 土←木, 金←火, 水←土
+    - 我生者 = (elem_idx + 1) % 5 → 木→火, 火→土, 土→金, 金→水, 水→木
+    - 我克者 = (elem_idx + 2) % 5 → 木→土, 火→金, 土→水, 金→木, 水→火
+
+    从格喜忌翻转：
+    - 日主本身变为忌神（从格后日干无独立力量）
+    - 从神（旺神）变为喜神
+
+    Returns:
+        {
+            "is_con": bool,
+            "con_type": str,
+            "cong_strength_name": str,
+            "xiyongshen_flip": [str],
+            "jishen_flip": [str],
+            "reason": str,
+        }
+        如不属于从格，返回 is_con=False
+    """
+    wx_counts = rizhu_by_count.get("wx_counts", {})
+    day_elem = rizhu_by_count.get("day_element", "")
+    elem_counts = {
+        "木": wx_counts.get("木", 0),
+        "火": wx_counts.get("火", 0),
+        "土": wx_counts.get("土", 0),
+        "金": wx_counts.get("金", 0),
+        "水": wx_counts.get("水", 0),
+    }
+    ELEM_NAMES = ["木", "火", "土", "金", "水"]
+    day_elem_idx = ELEM_NAMES.index(day_elem) if day_elem in ELEM_NAMES else -1
+
+    # 五行关系
+    sheng_idx = (day_elem_idx + 4) % 5   # 生我者（印星五行）
+    ke_idx = (day_elem_idx + 3) % 5      # 克我者（官鬼五行）
+    xie_idx = (day_elem_idx + 1) % 5      # 我生者（食伤五行）
+    hao_idx = (day_elem_idx + 2) % 5     # 我克者（财星五行）
+
+    sheng_name = ELEM_NAMES[sheng_idx]    # 印星五行
+    ke_name = ELEM_NAMES[ke_idx]          # 官鬼五行
+    xie_name = ELEM_NAMES[xie_idx]        # 食伤五行
+    hao_name = ELEM_NAMES[hao_idx]        # 财星五行
+
+    # 日干本身（通常1个）+ 印星 = 同类（日主自身力量）
+    day_elem_count = elem_counts[day_elem]  # 日干本身数量
+    tonglei_total = day_elem_count + elem_counts[sheng_name]  # 日干 + 印星
+
+    # ============================================================
+    # 从格判断
+    # ============================================================
+    # 条件：同类极少（≤2）且某神极旺（≥5且>同类×2）
+    THRESHOLD = 5
+    STRONG_RATIO = 2.0
+
+    if tonglei_total <= 2:
+        # 找最强的异类五行
+        rival_elements = [(e, c) for e, c in elem_counts.items() if e != day_elem]
+        dominant = [(e, c) for e, c in rival_elements
+                    if c >= THRESHOLD and c >= tonglei_total * STRONG_RATIO]
+        if dominant:
+            strongest_name, strongest_count = max(dominant, key=lambda x: x[1])
+            strongest_idx = ELEM_NAMES.index(strongest_name)
+
+            # 判断从格类型（按旺神的五行角色）
+            if strongest_idx == ke_idx:
+                con_type = "从杀格"
+            elif strongest_idx == hao_idx:
+                con_type = "从财格"
+            elif strongest_idx == sheng_idx:
+                con_type = "从印格"
+            elif strongest_idx == xie_idx:
+                con_type = "从儿格"
+            else:
+                con_type = f"从{strongest_name}格"
+
+            return {
+                "is_con": True,
+                "con_type": con_type,
+                "cong_strength_name": strongest_name,
+                "xiyongshen_flip": [strongest_name],
+                "jishen_flip": [day_elem, sheng_name],  # 日干和印都为忌
+                "reason": (f"日主{day_elem}同类({tonglei_total}个)极少，"
+                          f"{strongest_name}({strongest_count}个)极旺，"
+                          f"构成{con_type}，弃日主从{strongest_name}"),
+            }
+
+    # ============================================================
+    # 专旺格判断
+    # ============================================================
+    if tonglei_total >= 8 and tonglei_total >= sum(elem_counts.values()) * 0.6:
+        return {
+            "is_con": True,
+            "con_type": "专旺格",
+            "cong_strength_name": day_elem,
+            "xiyongshen_flip": [day_elem, sheng_name],
+            "jishen_flip": [ke_name, hao_name, xie_name],
+            "reason": (f"日主{day_elem}同类极旺({tonglei_total}个)，"
+                      f"构成专旺格，从其势"),
+        }
+
+    return {"is_con": False}
+
+
+# ============================================================
 # 判断主推方法：常规命盘 vs 特殊命盘
 # ============================================================
 
@@ -799,6 +915,7 @@ def determine_primary_method(bazi_full: Dict[str, Any]) -> Dict[str, Any]:
             "is_special": bool,
             "reasons": list[str],
             "analysis": str,
+            "con_pattern": dict | None,  # 从格检测结果（若有）
         }
     """
     pattern = bazi_full.get("pattern", {}).get("pattern", "")
@@ -807,12 +924,22 @@ def determine_primary_method(bazi_full: Dict[str, Any]) -> Dict[str, Any]:
     tiao_hou_urgent = bazi_full.get("xiyongshen", {}).get("tiao_hou_urgent", False)
     rizhu_strength = bazi_full.get("rizhu_strength", {}).get("strength", "中")
     rizhu_score = bazi_full.get("rizhu_strength", {}).get("score", 50)
+    bazi = bazi_full.get("bazi")
+    rizhu_by_count = bazi_full.get("rizhu_by_count")
 
     SPECIAL_PATTERNS = ["从杀格", "从财格", "从印格", "从儿格",
                        "专旺格", "化气格", "建禄格", "月刃格"]
 
     is_special = False
     reasons = []
+    con_result = None
+
+    # 0. 从格自动检测（基于全藏干计数）
+    if bazi and rizhu_by_count:
+        con_result = detect_con_pattern(bazi, rizhu_by_count)
+        if con_result.get("is_con"):
+            is_special = True
+            reasons.append(con_result["reason"])
 
     # 1. 格局是否为特殊格局
     if pattern in SPECIAL_PATTERNS:
@@ -825,7 +952,6 @@ def determine_primary_method(bazi_full: Dict[str, Any]) -> Dict[str, Any]:
         reasons.append(f"日主{rizhu_strength}，需滴天髓动态辩证")
 
     # 3. 从格判断（进一步检查）
-    # 如果格局名称包含"从"字
     if "从" in pattern and pattern_type == "内格":
         is_special = True
         reasons.append(f"「{pattern}」需弃日主从强神")
@@ -850,6 +976,7 @@ def determine_primary_method(bazi_full: Dict[str, Any]) -> Dict[str, Any]:
         "is_special": is_special,
         "reasons": reasons,
         "analysis": analysis,
+        "con_pattern": con_result,
     }
 
 

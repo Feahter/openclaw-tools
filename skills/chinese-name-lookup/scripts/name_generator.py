@@ -123,6 +123,17 @@ def generate_name_recommendations(
         result["error"] = "无法获取喜用神信息"
         return result
 
+    # 从格检测：如果从格被触发，用翻转后的喜忌替换八字信息的喜用神（用于姓名评分）
+    pm = bazi_info.get("primary_method", {})
+    con = pm.get("con_pattern")
+    if con and con.get("is_con"):
+        flipped_xiyong = con.get("xiyongshen_flip", [])
+        flipped_ji = con.get("jishen_flip", [])
+        if flipped_xiyong:
+            bazi_info["xiyongshen"]["xiyongshen"] = flipped_xiyong
+        if flipped_ji:
+            bazi_info["xiyongshen"]["jishen"] = flipped_ji
+
     # Step 2: 生成推荐
     try:
         recommendations = generate_names_v3(
