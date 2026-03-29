@@ -1038,6 +1038,7 @@ def full_liunian_analysis(
         "dayun_month_branch": dayun_result["month_branch"],
         "dayun_count": dayun_result["dayun_count"],
         "dayun_list": dayun_result["dayun_list"],
+        "dayun_start_exact": dayun_result.get("dayun_start_exact"),  # 精确起始年龄
         "yima": dayun_result["yima"],
         
         # 近5年流年

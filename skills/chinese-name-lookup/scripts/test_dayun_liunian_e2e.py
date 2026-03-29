@@ -143,8 +143,11 @@ def test_full_dayun_liunian_integration():
     # 测试3.2: 大运列表验证
     dayun_list = result["dayun_list"]
     assert len(dayun_list) == 12, f"应有12步大运, got {len(dayun_list)}"
-    assert dayun_list[0]["start_age"] == 0, "第一步大运起始年龄应为0"
-    assert dayun_list[0]["end_age"] == 9, "第一步大运结束年龄应为9"
+    # 新算法：从节气精确计算，不再固定为0
+    # assert dayun_list[0]["start_age"] == 0, "第一步大运起始年龄应为0"
+    assert dayun_list[0]["start_age"] >= 0, "起始年龄应为非负"
+    # 新算法：第一步大运从节气计算，end_age = start_age + 9
+    assert dayun_list[0]["end_age"] == dayun_list[0]["start_age"] + 9, "第一步大运结束年龄应为start_age+9"
     print(f"  大运数量: {len(dayun_list)}")
     print(f"  前3步大运:")
     for du in dayun_list[:3]:

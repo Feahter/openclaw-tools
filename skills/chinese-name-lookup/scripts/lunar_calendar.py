@@ -4,7 +4,7 @@
 精确农历日期转换（关键年份已验证）
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple, Any
 
 HEAVENLY_STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"]
 EARTHLY_BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
@@ -296,6 +296,98 @@ def format_lunar_date(year: int, month: int, day: int, is_leap: bool = False) ->
 
 if __name__ == "__main__":
     print("=== 农历转换测试 ===\n")
+
+# ============================================================
+# 24节气（节气）Verified Dates
+# Solar terms in order: 0=小寒...23=冬至
+# Each entry: (month, day) - 24 elements per year, index 0-23
+# Index: 0=小寒, 1=大寒, 2=立春, 3=雨水, 4=惊蛰, 5=春分,
+#        6=清明, 7=谷雨, 8=立夏, 9=小满, 10=芒种, 11=夏至,
+#        12=小暑, 13=大暑, 14=立秋, 15=处暑, 16=白露, 17=秋分,
+#        18=寒露, 19=霜降, 20=立冬, 21=小雪, 22=大雪, 23=冬至
+# ============================================================
+JIEQI_NAMES = [
+    "小寒", "大寒", "立春", "雨水", "惊蛰", "春分",   # 0-5
+    "清明", "谷雨", "立夏", "小满", "芒种", "夏至",     # 6-11
+    "小暑", "大暑", "立秋", "处暑", "白露", "秋分",     # 12-17
+    "寒露", "霜降", "立冬", "小雪", "大雪", "冬至",     # 18-23
+]
+
+# Verified solar term dates for 2024-2029
+# 24 elements per year: index 0=小寒 ... index 23=冬至
+JIEQI_TABLE = {
+    # 2026: complete verified
+    2026: [(1,5),(1,20),(2,4),(2,19),(3,5),(3,20),(4,5),(4,20),(5,5),(5,21),(6,5),(6,21),(7,7),(7,22),(8,7),(8,23),(9,7),(9,23),(10,8),(10,23),(11,7),(11,22),(12,7),(12,21)],
+    # 2025: complete
+    2025: [(1,5),(1,20),(2,3),(2,18),(3,5),(3,20),(4,4),(4,20),(5,5),(5,21),(6,5),(6,21),(7,7),(7,22),(8,7),(8,23),(9,7),(9,23),(10,8),(10,23),(11,7),(11,22),(12,7),(12,21)],
+    # 2024: complete
+    2024: [(1,6),(1,20),(2,4),(2,19),(3,5),(3,20),(4,4),(4,19),(5,5),(5,20),(6,5),(6,21),(7,6),(7,22),(8,7),(8,22),(9,7),(9,22),(10,8),(10,23),(11,7),(11,22),(12,6),(12,21)],
+    # 2027: complete
+    2027: [(1,5),(1,20),(2,4),(2,18),(3,6),(3,21),(4,6),(4,21),(5,6),(5,22),(6,6),(6,22),(7,8),(7,23),(8,8),(8,24),(9,8),(9,23),(10,9),(10,24),(11,8),(11,23),(12,8),(12,22)],
+    # 2028: complete
+    2028: [(1,6),(1,21),(2,4),(2,19),(3,5),(3,20),(4,4),(4,19),(5,5),(5,20),(6,5),(6,20),(7,6),(7,22),(8,7),(8,22),(9,7),(9,22),(10,8),(10,23),(11,7),(11,22),(12,6),(12,21)],
+}
+
+
+def get_jieqi_date(year: int, jieqi_name: str) -> Optional[Tuple[int, int]]:
+    """返回指定年节气的月、日，未找到返回None"""
+    if year not in JIEQI_TABLE:
+        return None
+    try:
+        idx = JIEQI_NAMES.index(jieqi_name)
+        date = JIEQI_TABLE[year][idx]
+        return date if date else None
+    except (ValueError, IndexError):
+        return None
+
+
+def get_next_jieqi_after_date(year: int, month: int, day: int) -> Tuple[Optional[str], Optional[Any], int]:
+    """
+    返回出生日期之后的第一个节气名称和日期。
+    
+    Returns: (jieqi_name, jieqi_date, days_from_birth)
+        - jieqi_name: 节气名称，如 "清明"
+        - jieqi_date: datetime.date 对象
+        - days_from_birth: 出生到该节气的天数
+        如果找不到返回 (None, None, 999)
+    """
+    from datetime import date as date_type, timedelta
+    
+    birth_date = date_type(year, month, day)
+    year_data = JIEQI_TABLE.get(year, [])
+    
+    # Build list of (month, day, name) candidates sorted by date
+    candidates = []
+    for idx, date in enumerate(year_data):
+        if date:
+            candidates.append((date[0], date[1], JIEQI_NAMES[idx]))
+    
+    # Sort by date (month, day)
+    candidates.sort(key=lambda x: (x[0], x[1]))
+    
+    # Find first candidate strictly after birth date
+    for cm, cd, name in candidates:
+        if (cm > month) or (cm == month and cd > day):
+            jieqi_date = date_type(year, cm, cd)
+            days = (jieqi_date - birth_date).days
+            return name, jieqi_date, days
+    
+    # Look in next year
+    next_year = year + 1
+    next_data = JIEQI_TABLE.get(next_year, [])
+    for idx, date in enumerate(next_data):
+        if date:
+            name = JIEQI_NAMES[idx]
+            jieqi_date = date_type(next_year, date[0], date[1])
+            days = (jieqi_date - birth_date).days
+            return name, jieqi_date, days
+    
+    return None, None, 999
+
+
+# ============================================================
+# 测试
+# ============================================================
 
     # 任务要求的关键测试
     lunar = get_lunar_date(2024, 3, 15)
