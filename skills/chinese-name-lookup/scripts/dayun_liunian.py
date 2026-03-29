@@ -544,14 +544,14 @@ def analyze_dayun(
     score = 0
     factors = []
     
-    # 天干评分
-    # 生助用神则吉，克泄用神则凶
-    if dayun_stem_name in xiyong_list:
+    # 天干评分（比较五行元素，非天干名）
+    dayun_stem_elem_name = ELEMENT_NAMES[STEM_ELEMENTS[dayun_stem_idx]]
+    if dayun_stem_elem_name in xiyong_list:
         score += 2
-        factors.append(f"大运天干{dayun_stem_name}为喜用神（{shishen_stem}），+2分")
-    elif dayun_stem_name in jishen_list:
+        factors.append(f"大运天干{dayun_stem_name}({dayun_stem_elem_name})为喜用神（{shishen_stem}），+2分")
+    elif dayun_stem_elem_name in jishen_list:
         score -= 2
-        factors.append(f"大运天干{dayun_stem_name}为忌神（{shishen_stem}），-2分")
+        factors.append(f"大运天干{dayun_stem_name}({dayun_stem_elem_name})为忌神（{shishen_stem}），-2分")
     else:
         # 中性，看十神关系
         if shishen_stem in ["正官", "七杀", "正印", "偏印"]:
@@ -588,22 +588,19 @@ def analyze_dayun(
     # 五行生克评分
     # 大运地支五行对日主的影响
     elem_relation = (dayun_branch_elem - day_elem) % 5
-    if elem_relation == 1:  # 大运地支生日主
-        if dayun_branch_name in xiyong_list:
+    dayun_branch_elem_name = ELEMENT_NAMES[dayun_branch_elem]
+    if elem_relation == 4:  # 日主生大运地支（泄）：大运支生日主
+        if dayun_branch_elem_name in xiyong_list:
             score += 1
-            factors.append(f"大运地支{ELEMENT_NAMES[dayun_branch_elem]}生日主，得地支之助，+1分")
-    elif elem_relation == 2:  # 大运地支泄日主
-        if dayun_branch_name in jishen_list:
-            score -= 1
-            factors.append(f"大运地支{ELEMENT_NAMES[dayun_branch_elem]}泄日主，-1分")
+            factors.append(f"大运地支{dayun_branch_name}({dayun_branch_elem_name})生日主，得地支之助，+1分")
     elif elem_relation == 3:  # 大运地支克日主
         if shishen_stem in ["正官", "七杀"]:
-            score += 1 if dayun_branch_name in xiyong_list else -1
-            factors.append(f"大运地支{ELEMENT_NAMES[dayun_branch_elem]}为官杀之地")
-    elif elem_relation == 4:  # 日主克大运地支
-        if dayun_branch_name in xiyong_list:
+            score += 1 if dayun_branch_elem_name in xiyong_list else -1
+            factors.append(f"大运地支{dayun_branch_name}({dayun_branch_elem_name})为官杀之地")
+    elif elem_relation == 2:  # 日主克大运地支（耗）
+        if dayun_branch_elem_name in xiyong_list:
             score += 1
-            factors.append(f"日主克大运地支财，得财之象")
+            factors.append(f"日主克大运地支{dayun_branch_name}({dayun_branch_elem_name})财，得财之象")
     
     # 判断吉凶
     if score >= 3:
@@ -908,23 +905,29 @@ def analyze_liunian_by_year(
     score = 0
     factors = []
     
-    # 1. 流年天干是否为喜用神/忌神
-    if liunian_stem_name in xiyong_list:
+    # 1. 流年天干是否为喜用神/忌神（比较五行元素，非天干名）
+    liunian_stem_elem_name = ELEMENT_NAMES[liunian_elem]
+    if liunian_stem_elem_name in xiyong_list:
         score += 20
-        factors.append(f"流年天干{liunian_stem_name}为喜用神，+20分")
-    elif liunian_stem_name in jishen_list:
+        factors.append(f"流年天干{liunian_stem_name}({liunian_stem_elem_name})为喜用神，+20分")
+    elif liunian_stem_elem_name in jishen_list:
         score -= 20
-        factors.append(f"流年天干{liunian_stem_name}为忌神，-20分")
+        factors.append(f"流年天干{liunian_stem_name}({liunian_stem_elem_name})为忌神，-20分")
     
-    # 2. 流年天干生助/克泄日主
-    # (other_elem - day_elem) % 5 == 1 表示 生我者
-    # (other_elem - day_elem) % 5 == 4 表示 我生者
-    # (other_elem - day_elem) % 5 == 2 表示 我克者
-    # (other_elem - day_elem) % 5 == 3 表示 克我者
-    elem_diff = (liunian_elem - day_elem) % 5
+    # 2. 流年天干与日干的五行生克关系
+    # 五行相生: 木→火→土→金→水→木
+    # (day_elem - liunian_elem) % 5:
+    #   == 1: 日干生流年干 (泄) → 流年干得生,日主泄力
+    #   == 2: 日干克流年干 (耗) → 流年干被克,日主耗力
+    #   == 3: 流年干克日干 (受克) → 日主受克
+    #   == 4: 流年干生日干 (受生) → 日主得生
+    #   == 0: 同类/比和
+    elem_diff = (day_elem - liunian_elem) % 5
     
-    is_sheng = elem_diff == 1  # 流年天干生助日主
-    isKe = elem_diff in [2, 3]  # 流年天干克泄日主
+    # 流年干生日干: is_sheng = True → 身弱则有力, 身旺则过旺
+    # 流年干克日干: isKe = True → 身旺可担, 身弱则更弱
+    is_sheng = elem_diff == 4  # 流年干生助日主
+    isKe = elem_diff == 3       # 流年干克日主
     
     # 获取身强身弱
     is_strong = rizhu.get("strength") in ["强", "旺"] if rizhu else False
@@ -954,13 +957,14 @@ def analyze_liunian_by_year(
             dayun_stem_name_val = HEAVENLY_STEMS[dayun_stem_idx_val]
             dayun_branch_name_val = EARTHLY_BRANCHES[dayun_branch_idx_val]
             
-            # 大运天干是否为喜用神/忌神
-            if dayun_stem_name_val in xiyong_list:
+            # 大运天干是否为喜用神/忌神（比较五行元素）
+            dayun_stem_elem_name = ELEMENT_NAMES[STEM_ELEMENTS[dayun_stem_idx_val]]
+            if dayun_stem_elem_name in xiyong_list:
                 score += 15
-                factors.append(f"大运天干{dayun_stem_name_val}为喜用神，叠加流年，+15分")
-            elif dayun_stem_name_val in jishen_list:
+                factors.append(f"大运天干{dayun_stem_name_val}({dayun_stem_elem_name})为喜用神，叠加流年，+15分")
+            elif dayun_stem_elem_name in jishen_list:
                 score -= 15
-                factors.append(f"大运天干{dayun_stem_name_val}为忌神，叠加流年，-15分")
+                factors.append(f"大运天干{dayun_stem_name_val}({dayun_stem_elem_name})为忌神，叠加流年，-15分")
             
             # 大运地支与流年地支的冲合
             if BRANCH_CHONGS.get(dayun_branch_idx_val) == branch_idx:
@@ -988,13 +992,13 @@ def analyze_liunian_by_year(
     if shishen_factor:
         factors.append(shishen_factor)
     
-    # 6. 流年地支五行专项
-    branch_elem_diff = (liunian_branch_elem - day_elem) % 5
-    if branch_elem_diff == 1:  # 地支生日主
+    # 6. 流年地支五行专项（使用正确的生克公式）
+    branch_elem_diff = (day_elem - liunian_branch_elem) % 5
+    if branch_elem_diff == 4:  # 地支生助日主（流年支生日干）
         if not is_strong:
             score += 5
             factors.append(f"流年地支{ELEMENT_NAMES[liunian_branch_elem]}气助日主，+5分")
-    elif branch_elem_diff in [2, 3]:  # 地支克泄日主
+    elif branch_elem_diff == 3:  # 地支克日主（流年支克日干）
         if is_strong:
             score += 5
             factors.append(f"流年地支{ELEMENT_NAMES[liunian_branch_elem]}气利身旺，+5分")
@@ -1254,6 +1258,8 @@ def full_dayun_analysis(
             "start_age": dayun["start_age"],
             "end_age": dayun["end_age"],
             "ganzhi": dayun["ganzhi"],
+            "stem_idx": dayun.get("stem_idx"),   # 新增：用于流年评分
+            "branch_idx": dayun.get("branch_idx"),  # 新增：用于流年评分
             "direction": dayun["direction"],
             "summary": summary,
         })
