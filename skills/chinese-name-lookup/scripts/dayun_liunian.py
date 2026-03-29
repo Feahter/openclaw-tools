@@ -29,6 +29,13 @@ except ImportError:
     get_changsheng_state = None
     CHANGSHENG_ORDER = ["长生","沐浴","冠带","临官","帝旺","衰","病","死","墓","绝","胎","养"]
 
+# 导入节气计算（用于精确大运起始日期）
+try:
+    from lunar_calendar import get_next_jieqi_after_date, JIEQI_TABLE
+except ImportError:
+    get_next_jieqi_after_date = None
+    JIEQI_TABLE = {}
+
 
 # ============================================================
 # 常量定义
@@ -273,20 +280,20 @@ def get_dayun_sequence(
     # 出生后多久进入第一步大运（通常从几岁开始）
     birth_dt = datetime.fromtimestamp(birth_timestamp)
     
-    # 大运起始年龄计算：
-    # 简单算法：假设出生即进入第一步大运，从月柱开始
-    # 实际上大运起始年龄需要精确到出生月份
-    # 简化处理：按《千里命稿》规则，从月柱开始计算
+    # 计算精确大运起始年龄（基于节气）
+    dayun_start_exact = get_dayun_start_age_exact(birth_dt.year, birth_dt.month, birth_dt.day)
+    first_start_age = dayun_start_exact["years"]
     
     dayuns = []
     for i in range(12):
-        start_age = i * 10
-        end_age = (i + 1) * 10 - 1
+        start_age = first_start_age + i * 10
+        end_age = start_age + 9
         
         dayun_info = {
             "index": i,
             "start_age": start_age,
             "end_age": end_age,
+            "start_age_exact": dayun_start_exact if i == 0 else None,  # Only first entry has exact age
             "stem_idx": dayun_stems[i],
             "branch_idx": dayun_branches[i],
             "stem": HEAVENLY_STEMS[dayun_stems[i]],
@@ -361,6 +368,75 @@ def get_dayun_with_exact_age(
         dayuns.append(dayun_info)
 
     return dayuns
+
+
+def get_dayun_start_age_exact(year: int, month: int, day: int) -> Dict[str, Any]:
+    """
+    精确计算大运起始年龄（岁+月+天）
+    
+    基于节气的大运起法公式（传统《千里命稿》改进版）：
+    - 找到出生日期之后的第一个节气
+    - 计算天数
+    - days / 3.65 ≈ 起始岁数(小数)
+    - 转换为 Y岁M个月D天
+    
+    注意: 实际命理网站可能有微小差异(使用3.75-4.0作为除数)，
+    这取决于具体派别的计算方法。本函数使用3.65作为标准值。
+    
+    Args:
+        year: 出生公历年
+        month: 出生公历月
+        day: 出生公历日
+    
+    Returns:
+        {
+            "years": N,           # 起始岁数(整数年)
+            "months": M,           # 剩余月数
+            "days": D,            # 剩余天数
+            "decimal_years": X.X, # 小数岁数
+            "days_total": N,      # 到节气总天数
+            "next_jieqi": "清明", # 下一个节气名
+            "next_jieqi_date": "4/5", # 下一个节气月/日
+        }
+    """
+    if get_next_jieqi_after_date is None:
+        # Fallback: use simple formula
+        import math
+        return {
+            "years": 0, "months": 0, "days": 0,
+            "decimal_years": 0.0, "days_total": 0,
+            "next_jieqi": "N/A", "next_jieqi_date": "N/A",
+        }
+    
+    jieqi_name, jieqi_date, days = get_next_jieqi_after_date(year, month, day)
+    
+    if jieqi_date is None or days >= 999:
+        return {
+            "years": 0, "months": 0, "days": 0,
+            "decimal_years": 0.0, "days_total": days,
+            "next_jieqi": "N/A", "next_jieqi_date": "N/A",
+        }
+    
+    # Formula: days / 3.65 ≈ decimal years
+    # 3.65 accounts for 365.25 days/year and the traditional 大运 counting
+    decimal_years = days / 3.65
+    
+    # Convert to years + months + days
+    total_months = int(decimal_years * 12)
+    years = total_months // 12
+    remaining_months = total_months % 12
+    # remaining days: fractional part of decimal_years converted to days
+    remaining_days = int((decimal_years - int(decimal_years)) * 30)
+    
+    return {
+        "years": years,
+        "months": remaining_months,
+        "days": remaining_days,
+        "decimal_years": round(decimal_years, 2),
+        "days_total": days,
+        "next_jieqi": jieqi_name,
+        "next_jieqi_date": f"{jieqi_date.month}/{jieqi_date.day}",
+    }
 
 
 # ============================================================
@@ -788,18 +864,307 @@ def analyze_liunian_by_year(
     dayun_info: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
-    根据年份分析流年
+    根据年份分析流年（增强版）
+    
+    包含：
+    - 流年干支 + 五行
+    - 流年与命局的生克关系
+    - 流年与大运的叠加效果
+    - 简单的吉凶判断 (score: -100 to 100)
+    - 简要分析文字 (2-3 sentences)
     
     Args:
         year: 公历年（2020-2050）
-        bazi_info: 八字信息
-        dayun_info: 当前大运信息
+        bazi_info: 八字信息（包含 bazi dict, xiyongshen, rizhu_strength 等）
+        dayun_info: 当前大运信息（可选）
     
     Returns:
-        流年分析结果
+        流年分析结果（增强版）
     """
     stem_idx, branch_idx = get_liunian_ganzhi(year)
-    return analyze_liunian(stem_idx, branch_idx, bazi_info, dayun_info)
+    
+    # 获取八字基础信息
+    bazi = bazi_info.get("bazi", bazi_info)
+    xiyong = bazi_info.get("xiyongshen", {})
+    rizhu = bazi_info.get("rizhu_strength", {})
+    xiyong_list = xiyong.get("xiyongshen", [])
+    jishen_list = xiyong.get("jishen", [])
+    
+    day_stem_idx = bazi["day"]["stem_idx"]
+    day_branch_idx = bazi["day"]["branch_idx"]
+    day_elem = STEM_ELEMENTS[day_stem_idx]
+    day_stem_name = HEAVENLY_STEMS[day_stem_idx]
+    day_branch_name = EARTHLY_BRANCHES[day_branch_idx]
+    
+    liunian_stem_name = HEAVENLY_STEMS[stem_idx]
+    liunian_branch_name = EARTHLY_BRANCHES[branch_idx]
+    liunian_elem = STEM_ELEMENTS[stem_idx]
+    liunian_branch_elem = BRANCH_ELEMENTS[branch_idx]
+    
+    # 流年十神
+    liunian_shishen = get_shishen(day_stem_idx, stem_idx)
+    
+    # ========== 评分计算 (base: -100 to 100) ==========
+    score = 0
+    factors = []
+    
+    # 1. 流年天干是否为喜用神/忌神
+    if liunian_stem_name in xiyong_list:
+        score += 20
+        factors.append(f"流年天干{liunian_stem_name}为喜用神，+20分")
+    elif liunian_stem_name in jishen_list:
+        score -= 20
+        factors.append(f"流年天干{liunian_stem_name}为忌神，-20分")
+    
+    # 2. 流年天干生助/克泄日主
+    # (other_elem - day_elem) % 5 == 1 表示 生我者
+    # (other_elem - day_elem) % 5 == 4 表示 我生者
+    # (other_elem - day_elem) % 5 == 2 表示 我克者
+    # (other_elem - day_elem) % 5 == 3 表示 克我者
+    elem_diff = (liunian_elem - day_elem) % 5
+    
+    is_sheng = elem_diff == 1  # 流年天干生助日主
+    isKe = elem_diff in [2, 3]  # 流年天干克泄日主
+    
+    # 获取身强身弱
+    is_strong = rizhu.get("strength") in ["强", "旺"] if rizhu else False
+    
+    if is_sheng:
+        if is_strong:
+            score -= 10  # 身旺再得生助则过旺
+            factors.append(f"流年天干{liunian_stem_name}生助日主，身旺则不吉，-10分")
+        else:
+            score += 10  # 身弱得生助则有力
+            factors.append(f"流年天干{liunian_stem_name}生助日主，身弱得扶，+10分")
+    elif isKe:
+        if is_strong:
+            score += 10  # 身旺见克泄可平衡
+            factors.append(f"流年天干{liunian_stem_name}克泄日主，身旺则可平衡，+10分")
+        else:
+            score -= 10  # 身弱再被克泄则更弱
+            factors.append(f"流年天干{liunian_stem_name}克泄日主，身弱则不利，-10分")
+    
+    # 3. 流年与大运的叠加效果
+    dayun_impact = 0
+    if dayun_info:
+        dayun_stem_idx_val = dayun_info.get("stem_idx")
+        dayun_branch_idx_val = dayun_info.get("branch_idx")
+        
+        if dayun_stem_idx_val is not None and dayun_branch_idx_val is not None:
+            dayun_stem_name_val = HEAVENLY_STEMS[dayun_stem_idx_val]
+            dayun_branch_name_val = EARTHLY_BRANCHES[dayun_branch_idx_val]
+            
+            # 大运天干是否为喜用神/忌神
+            if dayun_stem_name_val in xiyong_list:
+                score += 15
+                factors.append(f"大运天干{dayun_stem_name_val}为喜用神，叠加流年，+15分")
+            elif dayun_stem_name_val in jishen_list:
+                score -= 15
+                factors.append(f"大运天干{dayun_stem_name_val}为忌神，叠加流年，-15分")
+            
+            # 大运地支与流年地支的冲合
+            if BRANCH_CHONGS.get(dayun_branch_idx_val) == branch_idx:
+                score -= 20
+                factors.append(f"流年{liunian_branch_name}冲大运{dayun_branch_name_val}，动荡不安，-20分")
+            elif branch_idx in BRANCH_HES.get(dayun_branch_idx_val, {}):
+                score += 20
+                factors.append(f"流年{liunian_branch_name}合大运{dayun_branch_name_val}，诸事顺遂，+20分")
+            
+            # 获取大运对流年的影响分
+            dayun_impact = get_liunian_score(stem_idx, branch_idx, dayun_stem_idx_val, dayun_branch_idx_val)
+            score += dayun_impact * 5  # 放大倍数（原有分值范围[-2,2]）
+    
+    # 4. 流年地支与日支的冲合
+    if BRANCH_CHONGS.get(branch_idx) == day_branch_idx:
+        score -= 15
+        factors.append(f"流年{liunian_branch_name}冲日支{day_branch_name}，自身动荡，-15分")
+    elif branch_idx in BRANCH_HES.get(day_branch_idx, {}):
+        score += 15
+        factors.append(f"流年{liunian_branch_name}合日支{day_branch_name}，人缘相助，+15分")
+    
+    # 5. 流年十神专项判断
+    shishen_score, shishen_factor = _get_shishen_liunian_score(liunian_shishen, day_elem, is_strong)
+    score += shishen_score
+    if shishen_factor:
+        factors.append(shishen_factor)
+    
+    # 6. 流年地支五行专项
+    branch_elem_diff = (liunian_branch_elem - day_elem) % 5
+    if branch_elem_diff == 1:  # 地支生日主
+        if not is_strong:
+            score += 5
+            factors.append(f"流年地支{ELEMENT_NAMES[liunian_branch_elem]}气助日主，+5分")
+    elif branch_elem_diff in [2, 3]:  # 地支克泄日主
+        if is_strong:
+            score += 5
+            factors.append(f"流年地支{ELEMENT_NAMES[liunian_branch_elem]}气利身旺，+5分")
+    
+    # 限制在 -100 到 100 之间
+    score = max(-100, min(100, score))
+    
+    # 判断吉凶
+    if score > 60:
+        luck = "大吉"
+    elif score >= 40:
+        luck = "小吉"
+    elif score >= 20:
+        luck = "平"
+    elif score >= 0:
+        luck = "小凶"
+    else:
+        luck = "大凶"
+    
+    # 生成简要分析文字
+    analysis_text = generate_liunian_text(
+        {"shishen": liunian_shishen, "score": score, "luck": luck,
+         "stem": liunian_stem_name, "branch": liunian_branch_name,
+         "xiyong_in_stem": liunian_stem_name in xiyong_list,
+         "jishen_in_stem": liunian_stem_name in jishen_list},
+        xiyong,
+        rizhu
+    )
+    
+    return {
+        "year": year,
+        "stem": liunian_stem_name,
+        "branch": liunian_branch_name,
+        "ganzhi": liunian_stem_name + liunian_branch_name,
+        "element": ELEMENT_NAMES[liunian_elem],
+        "shishen": liunian_shishen,
+        "score": score,
+        "luck": luck,
+        "factors": factors,
+        "analysis": analysis_text,
+        "dayun_impact": dayun_impact,
+        "dayun_ganzhi": (HEAVENLY_STEMS[dayun_info.get("stem_idx")] + EARTHLY_BRANCHES[dayun_info.get("branch_idx")]) if dayun_info and dayun_info.get("stem_idx") is not None else None,
+    }
+
+
+def _get_shishen_liunian_score(shishen: str, day_elem: int, is_strong: bool) -> Tuple[int, str]:
+    """
+    根据流年十神返回专项评分和说明
+    
+    Returns:
+        (score_adjustment, factor_text)
+    """
+    factor = ""
+    
+    if shishen == "正官":
+        if day_elem in [0, 1]:  # 木火日主
+            factor = "正官流年，有官运之象"
+            return (5, factor)
+        else:
+            factor = "正官流年，运势平稳"
+            return (0, factor)
+    elif shishen == "七杀":
+        if not is_strong:
+            factor = "七杀流年，压力与挑战并存"
+            return (-5, factor)
+        else:
+            factor = "七杀流年，身旺可担"
+            return (5, factor)
+    elif shishen == "正印":
+        factor = "正印流年，利于学业名声"
+        return (5, factor)
+    elif shishen == "偏印":
+        factor = "偏印流年，需防小人是非"
+        return (-3, factor)
+    elif shishen == "食神":
+        factor = "食神流年，创造力发挥，财运渐入"
+        return (5, factor)
+    elif shishen == "伤官":
+        if day_elem in [0, 1]:  # 木火日主
+            factor = "伤官流年，才华显露但需注意表达"
+            return (-3, factor)
+        else:
+            factor = "伤官流年，财运有变化"
+            return (0, factor)
+    elif shishen == "正财":
+        factor = "正财流年，财运稳定，积累为宜"
+        return (5, factor)
+    elif shishen == "偏财":
+        factor = "偏财流年，财运起伏，投资需谨慎"
+        return (0, factor)
+    elif shishen == "比肩":
+        if is_strong:
+            factor = "比肩流年，竞争较多"
+            return (-3, factor)
+        else:
+            factor = "比肩流年，朋友相助"
+            return (3, factor)
+    elif shishen == "劫财":
+        factor = "劫财流年，财运有损，防小人破财"
+        return (-5, factor)
+    
+    return (0, "")
+
+
+def generate_liunian_text(
+    liunian_info: Dict[str, Any],
+    xiyongshen: Dict[str, Any],
+    pattern_info: Dict[str, Any]
+) -> str:
+    """
+    根据流年信息生成简要分析文字（2-3句）
+    
+    Args:
+        liunian_info: 流年分析结果（包含 shishen, score, luck, stem, branch, xiyong_in_stem, jishen_in_stem）
+        xiyongshen: 喜用神信息
+        pattern_info: 格局信息（来自 rizhu_strength）
+    
+    Returns:
+        2-3句流年分析文字
+    """
+    score = liunian_info.get("score", 0)
+    luck = liunian_info.get("luck", "平")
+    shishen = liunian_info.get("shishen", "")
+    stem = liunian_info.get("stem", "")
+    branch = liunian_info.get("branch", "")
+    xiyong_in = liunian_info.get("xiyong_in_stem", False)
+    jishen_in = liunian_info.get("jishen_in_stem", False)
+    
+    xiyong_list = xiyongshen.get("xiyongshen", []) if xiyongshen else []
+    jishen_list = xiyongshen.get("jishen", []) if xiyongshen else []
+    
+    sentences = []
+    
+    # 第一句：年份干支 + 十神
+    if shishen:
+        sentences.append(f"{stem}{branch}年，流年十神为{shishen}。")
+    else:
+        sentences.append(f"{stem}{branch}年。")
+    
+    # 第二句：吉凶判断
+    if score > 60:
+        sentences.append(f"此年{luck}，运势旺盛，宜把握机遇，积极进取。")
+    elif score >= 40:
+        sentences.append(f"此年{luck}，运势平稳，若能顺势而为，当有所成。")
+    elif score >= 20:
+        sentences.append(f"此年运势平平，宜守成蓄势，不宜冒进。")
+    elif score >= 0:
+        sentences.append(f"此年{luck}，运势略显低迷，宜谨慎行事，韬光养晦。")
+    else:
+        sentences.append(f"此年{luck}，运势低迷，宜静不宜动，蓄势待发。")
+    
+    # 第三句：喜忌神补充说明
+    if xiyong_in:
+        xy_names = ",".join(xiyong_list) if xiyong_list else stem
+        sentences.append(f"流年天干为喜用神，多有助力；{xy_names}为用神所在之年，宜把握。")
+    elif jishen_in:
+        ji_names = ",".join(jishen_list) if jishen_list else stem
+        sentences.append(f"流年天干为忌神，需防阻滞；{ji_names}为忌神所在之年，宜谨慎。")
+    else:
+        # 补充十神方向的提示
+        if shishen in ["正财", "偏财"]:
+            sentences.append("财星流年，财运为重，宜关注财务收支。")
+        elif shishen in ["正官", "七杀"]:
+            sentences.append("官杀流年，事业为重，宜积极进取但防小人。")
+        elif shishen in ["食神", "伤官"]:
+            sentences.append("食伤流年，才华为用，宜发挥特长、展示自我。")
+        elif shishen in ["正印", "偏印"]:
+            sentences.append("印星流年，学业名声为重，宜学习积累。")
+    
+    return "".join(sentences)
 
 
 def get_recent_liunian(
@@ -876,6 +1241,10 @@ def full_dayun_analysis(
     # 获取大运序列
     dayun_list = get_dayun_sequence(bazi_info, gender, birth_timestamp)
     
+    # 计算精确大运起始年龄
+    birth_dt = datetime.fromtimestamp(birth_timestamp)
+    dayun_start_exact = get_dayun_start_age_exact(birth_dt.year, birth_dt.month, birth_dt.day)
+    
     # 分析每步大运
     dayun_summaries = []
     for dayun in dayun_list:
@@ -904,6 +1273,7 @@ def full_dayun_analysis(
         "month_branch": EARTHLY_BRANCHES[bazi["month"]["branch_idx"]],
         "dayun_count": len(dayun_list),
         "dayun_list": dayun_summaries,
+        "dayun_start_exact": dayun_start_exact,  # 精确起始年龄: {years, months, days, decimal_years, next_jieqi, ...}
         "yima": yima,
         "recent_liunian": [
             {
