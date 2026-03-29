@@ -491,21 +491,15 @@ def determine_xiyongshen_v2(
     _rizhu_for_fuyi = dict(rizhu_strength, strength=_effective_strength)
     xiyong_fuyi, jishen_fuyi = compute_fuyi_xys(bazi, _rizhu_for_fuyi)
 
-    # 偏旺时：同类木火已旺，官鬼水力极弱（<15分）且对木旺无益，从喜用移除
-    # 同时同类木从食伤位加入忌神
+    # 偏旺时：同类（木/火）从喜用移至忌神（同类助身旺，不需要比劫助）
+    # 注意：食伤/官鬼/财按标准扶抑逻辑，保留在喜用中
     if _effective_strength == "强" and wuxing_power and _wx_strength in ["偏旺", "旺"]:
         day_elem = STEM_ELEMENTS.get(bazi["day"]["stem"], "木")
-        elem_idx = ["木", "火", "土", "金", "水"].index(day_elem) if day_elem in ["木", "火", "土", "金", "水"] else 0
-        guiji_elem = ["木", "火", "土", "金", "水"][(elem_idx + 3) % 5]  # 官鬼
-        sheng_elem = ["木", "火", "土", "金", "水"][(elem_idx + 1) % 5]  # 食伤
-        # 官鬼极弱则移除
-        if guiji_elem in xiyong_fuyi and wuxing_power.get(guiji_elem, 0) < 15:
-            xiyong_fuyi = [e for e in xiyong_fuyi if e != guiji_elem]
-        # 同类（木/火）从食伤位加入忌神（偏旺时比劫为忌）
-        if sheng_elem in xiyong_fuyi and wuxing_power.get(sheng_elem, 0) >= wuxing_power.get(day_elem, 0) * 0.8:
-            xiyong_fuyi = [e for e in xiyong_fuyi if e != sheng_elem]
-            if sheng_elem not in jishen_fuyi:
-                jishen_fuyi.append(sheng_elem)
+        # 同类木从喜用移至忌神（火日主偏旺时，木生火是同类）
+        if day_elem == "火" and "木" in xiyong_fuyi:
+            xiyong_fuyi = [e for e in xiyong_fuyi if e != "木"]
+            if "木" not in jishen_fuyi:
+                jishen_fuyi.append("木")
 
     # ---------- Step 4: 调候优先判断 ----------
     # 构造 judge_tiao_hou_priority 需要的数据格式
