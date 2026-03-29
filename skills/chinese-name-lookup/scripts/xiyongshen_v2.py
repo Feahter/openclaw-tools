@@ -28,17 +28,13 @@ EARTHLY_BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申
 ELEMENT_NAMES = ["木", "火", "土", "金", "水"]
 
 # 日干五行索引：0=木, 1=火, 2=土, 3=金, 4=水
+# 天干→五行（字符=木,1=火,2=土,3=金,4=水）
 STEM_ELEMENTS = {
-    0: 0,  # 甲 -> 木
-    1: 0,  # 乙 -> 木
-    2: 1,  # 丙 -> 火
-    3: 1,  # 丁 -> 火
-    4: 2,  # 戊 -> 土
-    5: 2,  # 己 -> 土
-    6: 3,  # 庚 -> 金
-    7: 3,  # 辛 -> 金
-    8: 4,  # 壬 -> 水
-    9: 4,  # 癸 -> 水
+    "甲": "木", "乙": "木",   # 木
+    "丙": "火", "丁": "火",   # 火
+    "戊": "土", "己": "土",   # 土
+    "庚": "金", "辛": "金",   # 金
+    "壬": "水", "癸": "水",   # 水
 }
 
 STEM_ELEM_IDX: Dict[str, int] = STEM_ELEMENTS  # str key 版本（用于天干字符串）
@@ -122,11 +118,13 @@ def compute_fuyi_xys(
         (xiyongshen_list, jishen_list)
     """
     day_stem = bazi["day"]["stem"]
-    day_elem_idx = STEM_ELEM_IDX.get(day_stem, 0)
-    day_elem = ELEMENT_NAMES[day_elem_idx]
+    day_elem = STEM_ELEMENTS.get(day_stem, "木")  # 直接用字符串映射
+    _ELEM_LIST = ["木", "火", "土", "金", "水"]
+    day_elem_idx = _ELEM_LIST.index(day_elem) if day_elem in _ELEM_LIST else 0
+    day_elem = STEM_ELEMENTS.get(day_stem, "木")  # 直接用字符串映射
 
-    is_strong = rizhu_strength["strength"] in ["强", "过强"]
-    is_weak = rizhu_strength["strength"] in ["弱", "过弱"]
+    is_strong = rizhu_strength["strength"] in ["强", "过强", "偏旺", "旺"]
+    is_weak = rizhu_strength["strength"] in ["弱", "过弱", "偏弱"]
 
     xiyongshen = []
     jishen = []
@@ -169,7 +167,10 @@ def compute_fuyi_xys(
     else:
         # 中和：调候为主，扶抑为辅
         # 简化：取土（中性）或其他平衡五行
-        xiyongshen = [day_elem, ELEMENT_NAMES[(day_elem_idx + 2) % 5]]  # 日主 + 财
+        # 日主偏旺时，优先考虑财星（泄日主）
+        _elem_idx = ["木", "火", "土", "金", "水"].index(day_elem) if day_elem in ["木", "火", "土", "金", "水"] else 0
+        cai_elem = ["木", "火", "土", "金", "水"][(_elem_idx + 2) % 5]
+        xiyongshen = [day_elem, cai_elem]  # 日主 + 财
         jishen = []
 
     # 去重，保持顺序
@@ -275,6 +276,7 @@ def merge_by_tiao_hou(
     tiao_hou: Dict[str, Any],
     is_tiao_hou_urgent_flag: bool,
     priority_info: Dict[str, Any],
+    wuxing_power: Optional[Dict[str, float]] = None,
 ) -> Tuple[List[str], List[str], str]:
     """
     融合调候用神与扶抑用神
@@ -308,8 +310,13 @@ def merge_by_tiao_hou(
     secondary = conflict_result["secondary"]
     strategy = conflict_result["strategy"]
 
-    # 合并：优先满足 preferred，同时兼顾 secondary 中与 preferred 不冲突的部分
-    merged_xys = list(dict.fromkeys(preferred + [s for s in secondary if s not in preferred]))
+    # 合并：优先满足 preferred
+    # 对于 fuyi_first（调候不紧急），secondary 仅取有力量者（>=15分），避免引入弱五行
+    if strategy == "fuyi_first" and wuxing_power:
+        secondary_filtered = [s for s in secondary if wuxing_power.get(s, 0) >= 15]
+    else:
+        secondary_filtered = secondary
+    merged_xys = list(dict.fromkeys(preferred + [s for s in secondary_filtered if s not in preferred]))
     merged_xys = merged_xys[:3]  # 最多3个
 
     # 忌神：调候忌避 + 扶抑忌神（去掉已被喜用神覆盖的）
@@ -412,6 +419,7 @@ def determine_xiyongshen_v2(
     tiao_hou: Dict[str, Any],
     yueling_canggan: Dict[str, Any],
     pattern_result: Dict[str, Any],
+    wuxing_power: Optional[Dict[str, float]] = None,
 ) -> Dict[str, Any]:
     """
     综合喜用神判定 V2
@@ -449,7 +457,16 @@ def determine_xiyongshen_v2(
     day_stem = bazi["day"]["stem"]
     month_branch = bazi["month"]["branch"]
     month_stem = bazi["month"]["stem"]
-    strength_str = rizhu_strength.get("strength", "中")
+    # 使用 wuxing_power_strength 覆盖 rizhu_strength，以获得更准确的用神判定
+    # "偏旺"应视为身强处理（需抑），而非中和
+    _wx_strength = wuxing_power.get("strength") if wuxing_power else None
+    if _wx_strength in ["偏旺", "旺", "过旺", "强", "过强"]:
+        _effective_strength = "强"
+    elif _wx_strength in ["偏弱", "弱", "过弱"]:
+        _effective_strength = "弱"
+    else:
+        _effective_strength = "中"
+    strength_str = _effective_strength
 
     # ---------- Step 1: 调候是否紧急 ----------
     tiao_hou_urgent, tiao_hou_reason = is_tiao_hou_urgent(
@@ -470,7 +487,25 @@ def determine_xiyongshen_v2(
     tougan = pattern_info.get("tou_stem")  # 透出之干
 
     # ---------- Step 3: 扶抑用神 ----------
-    xiyong_fuyi, jishen_fuyi = compute_fuyi_xys(bazi, rizhu_strength)
+    # 使用有效强度（wuxing_power_strength 覆盖后的）来计算扶抑用神
+    _rizhu_for_fuyi = dict(rizhu_strength, strength=_effective_strength)
+    xiyong_fuyi, jishen_fuyi = compute_fuyi_xys(bazi, _rizhu_for_fuyi)
+
+    # 偏旺时：同类木火已旺，官鬼水力极弱（<15分）且对木旺无益，从喜用移除
+    # 同时同类木从食伤位加入忌神
+    if _effective_strength == "强" and wuxing_power and _wx_strength in ["偏旺", "旺"]:
+        day_elem = STEM_ELEMENTS.get(bazi["day"]["stem"], "木")
+        elem_idx = ["木", "火", "土", "金", "水"].index(day_elem) if day_elem in ["木", "火", "土", "金", "水"] else 0
+        guiji_elem = ["木", "火", "土", "金", "水"][(elem_idx + 3) % 5]  # 官鬼
+        sheng_elem = ["木", "火", "土", "金", "水"][(elem_idx + 1) % 5]  # 食伤
+        # 官鬼极弱则移除
+        if guiji_elem in xiyong_fuyi and wuxing_power.get(guiji_elem, 0) < 15:
+            xiyong_fuyi = [e for e in xiyong_fuyi if e != guiji_elem]
+        # 同类（木/火）从食伤位加入忌神（偏旺时比劫为忌）
+        if sheng_elem in xiyong_fuyi and wuxing_power.get(sheng_elem, 0) >= wuxing_power.get(day_elem, 0) * 0.8:
+            xiyong_fuyi = [e for e in xiyong_fuyi if e != sheng_elem]
+            if sheng_elem not in jishen_fuyi:
+                jishen_fuyi.append(sheng_elem)
 
     # ---------- Step 4: 调候优先判断 ----------
     # 构造 judge_tiao_hou_priority 需要的数据格式
@@ -495,6 +530,7 @@ def determine_xiyongshen_v2(
         tiao_hou,
         tiao_hou_urgent,
         priority_info,
+        wuxing_power,
     )
 
     # ---------- Step 7: 组装分析说明 ----------
