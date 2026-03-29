@@ -825,9 +825,13 @@ def get_recent_liunian(
     if current_year is None:
         current_year = 2026
     if birth_year is None:
-        # 从 bazi_info 尝试获取
+        # 从 bazi_info 尝试获取（支持 {"lunar":{}} 或 {"bazi":{"year":{}} } 两种格式）
         lunar = bazi_info.get("lunar", {})
-        birth_year = lunar.get("year", 2026)
+        if not lunar:
+            # 尝试从 bazi 内部获取农历信息
+            bazi = bazi_info.get("bazi", {})
+            lunar = bazi.get("lunar", {}) if isinstance(bazi, dict) else {}
+        birth_year = lunar.get("year", None) if lunar else None
 
     # 确定当前所在大运
     current_dayun = None
@@ -836,8 +840,8 @@ def get_recent_liunian(
 
     results = []
     for year in range(current_year - count + 1, current_year + 1):
-        if year < birth_year:
-            continue  # 跳过出生前的流年
+        if birth_year is not None and year < birth_year:
+            continue  # 跳过出生年前的流年
         analysis = analyze_liunian_by_year(year, bazi_info, current_dayun)
         analysis["year"] = year
         results.append(analysis)

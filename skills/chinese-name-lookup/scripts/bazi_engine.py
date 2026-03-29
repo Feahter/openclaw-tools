@@ -777,7 +777,7 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int,
     # V2 喜用神判定（调候优先/格局已成/月令司令）
     xiyong_v2 = determine_xiyongshen_v2(
         bazi=bazi,
-        rizhu_strength=rizhu,
+        rizhu_strength=rizhu_v2,  # 使用V2量化身强弱
         tiao_hou=tiao_hou,
         yueling_canggan=yueling,
         pattern_result=pattern_result,
