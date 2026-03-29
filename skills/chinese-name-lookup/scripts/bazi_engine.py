@@ -904,18 +904,18 @@ def get_tiao_hou(tian_gan: str, yue_zhi: str) -> dict:
 
 
 def get_tiao_hou_xiyong(tian_gan: str, yue_zhi: str) -> list:
-    """查调候喜用神列表"""
-    return get_tiao_hou(tian_gan, yue_zhi).get("喜用", [])
+    """查调候喜用神列表（V2：主神+辅神，兼容旧格式）"""
+    info = get_tiao_hou(tian_gan, yue_zhi)
+    # V2格式
+    if "主神" in info:
+        return info.get("主神", []) + info.get("辅神", [])
+    # 旧格式兼容
+    return info.get("喜用", [])
 
 
 def get_tiao_hou_jibi(tian_gan: str, yue_zhi: str) -> list:
     """查调候忌避神列表"""
     return get_tiao_hou(tian_gan, yue_zhi).get("忌避", [])
-
-
-def get_tiao_hou_principle(tian_gan: str, yue_zhi: str) -> str:
-    """查调候原则"""
-    return get_tiao_hou(tian_gan, yue_zhi).get("原则", "")
 
 
 # ============================================================

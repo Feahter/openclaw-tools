@@ -840,27 +840,40 @@ def detect_con_pattern(bazi: Dict[str, Any], rizhu_by_count: Dict[str, Any]) -> 
     tonglei_total = day_elem_count + elem_counts[sheng_name]  # 日干 + 印星
 
     # ============================================================
-    # 从格判断
+    # 从格判断（千里命稿核心：无印滋身）
     # ============================================================
-    # 条件：同类极少（≤2）且某神极旺（≥5且>同类×2）
+    # 从格条件（千里命稿）：
+    # 1. 日主无根/同类极少（同类≤2）
+    # 2. 无印星滋身（印星极弱或不存在）
+    # 3. 某神极旺可从
     THRESHOLD = 5
     STRONG_RATIO = 2.0
+    TONGLEI_FROM = 2   # 从格要求同类（日干+印星）的最大数量
 
-    if tonglei_total <= 2:
+    sheng_count = elem_counts[sheng_name]  # 印星数量
+
+    if tonglei_total <= TONGLEI_FROM:
+        # 无印滋身检查（千里命稿关键）：印星是否存在但太弱？
+        no_yin_support = sheng_count <= 1  # 印星极少（≤1个）= 无印滋身
+
         # 找最强的异类五行
         rival_elements = [(e, c) for e, c in elem_counts.items() if e != day_elem]
         dominant = [(e, c) for e, c in rival_elements
                     if c >= THRESHOLD and c >= tonglei_total * STRONG_RATIO]
-        if dominant:
+
+        if dominant and no_yin_support:
             strongest_name, strongest_count = max(dominant, key=lambda x: x[1])
             strongest_idx = ELEM_NAMES.index(strongest_name)
 
-            # 判断从格类型（按旺神的五行角色）
+            # 判断从格类型（千里命稿：从旺 vs 从强）
+            # 从旺格：印绶为宾（日主弃其势）
+            # 从强格：身与印平均（无印滋身但有印可用）
             if strongest_idx == ke_idx:
                 con_type = "从杀格"
             elif strongest_idx == hao_idx:
                 con_type = "从财格"
             elif strongest_idx == sheng_idx:
+                # 从印格：印星本身极旺（与从强不同）
                 con_type = "从印格"
             elif strongest_idx == xie_idx:
                 con_type = "从儿格"
@@ -873,7 +886,7 @@ def detect_con_pattern(bazi: Dict[str, Any], rizhu_by_count: Dict[str, Any]) -> 
                 "cong_strength_name": strongest_name,
                 "xiyongshen_flip": [strongest_name],
                 "jishen_flip": [day_elem, sheng_name],  # 日干和印都为忌
-                "reason": (f"日主{day_elem}同类({tonglei_total}个)极少，"
+                "reason": (f"日主{day_elem}同类({tonglei_total}个)极少且无印滋身(印星={sheng_count}个)，"
                           f"{strongest_name}({strongest_count}个)极旺，"
                           f"构成{con_type}，弃日主从{strongest_name}"),
             }

@@ -71,15 +71,22 @@ WUXING_MAP: Dict[str, str] = {
 
 def get_tiao_hou_xiyong_wuxing(tiao_hou: Dict[str, Any]) -> List[str]:
     """
-    从调候数据中提取五行层面的喜用神
+    从调候数据中提取五行层面的喜用神（V2支持主神+辅神）
 
-    Args:
-        tiao_hou: {"喜用": ["丙", "癸"], "忌避": [...], "原则": str}
+    V2格式: {"主神": [...], "辅神": [...], "忌避": [...]}
+    旧格式: {"喜用": [...], "忌避": [...]}
 
     Returns:
         五行名称列表，如 ["火", "水"]
     """
-    xiyong_gan = tiao_hou.get("喜用", [])
+    # V2格式：主神+辅神
+    if "主神" in tiao_hou:
+        zhushen = tiao_hou.get("主神", [])
+        fushen = tiao_hou.get("辅神", [])
+        xiyong_gan = zhushen + fushen
+    else:
+        # 旧格式兼容
+        xiyong_gan = tiao_hou.get("喜用", [])
     wuxing_set = set()
     for g in xiyong_gan:
         w = WUXING_MAP.get(g)
@@ -89,7 +96,7 @@ def get_tiao_hou_xiyong_wuxing(tiao_hou: Dict[str, Any]) -> List[str]:
 
 
 def get_tiao_hou_jibi_wuxing(tiao_hou: Dict[str, Any]) -> List[str]:
-    """从调候忌避中提取五行"""
+    """从调候忌避中提取五行（V2支持）"""
     jibi_gan = tiao_hou.get("忌避", [])
     wuxing_set = set()
     for g in jibi_gan:
@@ -394,8 +401,9 @@ def calculate_confidence(
             score += 0.05
         # 余气/无透 不加分
 
-    # 调候加成
-    if tiao_hou and tiao_hou.get("喜用"):
+    # 调候加成（V2支持：主神/辅神 or 旧格式：喜用）
+    has_tiao_hou = bool(tiao_hou and (tiao_hou.get("主神") or tiao_hou.get("喜用")))
+    if has_tiao_hou:
         score += 0.15  # 有完整调候数据
         if result.get("tiao_hou_urgent"):
             score += 0.10  # 调候紧急，更有把握
