@@ -1,6 +1,6 @@
 # MEMORY.md - 重要约定与记录
 
-*Last Updated: 2026-03-27*
+*Last Updated: 2026-03-30*
 
 ---
 
@@ -228,13 +228,20 @@
 | `lightpanda` + `browser` | 替代 OpenClaw 默认浏览器，资源占用更低 |
 | `lightpanda` + `agent-reach` | 社媒平台抓取（配合 CDP） |
 
-## 🚀 chinese-name-lookup 八字命理 skill (2026-03-27)
+## 🚀 chinese-name-lookup 八字命理 skill (2026-03-30)
 
 ### 状态
 - **Phase 1-6**: ✅ 调候表/长生表/藏干/格局法/调候判定/喜用神/身强弱 v2
 - **Phase 7**: ✅ 神煞查询系统（15个神煞）
 - **Phase 8**: ✅ 大运流年推算
 - **Phase 9**: ✅ 完整报告格式化
+- **P1-a**: ✅ 纳音五行（60组纳音+性格+年日关系分析）
+- **P1-b**: ✅ 刑冲害合（六冲/六合/三刑/六害/天干五合）
+- **P1-c**: ⏳ 子息数量规则（渊海子平"一杀一子"+时支长生子女数）
+- **P1-d**: ⏳ 婚姻配偶星系统（男正财/女正官+配偶宫）
+- **P1-e**: ⏳ 孤鸾煞+阴错阳差
+- **P2-a**: ⏳ 女命婚姻贵贱格局分类
+- **P2-b**: ⏳ 神煞质量评估（贵人空亡/死绝）
 - **本地引擎**: ✅ 已完成（无外部API依赖）
 
 ### 关键文件
@@ -243,12 +250,8 @@
 - `scripts/rizhu_strength_v2.py` — 身强弱量化 v2
 - `scripts/poge_analyzer.py` — 破格原因识别
 - `scripts/liushen_xinxing.py` — 六神心性速查
-- `scripts/report_formatter.py` — 报告格式化
-- `scripts/name_generator.py` — 姓名生成
-- `scripts/xiyongshen_v2.py` — 本地喜用神 v2
-- `scripts/rizhu_strength_v2.py` — 身强弱量化 v2
-- `scripts/poge_analyzer.py` — 破格原因识别
-- `scripts/liushen_xinxing.py` — 六神心性速查
+- `scripts/nayin.py` — 纳音五行（P1-a，2026-03-30）
+- `scripts/penalty_harmony.py` — 刑冲害合（P1-b，2026-03-30）
 - `scripts/report_formatter.py` — 报告格式化
 - `scripts/name_generator.py` — 姓名生成
 
