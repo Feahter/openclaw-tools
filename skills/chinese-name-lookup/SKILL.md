@@ -371,27 +371,9 @@ print(result["markdown"])
 
 ## 参考文件
 
-| 文件 | 用途 |
-|------|------|
-| `scripts/lunar_calendar.py` | 农历转换（1900-2100年）|
-| `scripts/bazi_engine.py` | 八字排盘 + 十神 + 十二长生 |
-| `scripts/xiyongshen_v2.py` | 本地喜用神v2判定（调候优先+格局已成）|
-| `scripts/rizhu_strength_v2.py` | 日主强弱v2量化（权重法+计数法）+ determine_primary_method（命盘类型判断）|
-| `scripts/pattern_method.py` | 格局取用法 + 成败判定 + 破格分析 |
-| `scripts/poge_analyzer.py` | 破格原因识别（6种破格类型）|
-| `scripts/tiao_hou.py` | 穷通宝鉴120格调候喜忌表 |
-| `scripts/tiao_hou_judge.py` | 调候优先级判定 |
-| `scripts/yueling_canggan.py` | 月令藏干表 |
-| `scripts/shier_changsheng.py` | 十二长生表 |
-| `scripts/zodiac_preferences.py` | 十二生肖用字宜忌 |
-| `scripts/liushen_xinxing.py` | 六神心性速查（性格/职业/六亲）|
-| `scripts/name_scorer_v3.py` | 三维评分引擎 |
-| `scripts/dayun_liunian.py` | 大运流年推算 |
-| `scripts/shen_sha.py` | 神煞查询系统 |
-| `scripts/report_formatter.py` | Phase 9 完整报告格式化器 |
-| `scripts/name_generator.py` | 主入口，整合所有模块（含 analyze_existing_name）|
-| `references/stroke_table.json` | 汉字笔画数表 |
-| `references/wuge_rules.json` | 五格数理吉凶（仅供参考）|
+→ 完整文件说明见 `references/file-guide.md`（含已知 Bug 记录）
+
+**主入口**：`scripts/name_generator.py`（`quick_generate` / `generate_name_recommendations` / `analyze_existing_name`）
 
 ---
 
