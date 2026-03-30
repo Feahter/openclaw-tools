@@ -62,10 +62,14 @@ const config = {
 wrangler deploy
 ```
 
+**注意**：首次部署需要：
+1. `wrangler login`（浏览器授权，OAuth 交互）
+2. 在 https://dash.cloudflare.com/.../workers/onboarding 申请 workers.dev 子域名
+
 输出：
 ```
 Uploaded my-proxy (1.42 MB)
-  https://my-proxy.我的用户名.workers.dev
+  https://my-proxy.用户名.workers.dev
 ```
 
 ### 7. 配置自定义域名（可选）

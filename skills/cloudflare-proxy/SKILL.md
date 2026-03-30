@@ -12,7 +12,8 @@ trigger:
 config:
   proxy_url:
     description: Cloudflare Worker 代理地址（程序提取模式）
-    hint: "默认使用公共 Worker；自建 Worker 请参考 references/deploy-guide.md"
+    default: "https://arthur-proxy.frankfeahter.workers.dev"
+    hint: "已部署到你的 CF 账号，可直接使用。自建参考 references/deploy-guide.md"
 
 ## 使用方式
 
