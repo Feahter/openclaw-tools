@@ -1,6 +1,6 @@
 # OpenClaw Skills
 
-> 145+ AI Agent Skills for OpenClaw | Last updated: 2026-03-19
+> 145+ AI Agent Skills for OpenClaw | Last updated: 2026-03-30
 
 ## 📦 安装
 
@@ -33,6 +33,21 @@ git clone https://github.com/Feather/openclaw-tools.git
 | `agent-dispatch` | Agent 注册与路由 |
 | `agent-commander` | Agent 会话管理 |
 | `rescueclaw` | 操作回滚安全系统 |
+| `chinese-name-lookup` | 八字喜用神 + 生肖 + 神煞 + 大运流年姓名分析 |
+| `skill-tench-hunter` | 技术研究猎手 — 多源输入到结构化报告 |
+| `skill-project-butcher` | GitHub 项目深度分析 |
+| `skill-from-masters` | 基于专家方法论创建高质量 Skills |
+| `skill-agent-creator` | Skill 创建与编排 |
+| `skill-algo-researcher` | 算法研究助手 |
+| `skill-algorithm-master` | 算法工具 — 查/实现算法和数据结构 |
+| `skill-taste-calibrator` | AI 品味校准与判断力进化 |
+| `skill-template-layered-retrieval` | 文档分层检索模板 |
+| `test-driven-development` | TDD — RED-GREEN-REFACTOR 流程 |
+| `finishing-a-development-branch` | 分支完成决策指导 |
+| `using-git-worktrees` | Git Worktree 隔离开发 |
+| `code-review-expert` | 专家级代码审查 |
+| `db-query` | 数据库查询 + SSH 隧道管理 |
+| `task-workflow` | 复杂任务规划 + 子Agent + 进度报告工作流 |
 
 ### 🌐 浏览器 & 自动化 (Browser & Automation)
 | Skill | 描述 |
@@ -47,6 +62,9 @@ git clone https://github.com/Feather/openclaw-tools.git
 | `computer-use` | 桌面自动化 (Linux/Xvfb/XFCE) |
 | `mac-use` | macOS GUI 操控 |
 | `screenshot` | 截图工具 |
+| `bb-browser` | 浏览器命令行 — 36平台 103命令 |
+| `lightpanda` | 轻量级浏览器替代 Chrome/OpenClaw 默认 |
+| `webapp-testing` | Playwright 本地 Web 应用测试 |
 
 ### 📄 文档处理 (Documents)
 | Skill | 描述 |
@@ -64,6 +82,8 @@ git clone https://github.com/Feather/openclaw-tools.git
 | `anthropics-pptx` | Anthropic 官方 PPT 处理 |
 | `anthropics-xlsx` | Anthropic 官方 Excel 处理 |
 | `ppt-design-guide` | PPT 制作完整指南 |
+| `qmd` | 本地搜索/索引 CLI（BM25 + vectors + rerank）+ MCP 模式 |
+| `pretext-integration` | Pretext 集成 |
 
 ### 🧠 AI & 机器学习 (AI/ML)
 | Skill | 描述 |
@@ -79,6 +99,10 @@ git clone https://github.com/Feather/openclaw-tools.git
 | `auto-knowledge-acquisition` | GitHub 高质量项目发现与笔记 |
 | `oss-code-analysis` | 开源项目源码分析 |
 | `sw-data-scientist` | 结构化数据分析工作流 |
+| `autoresearch-skill` | 自动优化 Skill — Karpathy autoresearch 方法 |
+| `find-skills` | 技能发现与安装 |
+| `skillhub-preference` | SkillHub 优先 + ClawdHub fallback |
+| `model-usage` | CodexBar 模型用量/成本分析 |
 | `r-wmi` | Rokid 智能眼镜控制 |
 
 ### ☁️ DevOps & 运维 (DevOps)
@@ -95,6 +119,9 @@ git clone https://github.com/Feather/openclaw-tools.git
 | `tmux` | tmux 远程控制 |
 | `macbook-optimizer` | MacBook 全面优化 |
 | `system-health-reporter` | 系统健康报告 |
+| `cloudflare-proxy` | Cloudflare GFW 穿透 |
+| `openclaw-auto-updater` | OpenClaw & Skill 自动更新 |
+| `workflow-automation` | ETL 流水线 & DAG 工作流自动化 |
 
 ### 📱 平台集成 (Integrations)
 | Skill | 描述 |
@@ -109,6 +136,11 @@ git clone https://github.com/Feather/openclaw-tools.git
 | `tapestry` | 知识图谱构建 |
 | `openai-whisper` | 本地语音转文字 |
 | `sonoscli` | Sonos 音箱控制 |
+| `agent-reach` | Web 抓取 — Twitter/Reddit/YouTube/Bilibili 等 |
+| `fast-edit` | 大文件编辑、批量修改、剪贴板粘贴 |
+| `navclaw` | AI 导航 — 路线/堵车查询 |
+| `session-context` | 会话上下文管理 |
+| `session-insights` | 会话洞察分析 |
 
 ### 🧠 记忆 & 认知 (Memory & Cognition)
 | Skill | 描述 |
@@ -136,6 +168,9 @@ git clone https://github.com/Feather/openclaw-tools.git
 | `game-designer-toolkit` | GDD/系统设计/关卡设计 |
 | `text-game-dev` | 文字游戏/视觉小说开发 |
 | `nyx-archive-game-design-philosophy` | 游戏设计哲学 |
+| `Humanizer-zh` | 中文文本人性化改写 |
+| `ltx-video-generator` | LTX 视频生成 |
+| `macos-image-generation` | macOS 本地 Stable Diffusion 图像生成 |
 
 ### 🧩 思维模型 (Thinking)
 | Skill | 描述 |
@@ -161,6 +196,8 @@ git clone https://github.com/Feather/openclaw-tools.git
 | `perf-profiler` | 火焰图/CPU/内存 profiling |
 | `algorithm-toolkit` | 多语言算法代码库 |
 | `jq-json-processor` | JSON 处理 |
+| `planning-with-files` | Manus 风格文件规划 — 多步骤任务组织与进度追踪 |
+| `remotion-best-practices` | Remotion 视频创作最佳实践 |
 
 ### 🔐 安全 & 渗透 (Security)
 | Skill | 描述 |
@@ -193,6 +230,9 @@ git clone https://github.com/Feather/openclaw-tools.git
 | `download-waytoagi-prompts` | WayToAGI 提示词下载 |
 | `folk-marketing` | 民间风格营销文案 |
 | `x-post-automation` | X/Twitter 内容自动发布 |
+| `skill-web-search` | 网页正文提取与内容抓取 |
+| `web-access` | Web 访问工具 |
+| `web-content-fetcher` | 网页内容提取 |
 
 ### 🛠️ 硬件 & IoT
 | Skill | 描述 |
@@ -210,6 +250,12 @@ git clone https://github.com/Feather/openclaw-tools.git
 | `agency-git-workflow-master` | Git 工作流 |
 | `agency-senior-developer` | 全栈开发（Laravel/Three.js） |
 | `agency-model-qa` | 模型 QA |
+| `zeroclaw-driver` | ZeroClaw Rust 运行时驱动 |
+| `consensus-interact` | Consensus.tools 投票与协作 |
+| `claude-code-commander` | Claude Code 命令执行器 |
+| `page-agent-executor` | Page Agent 执行器 |
+| `page-agent-research` | Page Agent 研究助手 |
+| `ima-skill` | IMA 多模态技能 |
 
 ---
 
@@ -235,4 +281,4 @@ git add -A && git commit -m "chore: cleanup and update skills" && git push
 - C 级：<1K，需补充或仅占位
 
 ---
-Generated: 2026-03-19 | Total: 145 Skills
+Generated: 2026-03-30 | Total: 160 Skills
