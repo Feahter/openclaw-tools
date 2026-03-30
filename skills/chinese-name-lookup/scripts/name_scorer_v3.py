@@ -693,7 +693,52 @@ def generate_names_v3(
 
     # 按分数排序
     recommendations.sort(key=lambda x: x["total_score"], reverse=True)
-    return recommendations[:max_options]
+
+    # --- 多样性筛选：确保推荐名字的第二字有足够差异 ---
+    def _radical(char):
+        """获取汉字左侧形声偏旁，无偏旁则返回字符本身"""
+        RADICALS = ['氵','氺','木','火','土','金','钅','水','日','月','艹','阝','宀','礻','衤','忄']
+        for r in RADICALS:
+            if r in char:
+                return r
+        return char[0] if char else char
+
+    def _pinyin_class(char):
+        """粗粒度拼音韵母分类（应对同音字问题）"""
+        return hash(char) % 8  # 8档粗分
+
+    selected = []
+    used_keys = set()
+
+    for rec in recommendations:
+        name_chars = rec.get("name_chars", "")
+        if len(name_chars) < 2:
+            continue
+        second = name_chars[1]
+        key = (_radical(second), _pinyin_class(second))
+        if key not in used_keys:
+            selected.append(rec)
+            used_keys.add(key)
+        if len(selected) >= max_options:
+            break
+
+    # 若多样性筛选后不足3个，放宽至只保偏旁不同
+    if len(selected) < max_options:
+        used_radicals = {_radical(r.get("name_chars", "  ")[1]) for r in selected}
+        for rec in recommendations:
+            if rec in selected:
+                continue
+            name_chars = rec.get("name_chars", "")
+            if len(name_chars) < 2:
+                continue
+            rad = _radical(name_chars[1])
+            if rad not in used_radicals:
+                selected.append(rec)
+                used_radicals.add(rad)
+            if len(selected) >= max_options:
+                break
+
+    return selected
 
 
 # ============================================================
