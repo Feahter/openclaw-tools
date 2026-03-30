@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "bb-browser": {
+      "name": "bb-browser",
+      "zip_url": "https://lightmake.site/api/v1/download?slug=bb-browser",
+      "source": "skillhub",
+      "version": "0.6.0"
+    }
+  }
+}

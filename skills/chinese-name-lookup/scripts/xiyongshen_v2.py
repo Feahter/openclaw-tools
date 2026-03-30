@@ -468,7 +468,7 @@ def determine_xiyongshen_v2(
     # 使用 wuxing_power_strength 覆盖 rizhu_strength，以获得更准确的用神判定
     # "偏旺"应视为身强处理（需抑），而非中和
     _wx_strength = wuxing_power.get("strength") if wuxing_power else None
-    if _wx_strength in ["偏旺", "旺", "过旺", "强", "过强"]:
+    if _wx_strength in ["极旺", "偏旺", "旺", "过旺", "强", "过强"]:
         _effective_strength = "强"
     elif _wx_strength in ["偏弱", "弱", "过弱"]:
         _effective_strength = "弱"
@@ -501,13 +501,18 @@ def determine_xiyongshen_v2(
 
     # 偏旺时：同类（木/火）从喜用移至忌神（同类助身旺，不需要比劫助）
     # 注意：食伤/官鬼/财按标准扶抑逻辑，保留在喜用中
-    if _effective_strength == "强" and wuxing_power and _wx_strength in ["偏旺", "旺"]:
+    if _effective_strength == "强" and wuxing_power and _wx_strength in ["偏旺", "旺", "极旺"]:
         day_elem = STEM_ELEMENTS.get(bazi["day"]["stem"], "木")
-        # 同类木从喜用移至忌神（火日主偏旺时，木生火是同类）
+        # 极度旺-泄克为用：同类（日主五行+印星）全移至忌神
         if day_elem == "火" and "木" in xiyong_fuyi:
             xiyong_fuyi = [e for e in xiyong_fuyi if e != "木"]
             if "木" not in jishen_fuyi:
                 jishen_fuyi.append("木")
+        # 极旺时：日主本身也是忌神（火日主极旺时，火比劫为忌）
+        if _wx_strength == "极旺" and "火" in xiyong_fuyi:
+            xiyong_fuyi = [e for e in xiyong_fuyi if e != "火"]
+            if "火" not in jishen_fuyi:
+                jishen_fuyi.insert(0, "火")
 
     # ---------- Step 4: 调候优先判断 ----------
     # 构造 judge_tiao_hou_priority 需要的数据格式
@@ -526,10 +531,16 @@ def determine_xiyongshen_v2(
     )
 
     # ---------- Step 6: 调候融合 ----------
+    # 极旺-时，身旺已至极，同类全忌，调候不再优先，以克泄为准
+    _wx_for_merge = wuxing_power.get("strength") if wuxing_power else None
+    if _wx_for_merge == "极旺":
+        tiao_hou_override = {}  # 跳过调候，直接用泄克法
+    else:
+        tiao_hou_override = tiao_hou
     merged_xys, merged_js, merge_reason = merge_by_tiao_hou(
         xiyong_after_pattern,
         jishen_after_pattern,
-        tiao_hou,
+        tiao_hou_override,
         tiao_hou_urgent,
         priority_info,
         wuxing_power,

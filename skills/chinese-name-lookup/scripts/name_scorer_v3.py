@@ -682,7 +682,6 @@ def generate_candidates(xiyongshen_list: List[str], count: int = 150) -> List[Di
             candidates.append({"char": char, "wuxing": get_char_wuxing(char), "stroke": stroke})
             seen.add(char)
 
-    random.shuffle(candidates)
     return candidates[:count]
 
 
@@ -742,14 +741,20 @@ def generate_names_v3(
                 return r
         return char[0] if char else char
 
+    # 韵母类别映射（确定性）
+    PINYIN_FINALS = ['a','o','e','i','u','ai','ei','ui','ao','ou','iu','ie','ve','er','an','en','in','un','ang','eng','ing','ong']
+
     def _pinyin_class(char):
-        return hash(char) % 8
+        for f in reversed(PINYIN_FINALS):  # 长韵母优先匹配
+            if f in char:
+                return f
+        return char[0] if char else char
 
     selected = []
     used_radicals = set()
     used_pinyins = set()
 
-    # Pass 1：严格模式（形+音双重不同）
+    # Pass 1：严格模式（第二字 radical 不同，音档也尽量不同）
     for rec in recommendations:
         name_chars = rec.get("name_chars", "")
         if len(name_chars) < 2:
@@ -757,7 +762,7 @@ def generate_names_v3(
         second = name_chars[1]
         rad = _radical(second)
         pclass = _pinyin_class(second)
-        if rad not in used_radicals and pclass not in used_pinyins:
+        if rad not in used_radicals:
             selected.append(rec)
             used_radicals.add(rad)
             used_pinyins.add(pclass)
@@ -766,6 +771,7 @@ def generate_names_v3(
 
     # Pass 2：放宽至 radical 不同
     if len(selected) < max_options:
+        used_pinyins = set()  # 清空 pinyin 限制，只保 radical
         for rec in recommendations:
             if rec in selected:
                 continue

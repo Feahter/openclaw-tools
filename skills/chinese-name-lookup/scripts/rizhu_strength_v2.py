@@ -387,6 +387,110 @@ def _score_to_strength_label(score: float) -> str:
         return "极弱"
 
 
+# ============================================================
+# 藏干长生加权五行力量法（主判断，与网站一致）
+# ============================================================
+# 长生权重表（用于藏干力量计算）
+_CHANGSHENG_WEIGHT = {
+    "临官": 0.85, "帝旺": 1.0,
+    "长生": 0.7, "沐浴": 0.7, "冠带": 0.7,
+    "衰": 0.4, "病": 0.4,
+    "死": 0.2, "墓": 0.2, "绝": 0.2,
+    "胎": 0.3, "养": 0.3,
+}
+# 藏干本气/中气/余气权重
+_STEM_WEIGHT = {"本气": 1.0, "中气": 0.5, "余气": 0.25}
+
+
+def _calc_wuxing_power_by_changsheng(day_stem: str, bazi: Dict) -> Dict[str, Any]:
+    """
+    藏干长生加权五行力量法
+
+    计算规则（与主流排盘网站一致）：
+    - 天干本气: 1分
+    - 地支本气: 1分
+    - 藏干: 长生权重 × 藏干权重(本气1/中气0.5/余气0.25)
+      （长生地支决定该藏干对日主五行的实质增力程度）
+
+    身强弱判断（藏干长生加权比例法）：
+    - ratio = 同类 / 异类
+    - 同类 = 日主五行 + 印星（五行）
+    - 异类 = 官鬼 + 财 + 食伤
+    """
+    day_elem = STEM_ELEMENTS[TIAN_GAN_IDX[day_stem]]
+    sheng_idx = (day_elem + 4) % 5  # 印星
+    xie_idx = (day_elem + 1) % 5    # 食伤
+    hao_idx = (day_elem + 2) % 5    # 财
+    ke_idx = (day_elem + 3) % 5     # 官鬼
+
+    scores = {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0}  # 木火土金水
+
+    for pillar in [bazi["year"], bazi["month"], bazi["day"], bazi["hour"]]:
+        stem_idx = pillar["stem_idx"]
+        branch_idx = pillar["branch_idx"]
+        branch_name = BRANCH_NAMES[branch_idx]
+
+        # 天干本气
+        scores[STEM_ELEMENTS[stem_idx]] += 1.0
+
+        # 地支本气
+        scores[BRANCH_ELEMENTS[branch_idx]] += 1.0
+
+        # 藏干 × 长生权重
+        hidden = BRANCH_HIDDEN_STEMS.get(branch_idx, [None, None, None])
+        for order_idx, hidden_stem_idx in enumerate(hidden):
+            if hidden_stem_idx is None:
+                continue
+            # 藏干顺序：本气(0)、中气(1)、余气(2)
+            key = ["本气", "中气", "余气"][order_idx]
+            stem_w = _STEM_WEIGHT[key]
+            # 该藏干对日主的长生状态（地支决定）
+            state = get_changsheng_state(day_stem, branch_name)
+            cs_w = _CHANGSHENG_WEIGHT.get(state, 0.3)
+            scores[STEM_ELEMENTS[hidden_stem_idx]] += stem_w * cs_w
+
+    tonglei = scores[day_elem] + scores[sheng_idx]
+    yixei = scores[xie_idx] + scores[hao_idx] + scores[ke_idx]
+    ratio = tonglei / yixei if yixei > 0 else 99.0
+
+    if ratio >= 1.7:
+        level = "极旺"
+    elif ratio >= 1.25:
+        level = "偏旺"
+    elif ratio >= 0.8:
+        level = "中和"
+    else:
+        level = "偏弱"
+
+    # 喜忌判断（身强喜克泄，身弱喜生扶）
+    if ratio >= 1.25:  # 偏旺/极旺
+        xiyong = [ELEMENT_NAMES[ke_idx], ELEMENT_NAMES[hao_idx]]  # 官鬼+财
+        if ratio >= 1.7:
+            xiyong.append(ELEMENT_NAMES[xie_idx])  # 极旺加食伤泄
+        ji = [ELEMENT_NAMES[day_elem], ELEMENT_NAMES[sheng_idx]]  # 日主+印
+    elif ratio >= 0.8:  # 中和
+        xiyong = [ELEMENT_NAMES[hao_idx]]  # 财为主
+        ji = [ELEMENT_NAMES[day_elem], ELEMENT_NAMES[sheng_idx]]
+    else:  # 偏弱/极弱
+        xiyong = [ELEMENT_NAMES[sheng_idx], ELEMENT_NAMES[day_elem]]  # 印+比劫
+        ji = [ELEMENT_NAMES[ke_idx], ELEMENT_NAMES[hao_idx], ELEMENT_NAMES[xie_idx]]
+
+    # 去重保持顺序
+    xiyong = list(dict.fromkeys(xiyong))
+    ji = list(dict.fromkeys(ji))
+
+    return {
+        "strength_level": level,
+        "ratio": round(ratio, 3),
+        "tonglei": round(tonglei, 2),
+        "yixei": round(yixei, 2),
+        "xiyongshen": xiyong,
+        "jishen": ji,
+        "scores": {ELEMENT_NAMES[k]: round(v, 2) for k, v in scores.items()},
+        "method": "藏干长生加权法",
+    }
+
+
 def get_rizhu_strength_v2(bazi: Dict) -> Dict[str, Any]:
     """
     日主强弱量化判定 v2 - 带权重算法
@@ -419,8 +523,32 @@ def get_rizhu_strength_v2(bazi: Dict) -> Dict[str, Any]:
     day_element = STEM_ELEMENTS[day_stem_idx]
     month_branch_name = BRANCH_NAMES[bazi["month"]["branch_idx"]]
 
-    # 1. 月令得分（40%）
-    yueling = _calc_yueling_score(day_stem_name, month_branch_name)
+    # 1. 藏干长生加权五行力量法（主判断，与网站一致）
+    #    用同类/异类比例判断身强弱，替代原月令加权
+    power_by_cs = _calc_wuxing_power_by_changsheng(day_stem_name, bazi)
+    # 将藏干比例映射为月令得分（保持总分框架兼容）
+    # ratio=1.0 → 中=50分；ratio每偏离0.2 → 分数±15
+    ratio = power_by_cs["ratio"]
+    if ratio >= 1.7:
+        yueling_score = 80  # 极旺
+    elif ratio >= 1.3:
+        yueling_score = 65  # 偏旺
+    elif ratio >= 0.8:
+        yueling_score = 48  # 中和
+    elif ratio >= 0.6:
+        yueling_score = 30  # 偏弱
+    else:
+        yueling_score = 15  # 极弱
+
+    yueling = {
+        "state": power_by_cs["strength_level"],
+        "state_idx": 0,
+        "score": yueling_score,
+        "weight": 0.4,
+        "ratio": ratio,
+        "tonglei": power_by_cs["tonglei"],
+        "yixei": power_by_cs["yixei"],
+    }
 
     # 2. 通根得分（30%）
     tongen = _calc_tongen_score(day_stem_name, bazi)

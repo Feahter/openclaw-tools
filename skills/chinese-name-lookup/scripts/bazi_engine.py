@@ -16,6 +16,7 @@ from pattern_method import determine_pattern, judge_pattern_cheng, analyze_patte
 from shen_sha import get_shen_sha_summary as _get_shen_sha_summary
 from xiyongshen_v2 import determine_xiyongshen_v2
 from liushen_xinxing import build_shishen_xinxing_from_bazi, get_shishen_xinxing
+from rizhu_strength_v2 import _calc_wuxing_power_by_changsheng
 from rizhu_strength_v2 import get_rizhu_strength_v2, get_strength_by_count, determine_primary_method
 
 
@@ -774,6 +775,10 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int,
     # 格局分析（子平格局法）
     pattern_result = analyze_pattern(bazi)
 
+    # 藏干长生加权五行力量（与网站一致的身强弱判断）
+    day_stem_str = HEAVENLY_STEMS[bazi["day"]["stem_idx"]]  # "丙"
+    wuxing_power_by_cs = _calc_wuxing_power_by_changsheng(day_stem_str, bazi)
+
     # V2 喜用神判定（调候优先/格局已成/月令司令）
     xiyong_v2 = determine_xiyongshen_v2(
         bazi=bazi,
@@ -781,6 +786,7 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int,
         tiao_hou=tiao_hou,
         yueling_canggan=yueling,
         pattern_result=pattern_result,
+        wuxing_power=wuxing_power_by_cs,
     )
 
     # 补充 V2 缺失的字段（从 V1 或直接计算）
