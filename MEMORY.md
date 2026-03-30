@@ -261,3 +261,24 @@
 - `scripts/report_formatter.py` — 报告格式化
 - `scripts/name_generator.py` — 姓名生成
 
+
+---
+
+## 🌐 cloudflare-proxy 网络穿透 skill (2026-03-30)
+
+### 背景
+GFW 内 GitHub/HuggingFace/Twitter 等站点无法直接访问，web-access 失败后需降级。
+
+### 关键发现
+- **公共 CF Worker 被自身验证墙拦**：Turnstile 触发条件不明，curl 能用但 Python urllib 403
+- **wrangler login 需要浏览器**：无法无头自动化 → API Token 方式兜底
+- **自建 Worker 是唯一可靠方案**：免费 10 万请求/天
+
+### 关键文件
+- `skills/cloudflare-proxy/scripts/proxy_fetch.py` — 程序提取模式
+- `skills/cloudflare-proxy/scripts/deploy_api_token.py` — CF API Token 全自动部署
+- `skills/cloudflare-proxy/scripts/deploy_worker.sh` — Wrangler OAuth 部署
+
+### 待完成
+- 用户需要提供 CF API Token 才能激活
+- GitHub push 持续卡住（网络问题），本地 commits 待推送
