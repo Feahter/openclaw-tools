@@ -465,15 +465,93 @@ def determine_xiyongshen_v2(
     day_stem = bazi["day"]["stem"]
     month_branch = bazi["month"]["branch"]
     month_stem = bazi["month"]["stem"]
-    # 使用 wuxing_power_strength 覆盖 rizhu_strength，以获得更准确的用神判定
-    # "偏旺"应视为身强处理（需抑），而非中和
-    _wx_strength = wuxing_power.get("strength") if wuxing_power else None
-    if _wx_strength in ["极旺", "偏旺", "旺", "过旺", "强", "过强"]:
+
+    # ===== 得令系数法（网站同款逻辑）=====
+    # 天干得令表（0-9索引，对应甲-癸）
+    STEM_LING = {
+        0: {2, 3},   # 甲木：寅(2)卯(3)得令
+        1: {2, 3},   # 乙木
+        2: {5, 6},   # 丙火：巳(5)午(6)得令
+        3: {5, 6},   # 丁火
+        4: {1, 4, 7, 10},  # 戊土：辰(1)戌(4)丑(7)未(10)得令
+        5: {1, 4, 7, 10},  # 己土
+        6: {8, 9},   # 庚金：申(8)酉(9)得令
+        7: {8, 9},   # 辛金
+        8: {0, 11},  # 壬水：亥(0)子(11)得令
+        9: {0, 11},  # 癸水
+    }
+    # 地支藏干表（仅用于得令系数法）本气+中气+余气 → stem index
+    # 地支index: 0子,1丑,2寅,3卯,4辰,5巳,6午,7未,8申,9酉,10戌,11亥
+    # stem index: 0甲,1乙,2丙,3丁,4戊,5己,6庚,7辛,8壬,9癸
+    # element: 0木,1火,2土,3金,4水 (stem % 5)
+    BRANCH_CANGGAN = {
+        0: (9, None, None),  # 子：癸
+        1: (4, 9, 7),        # 丑：己,癸,辛
+        2: (0, 2, 4),        # 寅：甲,丙,戊
+        3: (1, 0, None),     # 卯：乙,甲
+        4: (2, 1, 9),        # 辰：戊,乙,癸
+        5: (2, 6, 4),        # 巳：丙,庚,戊
+        6: (3, 5, None),     # 午：丁,己
+        7: (5, 3, 1),        # 未：己,丁,乙
+        8: (6, 8, 4),        # 申：庚,壬,戊
+        9: (7, 6, None),     # 酉：辛,庚
+        10: (4, 7, 3),       # 戌：戊,辛,丁
+        11: (8, 0, None),    # 亥：壬,甲
+    }
+    # 天干得令表（0-9索引，对应甲-癸）
+    STEM_LING = {
+        0: {2, 3}, 1: {2, 3}, 2: {5, 6}, 3: {5, 6},
+        4: {1, 4, 7, 10}, 5: {1, 4, 7, 10},
+        6: {8, 9}, 7: {8, 9}, 8: {0, 11}, 9: {0, 11},
+    }
+    # 干支索引→五行(0-4): 0木,1火,2土,3金,4水
+    STEM_ELE_IDX = {0:0, 1:0, 2:1, 3:1, 4:2, 5:2, 6:3, 7:3, 8:4, 9:4}
+
+    def _stem_score(stem_idx, month_idx):
+        """天干在某月令的得分（得令=3,生源=1.5,失令=0）"""
+        day_e = STEM_ELE_IDX[stem_idx]
+        benqi_stem = BRANCH_CANGGAN[month_idx][0]
+        month_e = STEM_ELE_IDX[benqi_stem]
+        # 得令：同气 或 月令生我
+        if day_e == month_e or (month_e + 1) % 5 == day_e:
+            return 3.0
+        # 生源：月令我生之物
+        if (day_e + 1) % 5 == month_e:
+            return 1.5
+        return 0.0
+
+    def _branch_score(stem_idx, branch_idx):
+        """地支对某天干的得令得分（本气同类=2.5，中气/余气同类=1.5）"""
+        day_e = STEM_ELE_IDX[stem_idx]
+        stems = BRANCH_CANGGAN[branch_idx]
+        # 本气得令=2.5
+        if STEM_ELE_IDX[stems[0]] == day_e:
+            return 2.5
+        # 中气得令=1.5
+        if stems[1] is not None and STEM_ELE_IDX[stems[1]] == day_e:
+            return 1.5
+        return 0.0
+
+    ds_idx = bazi["day"]["stem_idx"]
+    yue_idx = bazi["month"]["branch_idx"]
+    deling = (
+        _stem_score(bazi["year"]["stem_idx"], yue_idx) +
+        _stem_score(bazi["month"]["stem_idx"], yue_idx) +
+        _stem_score(bazi["day"]["stem_idx"], yue_idx) +
+        _stem_score(bazi["hour"]["stem_idx"], yue_idx) +
+        _branch_score(ds_idx, bazi["year"]["branch_idx"]) +
+        _branch_score(ds_idx, yue_idx) +
+        _branch_score(ds_idx, bazi["day"]["branch_idx"]) +
+        _branch_score(ds_idx, bazi["hour"]["branch_idx"])
+    )
+
+    # 得令总分×0.83 ≈ 五行气势百分比；总分>8为旺，<4为弱
+    if deling >= 8.0:
         _effective_strength = "强"
-    elif _wx_strength in ["偏弱", "弱", "过弱"]:
-        _effective_strength = "弱"
-    else:
+    elif deling >= 4.0:
         _effective_strength = "中"
+    else:
+        _effective_strength = "弱"
     strength_str = _effective_strength
 
     # ---------- Step 1: 调候是否紧急 ----------
@@ -501,15 +579,17 @@ def determine_xiyongshen_v2(
 
     # 偏旺时：同类（木/火）从喜用移至忌神（同类助身旺，不需要比劫助）
     # 注意：食伤/官鬼/财按标准扶抑逻辑，保留在喜用中
-    if _effective_strength == "强" and wuxing_power and _wx_strength in ["偏旺", "旺", "极旺"]:
+    if _effective_strength == "强" and wuxing_power:
+        _cs_strength = wuxing_power.get("strength_level", "中")
         day_elem = STEM_ELEMENTS.get(bazi["day"]["stem"], "木")
-        # 极度旺-泄克为用：同类（日主五行+印星）全移至忌神
-        if day_elem == "火" and "木" in xiyong_fuyi:
-            xiyong_fuyi = [e for e in xiyong_fuyi if e != "木"]
-            if "木" not in jishen_fuyi:
-                jishen_fuyi.append("木")
-        # 极旺时：日主本身也是忌神（火日主极旺时，火比劫为忌）
-        if _wx_strength == "极旺" and "火" in xiyong_fuyi:
+        # 偏旺/极旺时：同类（木/火）从喜用移至忌神
+        if _cs_strength in ["偏旺", "旺", "极旺"]:
+            if day_elem == "火" and "木" in xiyong_fuyi:
+                xiyong_fuyi = [e for e in xiyong_fuyi if e != "木"]
+                if "木" not in jishen_fuyi:
+                    jishen_fuyi.append("木")
+        # 极旺时：日主本身也是忌神
+        if _cs_strength == "极旺" and "火" in xiyong_fuyi:
             xiyong_fuyi = [e for e in xiyong_fuyi if e != "火"]
             if "火" not in jishen_fuyi:
                 jishen_fuyi.insert(0, "火")
