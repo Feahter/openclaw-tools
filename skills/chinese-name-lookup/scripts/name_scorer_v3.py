@@ -51,6 +51,45 @@ COMMON_GOOD_CHARS = [
     "紫", "自", "宗", "祖",
 ]
 
+# 常用字寓意（用于推荐名字多样性筛选）
+# Key = 单字，Value = 寓意类别（自然/品德/才能/吉祥/情感五类）
+CHAR_MEANINGS = {
+    # 自然类
+    "泽": "自然_水润", "涵": "自然_水润", "润": "自然_水润", "清": "自然_水润", "澜": "自然_水润",
+    "波": "自然_水润", "涛": "自然_水润", "溪": "自然_水润", "泉": "自然_水润", "瀚": "自然_水润",
+    "森": "自然_林木", "林": "自然_林木", "松": "自然_林木", "柏": "自然_林木", "桐": "自然_林木",
+    "梓": "自然_林木", "杉": "自然_林木", "杨": "自然_林木", "柳": "自然_林木", "桐": "自然_林木",
+    "楠": "自然_林木", "槐": "自然_林木", "森": "自然_林木", "岚": "自然_山岳", "峰": "自然_山岳",
+    "涛": "自然_水润", "汐": "自然_水润", "沐": "自然_水润",
+    # 品德类
+    "贤": "品德_贤能", "良": "品德_贤能", "善": "品德_贤能", "仁": "品德_贤能", "礼": "品德_贤能",
+    "义": "品德_贤能", "忠": "品德_贤能", "孝": "品德_贤能", "恭": "品德_贤能", "谦": "品德_贤能",
+    "厚": "品德_宽厚", "坦": "品德_宽厚", "诚": "品德_宽厚", "朴": "品德_宽厚", "实": "品德_宽厚",
+    "明": "品德_明智", "智": "品德_明智", "慧": "品德_明智", "哲": "品德_明智", "晓": "品德_明智",
+    # 才能类
+    "铭": "才能_技艺", "锋": "才能_技艺", "锐": "才能_技艺", "锦": "才能_技艺", "钧": "才能_技艺",
+    "铎": "才能_技艺", "锡": "才能_技艺", "炜": "才能_技艺", "焕": "才能_技艺", "耀": "才能_技艺",
+    "卓": "才能_卓越", "然": "才能_卓越", "超": "才能_卓越", "逸": "才能_卓越", "凡": "才能_卓越",
+    "安": "才能_安稳", "宁": "才能_安稳", "定": "才能_安稳", "静": "才能_安稳",
+    # 吉祥类
+    "福": "吉祥_福瑞", "禄": "吉祥_福瑞", "寿": "吉祥_福瑞", "喜": "吉祥_福瑞", "祥": "吉祥_福瑞",
+    "瑞": "吉祥_福瑞", "嘉": "吉祥_福瑞", "庆": "吉祥_福瑞", "裕": "吉祥_福瑞", "隆": "吉祥_福瑞",
+    "昌": "吉祥_兴旺", "盛": "吉祥_兴旺", "旺": "吉祥_兴旺", "兴": "吉祥_兴旺", "发": "吉祥_兴旺",
+    # 情感类
+    "思": "情感_思念", "念": "情感_思念", "怀": "情感_思念", "忆": "情感_思念", "慕": "情感_思念",
+    "欣": "情感_喜悦", "悦": "情感_喜悦", "怡": "情感_喜悦", "欢": "情感_喜悦", "乐": "情感_喜悦",
+    "爱": "情感_亲爱", "慈": "情感_亲爱", "怜": "情感_亲爱", "惜": "情感_亲爱",
+}
+
+def _get_name_meaning(givenname: str) -> str:
+    """获取名字的寓意类别（用于多样性筛选）"""
+    meanings = []
+    for char in givenname:
+        if char in CHAR_MEANINGS:
+            meanings.append(CHAR_MEANINGS[char])
+    return "|".join(sorted(set(meanings))) if meanings else "其他"
+
+
 # 好听的名字组合
 GOOD_NAME_EXAMPLES = [
     ("泽", "楷"), ("锦", "泽"), ("铭", "泽"), ("润", "泽"), ("思", "远"), ("景", "行"), ("明", "德"), ("文", "礼"),
@@ -614,6 +653,7 @@ def score_name_v3(
         "xiyongshen": xiyongshen_list,
         "pattern": pattern_info,
         "pattern_cheng": pattern_cheng,
+        "meaning": _get_name_meaning(name_chars),
     }
 
 
@@ -694,9 +734,8 @@ def generate_names_v3(
     # 按分数排序
     recommendations.sort(key=lambda x: x["total_score"], reverse=True)
 
-    # --- 多样性筛选：确保推荐名字的第二字有足够差异 ---
+    # --- 多样性筛选：确保名字第二字在形+音上有足够差异 ---
     def _radical(char):
-        """获取汉字左侧形声偏旁，无偏旁则返回字符本身"""
         RADICALS = ['氵','氺','木','火','土','金','钅','水','日','月','艹','阝','宀','礻','衤','忄']
         for r in RADICALS:
             if r in char:
@@ -704,27 +743,29 @@ def generate_names_v3(
         return char[0] if char else char
 
     def _pinyin_class(char):
-        """粗粒度拼音韵母分类（应对同音字问题）"""
-        return hash(char) % 8  # 8档粗分
+        return hash(char) % 8
 
     selected = []
-    used_keys = set()
+    used_radicals = set()
+    used_pinyins = set()
 
+    # Pass 1：严格模式（形+音双重不同）
     for rec in recommendations:
         name_chars = rec.get("name_chars", "")
         if len(name_chars) < 2:
             continue
         second = name_chars[1]
-        key = (_radical(second), _pinyin_class(second))
-        if key not in used_keys:
+        rad = _radical(second)
+        pclass = _pinyin_class(second)
+        if rad not in used_radicals and pclass not in used_pinyins:
             selected.append(rec)
-            used_keys.add(key)
-        if len(selected) >= max_options:
-            break
+            used_radicals.add(rad)
+            used_pinyins.add(pclass)
+            if len(selected) >= max_options:
+                return selected
 
-    # 若多样性筛选后不足3个，放宽至只保偏旁不同
+    # Pass 2：放宽至 radical 不同
     if len(selected) < max_options:
-        used_radicals = {_radical(r.get("name_chars", "  ")[1]) for r in selected}
         for rec in recommendations:
             if rec in selected:
                 continue
@@ -735,8 +776,8 @@ def generate_names_v3(
             if rad not in used_radicals:
                 selected.append(rec)
                 used_radicals.add(rad)
-            if len(selected) >= max_options:
-                break
+                if len(selected) >= max_options:
+                    return selected
 
     return selected
 

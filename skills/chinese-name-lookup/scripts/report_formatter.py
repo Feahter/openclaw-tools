@@ -344,6 +344,22 @@ def _format_mingju_analysis(bazi_info: Dict[str, Any]) -> List[str]:
 
     # 五行分布
     wx_counts = xiyongshen.get("wx_counts", {})
+    # --- 两法喜用神冲突检测 ---
+    # 千里命稿: bazi_info["xiyongshen"]["xiyongshen"]
+    # 滴天髓: bazi_info["xiyongshen"]["_v1"]["xiyongshen"]
+    v2_xs = xiyongshen.get("xiyongshen", [])
+    v1_xs = xiyongshen.get("_v1", {}).get("xiyongshen", [])
+    if v2_xs and v1_xs and set(v2_xs) != set(v1_xs):
+        lines.append("⚠️ **两法喜用神存在分歧**：")
+        lines.append(f"  - 千里命稿：**{'、'.join(v2_xs)}**")
+        lines.append(f"  - 滴天髓法：**{'、'.join(v1_xs)}**")
+        # 计算重叠
+        overlap = set(v2_xs) & set(v1_xs)
+        if overlap:
+            lines.append(f"  - 重叠（两法共识）：{'、'.join(overlap)}")
+        lines.append("  - 结论：以主推方法为准，参考方法仅供参考")
+        lines.append("")
+
     if wx_counts:
         lines.append("**五行分布**：")
         bars = []
