@@ -31,6 +31,8 @@ from dayun_liunian import (
     is_shun, is_yang_stem,
 )
 from shen_sha import get_shen_sha_summary, get_tianyi_guiren, get_wenchang, get_yima, get_huagai, get_taohua
+from marriage_fate_classifier import classify_female_marriage_fate
+from shensha_quality import assess_all_shensha
 from zodiac_preferences import get_zodiac_preferences
 from liushen_xinxing import get_full_xinxing_report
 
@@ -88,6 +90,13 @@ def format_full_report(
     lines.append("")
     lines.append("---")
     lines.append("")
+
+    # ===== 女命婚姻格局（P2-a）=====
+    if gender == 0:  # 女命
+        lines.extend(_format_female_marriage_section(bazi_info))
+        lines.append("")
+        lines.append("---")
+        lines.append("")
 
     # ===== 大运流年 =====
     lines.extend(_format_dayun_section(bazi_info, gender))
@@ -345,20 +354,20 @@ def _format_mingju_analysis(bazi_info: Dict[str, Any]) -> List[str]:
     # 五行分布
     wx_counts = xiyongshen.get("wx_counts", {})
     # --- 两法喜用神冲突检测 ---
-    # 千里命稿: bazi_info["xiyongshen"]["xiyongshen"]
-    # 滴天髓: bazi_info["xiyongshen"]["_v1"]["xiyongshen"]
+    # v2_xs = 主推方法 result, v1_xs = 参考方法 result
+    # 标签根据实际主推方法动态切换
     v2_xs = xiyongshen.get("xiyongshen", [])
     v1_xs = xiyongshen.get("_v1", {}).get("xiyongshen", [])
     if v2_xs and v1_xs and set(v2_xs) != set(v1_xs):
-        lines.append("⚠️ **两法喜用神存在分歧**：")
-        lines.append(f"  - 千里命稿：**{'、'.join(v2_xs)}**")
-        lines.append(f"  - 滴天髓法：**{'、'.join(v1_xs)}**")
-        # 计算重叠
+        primary_label = "千里命稿法" if primary == "千里命稿" else "滴天髓法"
+        secondary_label = "滴天髓法" if primary == "千里命稿" else "千里命稿法"
         overlap = set(v2_xs) & set(v1_xs)
         if overlap:
+            lines.append("⚠️ **两法喜用神存在分歧**：")
+            lines.append(f"  - {primary_label}（主推）：**{'、'.join(v2_xs)}**")
+            lines.append(f"  - {secondary_label}（参考）：**{'、'.join(v1_xs)}**")
             lines.append(f"  - 重叠（两法共识）：{'、'.join(overlap)}")
-        lines.append("  - 结论：以主推方法为准，参考方法仅供参考")
-        lines.append("")
+            lines.append(f"  - 结论：以{primary_label}为准（{primary_label}适合此命盘类型），参考方法仅作对比")
 
     if wx_counts:
         lines.append("**五行分布**：")
@@ -392,6 +401,68 @@ def _format_mingju_analysis(bazi_info: Dict[str, Any]) -> List[str]:
         reason_text = pattern.get("reason", "")
         if reason_text:
             lines.append(f"  - 分析：{reason_text[:60]}...")
+
+    # 格局四等（真/清/浊/破）
+    try:
+        from pattern_method import evaluate_pattern_class
+        pattern_result_for_class = {
+            "pattern_info": pattern,
+            "cheng_info": pattern_cheng,
+        }
+        pattern_class_result = evaluate_pattern_class(bazi_info.get("bazi", {}), pattern_result_for_class)
+        if pattern_class_result:
+            pc = pattern_class_result
+            lines.append(f"- **格局等级**：{pc['level']}")
+            if pc.get("reasons"):
+                for r in pc["reasons"]:
+                    lines.append(f"  - {r}")
+    except Exception:
+        pass  # 格局四等评定失败不影响报告生成
+
+    # 喜用神/忌神 + 调候调试信息
+    # 读取 V2 _debug 信息（藏在 xiyongshen._debug 里）
+    xiyong_v2 = bazi_info.get("xiyongshen", {})
+    xiyong_v2_debug = xiyong_v2.get("_debug", {})
+    huanre_zagan = xiyong_v2.get("huanre_zagan", {})
+    tongguan = xiyong_v2.get("tongguan", {})
+    tiao_hou_reason = xiyong_v2_debug.get("tiao_hou_reason", "")
+    priority_info = xiyong_v2_debug.get("priority_info", {})
+    merge_reason = xiyong_v2_debug.get("merge_reason", "")
+    tiao_hou_xiyong = xiyong_v2_debug.get("tiao_hou_xiyong", [])
+    fuyi_xiyong = xiyong_v2_debug.get("fuyi_xiyong", [])
+
+    # 寒热燥湿判定
+    if huanre_zagan:
+        huanre_level = huanre_zagan.get("level", "未知")
+        huanre_suggestion = huanre_zagan.get("suggestion", "")
+        lines.append(f"- **寒热燥湿**：【{huanre_level}】")
+        lines.append(f"  - 火气:{huanre_zagan.get('火热',0)}个，寒气:{huanre_zagan.get('水寒',0)}个，燥:{huanre_zagan.get('燥',0)}个，湿:{huanre_zagan.get('湿',0)}个")
+        if huanre_suggestion:
+            lines.append(f"  - 建议：{huanre_suggestion}")
+
+    # 四大用神体系
+    if priority_info or merge_reason:
+        analysis_method = xiyong_v2.get("method", "v2_local")
+        tiao_hou_priority = priority_info.get("tiao_hou_priority", False)
+        priority_reason = priority_info.get("reason", "")
+        priority_reason_first = priority_reason.split("；")[0] if priority_reason else ""
+        tongguan_indicator = "是" if tongguan.get("needs_tongguan", False) else "否"
+        tongguan_suggestion = tongguan.get("suggestion", "") if tongguan.get("needs_tongguan", False) else ""
+
+        lines.append(f"- **用神体系**：【格局法用神】")
+        if priority_reason_first:
+            lines.append(f"  - 调候是否优先：{'是' if tiao_hou_priority else '否'}（{priority_reason_first}）")
+        else:
+            lines.append(f"  - 调候是否优先：{'是' if tiao_hou_priority else '否'}")
+        if tiao_hou_xiyong:
+            lines.append(f"  - 调候用神：{'、'.join(tiao_hou_xiyong) if tiao_hou_xiyong else '无'}")
+        if fuyi_xiyong:
+            lines.append(f"  - 扶抑用神：{'、'.join(fuyi_xiyong) if fuyi_xiyong else '无'}")
+        final_xs = xiyong_v2.get("xiyongshen", xiyong_list)
+        lines.append(f"  - 融合结果：{'、'.join(final_xs) if final_xs else '待定'}（{merge_reason[:50]}...）" if len(merge_reason) > 50 else f"  - 融合结果：{'、'.join(final_xs) if final_xs else '待定'}（{merge_reason}）")
+        if tongguan.get("needs_tongguan", False):
+            lines.append(f"  - 通关用神：{tongguan_suggestion}（需通关冲突：{'、'.join(tongguan.get('conflict',[]))}）")
+
 
     # 十神心性解读
     xinxing = bazi_info.get("xinxing", [])
@@ -465,12 +536,45 @@ def _format_shen_sha_list(bazi_info: Dict[str, Any]) -> List[str]:
     # P0 神煞（最重要）
     p0 = shen_sha.get("P0", {})
     if p0:
+        # 获取神煞质量评估
+        if 'day_stem_idx' not in bazi_info:
+            bazi_info['day_stem_idx'] = bazi_info['bazi']['day']['stem_idx']
+        quality_list = assess_all_shensha(bazi_info)
+        # 构建质量查找表：{shensha_name: {branch: quality_info}}
+        quality_map: Dict[str, Dict[str, Dict]] = {}
+        for q in quality_list:
+            ss_name = q.get("神煞", "")
+            if ss_name not in quality_map:
+                quality_map[ss_name] = {}
+            branch = q.get("地支", "")
+            quality_map[ss_name][branch] = q
+
         items = []
         for name in ["天乙贵人", "文昌", "驿马", "华盖", "桃花"]:
             data = p0.get(name, {})
             desc = data.get("description", "")
             if desc:
-                items.append(f"- **{name}**：{desc}")
+                # 为每个地支标注质量
+                parts = desc.replace('落在', ' ').replace('、', ' ').replace('在', ' ').split()
+                branches = [p for p in parts if p in EARTHLY_BRANCHES]
+                annotated = []
+                for b in branches:
+                    q_info = quality_map.get(name, {}).get(b, {})
+                    grade = q_info.get("质量评级", "")
+                    notes = q_info.get("综合评估", "").rstrip("。")
+                    if grade == "强力":
+                        suffix = "★"
+                    elif grade == "有效":
+                        suffix = "★★★"
+                    elif grade == "弱效":
+                        suffix = "★★"
+                    elif grade == "无效":
+                        suffix = "✗"
+                    else:
+                        suffix = ""
+                    # 质量注释仅用于debug inline 不展示完整说明
+                    annotated.append(f"{b}（{grade}{suffix}）" if suffix else b)
+                items.append(f"- **{name}**：{' '.join(annotated)}")
             else:
                 items.append(f"- **{name}**：无")
 
@@ -478,6 +582,8 @@ def _format_shen_sha_list(bazi_info: Dict[str, Any]) -> List[str]:
             lines.append("### P0 主要神煞")
             lines.append("")
             lines.extend(items)
+            lines.append("")
+            lines.append("> 质量评级说明：★=强力（得令无损害） ★★★=有效 ★★=弱效（失令或被刑冲） ✗=无效（落空亡或死绝）")
             lines.append("")
 
     # P1 神煞（重要）
@@ -494,6 +600,105 @@ def _format_shen_sha_list(bazi_info: Dict[str, Any]) -> List[str]:
             lines.append("### P1 辅助神煞")
             lines.append("")
             lines.extend(items)
+            # 不加空行，让 format_full_report 的统一分隔处理
+
+        # 新增 P1 神煞（太极贵人、咸池、绞煞、十恶大败、元辰、大耗）
+        new_p1_items = []
+        for name in ["太极贵人", "咸池", "绞煞", "十恶大败", "元辰", "大耗"]:
+            data = p1.get(name, {})
+            desc = data.get("description", "")
+            if desc:
+                new_p1_items.append(f"- **{name}**：{desc}")
+
+        if new_p1_items:
+            lines.append("### P1 其他神煞")
+            lines.append("")
+            lines.extend(new_p1_items)
+            # 不加空行，让 format_full_report 的统一分隔处理
+
+    # ===== 胎元神煞 =====
+    taiyuan = shen_sha.get("胎元", {})
+    if taiyuan:
+        lines.append("### 胎元神煞")
+        lines.append("")
+        desc = taiyuan.get("description", "")
+        if desc:
+            lines.append(f"- **{taiyuan.get('taiyuan_stem', '')}{taiyuan.get('taiyuan_branch', '')}**：{desc}")
+
+    # ===== 命宫神煞 =====
+    minggong = shen_sha.get("命宫", {})
+    if minggong:
+        lines.append("### 命宫神煞")
+        lines.append("")
+        desc = minggong.get("description", "")
+        if desc:
+            lines.append(f"- **{minggong.get('minggong_stem', '')}{minggong.get('minggong_branch', '')}**：{desc}")
+
+    # ===== P2 次要神煞 =====
+    p2 = shen_sha.get("P2", {})
+    if p2:
+        items2 = []
+        for name, data in p2.items():
+            desc = data.get("description", "") if isinstance(data, dict) else ""
+            if desc:
+                items2.append(f"- **{name}**：{desc}")
+        if items2:
+            lines.append("### P2 次要神煞")
+            lines.append("")
+            lines.extend(items2)
+
+    return lines
+
+
+def _format_female_marriage_section(bazi_info: Dict[str, Any]) -> List[str]:
+    """格式化女命婚姻格局 section（P2-a）"""
+    lines = []
+    lines.append("## 女命婚姻格局")
+    lines.append("")
+
+    if 'day_stem_idx' not in bazi_info:
+        bazi_info['day_stem_idx'] = bazi_info['bazi']['day']['stem_idx']
+    result = classify_female_marriage_fate(bazi_info)
+    category = result.get("category", "未知")
+    score = result.get("score", 0)
+    matching = result.get("matching_patterns", [])
+    violating = result.get("violating_patterns", [])
+    analysis = result.get("analysis", "")
+
+    # 评分条
+    bar_len = int(score / 10)
+    bar = "█" * bar_len + "░" * (10 - bar_len)
+    lines.append(f"**评分**：{bar} {score}/100")
+    lines.append("")
+
+    # 格局类别
+    if category == "富贵":
+        lines.append(f"🏆 **格局：富贵**")
+    elif category == "中上":
+        lines.append(f"✨ **格局：中上**")
+    elif category == "贫贱":
+        lines.append(f"⚠️ **格局：贫贱**")
+    else:
+        lines.append(f"➖ **格局：平常**")
+    lines.append("")
+
+    # 富贵因素
+    if matching:
+        lines.append("**【富贵因素】**")
+        for p in matching:
+            lines.append(f"- {p}")
+        lines.append("")
+
+    # 不利因素
+    if violating:
+        lines.append("**【不利因素】**")
+        for p in violating:
+            lines.append(f"- {p}")
+        lines.append("")
+
+    # 分析说明
+    if analysis:
+        lines.append(f"*{analysis}*")
 
     return lines
 

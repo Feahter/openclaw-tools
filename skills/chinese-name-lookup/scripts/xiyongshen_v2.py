@@ -130,8 +130,8 @@ def compute_fuyi_xys(
     day_elem_idx = _ELEM_LIST.index(day_elem) if day_elem in _ELEM_LIST else 0
     day_elem = STEM_ELEMENTS.get(day_stem, "木")  # 直接用字符串映射
 
-    is_strong = rizhu_strength["strength"] in ["强", "过强", "偏旺", "旺"]
-    is_weak = rizhu_strength["strength"] in ["弱", "过弱", "偏弱"]
+    is_strong = rizhu_strength["strength"] in ["强", "过强", "极强", "偏旺", "旺"]
+    is_weak = rizhu_strength["strength"] in ["弱", "过弱", "极弱", "偏弱"]
 
     xiyongshen = []
     jishen = []
@@ -342,7 +342,109 @@ def merge_by_tiao_hou(
 
 
 # ============================================================
-# 5. 置信度评估
+# 5. 寒热燥湿判定
+# ============================================================
+
+def judge_huanre_zagan(bazi: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    判断命局寒热燥湿程度
+    
+    基于月令地支的寒热燥湿属性，统计四柱地支的火热/水寒/燥/湿分布。
+    
+    火热气：巳、午、未、戌
+    水寒气：亥、子、丑、辰
+    燥土：未、戌
+    湿土：辰、丑
+    """
+    huo_branches = {"巳", "午", "未", "戌"}
+    han_branches = {"亥", "子", "丑", "辰"}
+    zao_branches = {"未", "戌"}
+    shi_branches = {"辰", "丑"}
+    
+    # Count occurrences in all 4 branches
+    bz = bazi["bazi"] if "bazi" in bazi else bazi
+    branches = [bz[p]["branch"] for p in ["year", "month", "day", "hour"]]
+    huo = sum(1 for b in branches if b in huo_branches)
+    han = sum(1 for b in branches if b in han_branches)
+    zao = sum(1 for b in branches if b in zao_branches)
+    shi = sum(1 for b in branches if b in shi_branches)
+    
+    # 综合判定
+    if huo >= 3:
+        level = "偏热"
+    elif han >= 3:
+        level = "偏寒"
+    elif huo >= 2 and han >= 2:
+        level = "寒热交战"
+    elif zao >= 2:
+        level = "偏燥"
+    elif shi >= 2:
+        level = "偏湿"
+    else:
+        level = "中和"
+    
+    return {
+        "level": level,
+        "火热": huo,
+        "水寒": han,
+        "燥": zao,
+        "湿": shi,
+        "suggestion": f"命局{level}，{'调候为急' if level in ['偏热','偏寒','寒热交战'] else '以扶抑为主'}"
+    }
+
+
+# ============================================================
+# 6. 通关用神判定
+# ============================================================
+
+def check_tongguan(bazi: Dict[str, Any], xiyong: List[str], jishen: List[str]) -> Dict[str, Any]:
+    """
+    检查是否需要通关用神
+    
+    当喜用神与忌神存在相克关系时（如木土相争、金木相争），
+    找一个能化解冲突的通关五行。
+    
+    通关规则：
+    - 木土相争 → 火通关
+    - 金木相争 → 水通关
+    - 水火相争 → 土通关
+    - 火金相争 → 水通关
+    """
+    WUXING_MAP_LOCAL: Dict[str, str] = {
+        "甲": "木", "乙": "木",
+        "丙": "火", "丁": "火",
+        "戊": "土", "己": "土",
+        "庚": "金", "辛": "金",
+        "壬": "水", "癸": "水",
+    }
+    
+    # Check for conflicting pairs
+    x_wuxing = set(WUXING_MAP_LOCAL.get(x, x) for x in xiyong if x in WUXING_MAP_LOCAL)
+    j_wuxing = set(WUXING_MAP_LOCAL.get(x, x) for x in jishen if x in WUXING_MAP_LOCAL)
+    
+    tongguan_map = {
+        frozenset(["木", "土"]): "火",
+        frozenset(["金", "木"]): "水",
+        frozenset(["水", "火"]): "土",
+        frozenset(["火", "金"]): "水",
+    }
+    
+    conflicts = x_wuxing & j_wuxing
+    if conflicts:
+        for conflict in conflicts:
+            for pair, mediator in tongguan_map.items():
+                if conflict in pair:
+                    return {
+                        "needs_tongguan": True,
+                        "conflict": list(conflicts),
+                        "mediator": mediator,
+                        "suggestion": f"{mediator}通关"
+                    }
+    return {"needs_tongguan": False}
+
+
+# ============================================================
+# 7. 置信度评估
 # ============================================================
 
 def calculate_confidence(
@@ -418,7 +520,7 @@ def calculate_confidence(
 
 
 # ============================================================
-# 6. 主判定函数
+# 8. 主判定函数
 # ============================================================
 
 def determine_xiyongshen_v2(
@@ -679,7 +781,13 @@ def determine_xiyongshen_v2(
         tiao_hou=tiao_hou,
     )
 
-    # ---------- Step 9: 组装结果 ----------
+    # ---------- Step 9: 寒热燥湿判定 ----------
+    huanre_zagan = judge_huanre_zagan(bazi)
+    
+    # ---------- Step 10: 通关用神判定 ----------
+    tongguan_result = check_tongguan(bazi, merged_xys, merged_js)
+    
+    # ---------- Step 11: 组装结果 ----------
     result = {
         "xiyongshen": merged_xys,
         "jishen": merged_js,
@@ -691,6 +799,8 @@ def determine_xiyongshen_v2(
         "analysis": analysis,
         "method": "v2_local",
         "confidence": confidence,
+        "huanre_zagan": huanre_zagan,
+        "tongguan": tongguan_result,
         # 内部参考（调试用）
         "_debug": {
             "tiao_hou_reason": tiao_hou_reason,

@@ -1,6 +1,6 @@
 {
   "skill_name": "chinese-name-lookup",
-  "description": "基于八字喜用神、生肖属相、十神十二长生、神煞、大运流年的传统中国姓名分析与推荐。本地引擎无需API，五格仅作参考。",
+  "description": "分析名字 / 八字起名 / 八字报告。触发词：分析名字, 八字起名, 根据八字取名, 帮我起个名字, 喜用神, 五行缺什么, 姓名推荐, 姓X名Y, 帮我起个姓X的宝宝名字, 名字测试, 八字排盘, 八字报告, 帮我做个八字分析, 生成八字命盘, 分析下这个名字, 八字神煞, 大运流年, 女命婚姻, 婚姻格局, 神煞质量, 空亡, 子息, 配偶星, 孤鸾煞, 八字喜用神, 八字分析报告, 姓名八字分析, 子息运, 婚姻配偶星, 这个八字有没有孤鸾煞, 帮我看看神煞质量. 本地八字引擎(无需API)：八字排盘 + 喜用神双轨法(千里命稿权重法/滴天髓计数法,自动选主推) + 十神/十二长生 + 神煞(含空亡/死绝/刑冲质量评级) + 大运流年 + 纳音五行 + 刑冲害合 + 女命婚姻格局贵贱(15富贵18贫贱) + 子息数量 + 配偶星 + 孤鸾煞/阴错阳差 + 三维姓名推荐评分(喜用神40%/生肖30%/十神长生20%/字义10%). 不使用日本五格剖象法。",
   "evals": [
     {
       "id": 1,
@@ -9,31 +9,11 @@
       "files": [],
       "notes": "测试起名场景，本地引擎 + 新功能（神煞/大运流年/Phase 9报告）",
       "assertions": [
-        {
-          "type": "contains",
-          "text": "八字命盘",
-          "description": "报告包含八字命盘"
-        },
-        {
-          "type": "contains",
-          "text": "用神",
-          "description": "报告包含喜用神"
-        },
-        {
-          "type": "contains",
-          "text": "大运",
-          "description": "报告包含大运序列"
-        },
-        {
-          "type": "contains",
-          "text": "流年",
-          "description": "报告包含近5年流年"
-        },
-        {
-          "type": "contains",
-          "text": "推荐",
-          "description": "报告包含推荐名字"
-        }
+        {"type": "contains", "text": "八字命盘", "description": "报告包含八字命盘"},
+        {"type": "contains", "text": "用神", "description": "报告包含喜用神"},
+        {"type": "contains", "text": "大运", "description": "报告包含大运序列"},
+        {"type": "contains", "text": "流年", "description": "报告包含近5年流年"},
+        {"type": "contains", "text": "推荐", "description": "报告包含推荐名字"}
       ]
     },
     {
@@ -43,31 +23,11 @@
       "files": [],
       "notes": "测试无出生时间时的正确行为：不应生成虚假八字，应要求用户补充",
       "assertions": [
-        {
-          "type": "contains",
-          "text": "缺少出生时间",
-          "description": "报告明确提示缺少出生时间"
-        },
-        {
-          "type": "contains",
-          "text": "陈",
-          "description": "包含姓氏分析"
-        },
-        {
-          "type": "contains",
-          "text": "浩然",
-          "description": "包含名字用字分析"
-        },
-        {
-          "type": "not_contains",
-          "text": "甲辰年",
-          "description": "不得捏造八字年份"
-        },
-        {
-          "type": "not_contains",
-          "text": "天乙贵人",
-          "description": "无出生时间不应输出神煞（需要八字才能计算）"
-        }
+        {"type": "contains", "text": "缺少出生时间", "description": "报告明确提示缺少出生时间"},
+        {"type": "contains", "text": "陈", "description": "包含姓氏分析"},
+        {"type": "contains", "text": "浩然", "description": "包含名字用字分析"},
+        {"type": "not_contains", "text": "甲辰年", "description": "不得捏造八字年份"},
+        {"type": "not_contains", "text": "天乙贵人", "description": "无出生时间不应输出神煞（需要八字才能计算）"}
       ]
     },
     {
@@ -77,21 +37,43 @@
       "files": [],
       "notes": "测试女儿起名 + 大运流年",
       "assertions": [
-        {
-          "type": "contains",
-          "text": "大运",
-          "description": "报告包含大运信息"
-        },
-        {
-          "type": "contains",
-          "text": "流年",
-          "description": "报告包含流年分析"
-        },
-        {
-          "type": "contains",
-          "text": "推荐",
-          "description": "报告包含推荐名字"
-        }
+        {"type": "contains", "text": "大运", "description": "报告包含大运信息"},
+        {"type": "contains", "text": "流年", "description": "报告包含流年分析"},
+        {"type": "contains", "text": "推荐", "description": "报告包含推荐名字"}
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "这个八字的女命婚姻格局怎么样？帮我分析下",
+      "expected_output": "应输出女命婚姻格局分析，包含富贵/贫贱分类和评分",
+      "files": [],
+      "notes": "测试P2-a女命婚姻格局触发",
+      "assertions": [
+        {"type": "contains", "text": "女命婚姻格局", "description": "报告包含女命婚姻格局section"},
+        {"type": "contains", "text": "评分", "description": "包含评分"},
+        {"type": "contains", "text": "富贵", "description": "包含富贵因素或贫贱因素"}
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "八字是辛未年壬辰月丁亥日庚子时，女命，请帮我分析婚姻运势",
+      "expected_output": "应输出完整八字报告，包含女命婚姻格局和神煞质量评估",
+      "files": [],
+      "notes": "测试完整八字分析（含婚姻格局）",
+      "assertions": [
+        {"type": "contains", "text": "女命婚姻格局", "description": "包含女命婚姻格局"},
+        {"type": "contains", "text": "丁亥", "description": "日柱正确"}
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "帮我看看这个八字的神煞质量，哪些神煞是空亡状态？",
+      "expected_output": "应输出神煞质量评估，标注空亡的神煞",
+      "files": [],
+      "notes": "测试P2-b神煞质量评估（含空亡判断）",
+      "assertions": [
+        {"type": "contains", "text": "空亡", "description": "包含空亡相关信息"},
+        {"type": "contains", "text": "神煞", "description": "包含神煞质量评估"}
       ]
     }
   ]

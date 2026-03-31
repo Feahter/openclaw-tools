@@ -746,7 +746,99 @@ def analyze_pattern(bazi: Dict[str, Any]) -> Dict[str, Any]:
 
 
 # ============================================================
-# 10. 格局评分（名字对格局的影响）
+# 10. 格局四等：真/清/浊/破（子平真诠）
+# ============================================================
+
+def evaluate_pattern_class(
+    bazi: Dict[str, Any],
+    pattern_result: Dict[str, Any],
+) -> Dict[str, Any]:
+    """
+    评价格局四等：真/清/浊/破
+    
+    基于《子平真诠》格局评定标准：
+    - **真**：月令本气透出 + 无冲刑破坏 → 最高
+    - **清**：用神清纯不杂，无破 → 次高
+    - **浊**：凶神混杂，但无明显破坏 → 普通
+    - **破**：冲刑害破坏格局 → 低
+    
+    Args:
+        bazi: 八字字典
+        pattern_result: analyze_pattern() 返回结果，包含 pattern_info 和 cheng_info
+    
+    Returns:
+        {
+            "class": "真"/"清"/"浊"/"破",
+            "level": str,          # 显示名称
+            "score": int,          # 分数 0-100
+            "reasons": List[str],  # 判断理由
+        }
+    """
+    if not pattern_result:
+        return {"class": "未知", "level": "无法评定", "score": 0, "reasons": ["格局信息不完整"]}
+    
+    pattern_info = pattern_result.get("pattern_info", {})
+    cheng_info = pattern_result.get("cheng_info", {})
+    
+    geku_name = pattern_info.get("pattern", "")
+    tou_level = pattern_info.get("tou_level", "无透")
+    cheng_level = cheng_info.get("level", "未知")  # 上等/中等/下等/破格
+    is_cheng = cheng_info.get("is_cheng", False)
+    poge_reason = cheng_info.get("poge_reason", "")
+    factors = cheng_info.get("factors", [])
+    
+    reasons: List[str] = []
+    score = 50  # 基础分
+    
+    # ---- 条件1: 真格 ----
+    # 月令本气透出 + 无冲刑害破坏
+    is_benqi_tou = (tou_level == "本气")
+    has_po = bool(poge_reason) or cheng_level == "破格"
+    
+    if is_benqi_tou and not has_po and is_cheng:
+        result_class = "真"
+        score = 90
+        reasons.append(f"月令本气透出（{tou_level}），格局无破坏")
+        reasons.append(f"格局{geku_name}{cheng_level}，纯粹有力")
+        level_str = "格局真（最高）"
+    # ---- 条件2: 清格 ----
+    # 用神清纯不杂，无明显破格因素
+    elif is_cheng and not has_po:
+        result_class = "清"
+        score = 75
+        reasons.append(f"格局已成，用神清纯")
+        reasons.append(f"格局{geku_name}{cheng_level}，配合良好")
+        level_str = "格局清（次高）"
+    # ---- 条件3: 浊格 ----
+    # 有凶神混杂或其他不足，但无明显冲刑害破坏
+    elif is_cheng and has_po and cheng_level != "破格":
+        result_class = "浊"
+        score = 55
+        reasons.append(f"有破格因素：{poge_reason}" if poge_reason else "格局有瑕疵")
+        reasons.append(f"格局{geku_name}{cheng_level}，存在不足")
+        level_str = "格局浊（普通）"
+    # ---- 条件4: 破格 ----
+    else:
+        result_class = "破"
+        score = 30
+        reasons.append(f"破格原因：{poge_reason}" if poge_reason else "格局被破坏")
+        reasons.append(f"{geku_name}破格，需补救")
+        level_str = "格局破（最低）"
+    
+    return {
+        "class": result_class,
+        "level": level_str,
+        "score": score,
+        "reasons": reasons,
+        "tou_level": tou_level,
+        "is_cheng": is_cheng,
+        "cheng_level": cheng_level,
+        "poge_reason": poge_reason,
+    }
+
+
+# ============================================================
+# 11. 格局评分（名字对格局的影响）
 # ============================================================
 
 def score_by_pattern(name_chars: str,

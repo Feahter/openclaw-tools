@@ -538,6 +538,316 @@ def get_wangshen(year_branch_idx: int) -> Dict[str, Any]:
 
 
 # ============================================================
+# P1/P2 新增神煞
+# ============================================================
+
+def get_taiyi_guiren_p1(year_stem_idx: int) -> Dict[str, Any]:
+    """
+    太极贵人（诸神之冠，最尊贵的神煞）
+
+    口诀：甲乙丙丁戊己庚辛壬癸
+          子丑寅卯辰巳午未申酉戌亥
+    甲见子丑，乙见子丑，丙丁见寅卯，戊己见辰巳，庚辛见午未，壬癸见申酉
+
+    Args:
+        year_stem_idx: 年干索引 (0-9)
+
+    Returns:
+        dict: {"branches": ["子", "丑"], "description": str}
+    """
+    TAIYI = {
+        0: ["子", "丑"],  # 甲
+        1: ["子", "丑"],  # 乙
+        2: ["寅", "卯"],  # 丙
+        3: ["寅", "卯"],  # 丁
+        4: ["辰", "巳"],  # 戊
+        5: ["辰", "巳"],  # 己
+        6: ["午", "未"],  # 庚
+        7: ["午", "未"],  # 辛
+        8: ["申", "酉"],  # 壬
+        9: ["申", "酉"],  # 癸
+    }
+    branches = TAIYI.get(year_stem_idx, [])
+    return {
+        "branches": branches,
+        "description": f"太极贵人在{'、'.join(branches)}" if branches else "无太极贵人",
+    }
+
+
+def get_xianchi(bazi: Dict) -> Dict[str, Any]:
+    """
+    咸池（桃花之别名，又名败神）
+
+    申子辰见酉，寅午戌见卯，亥卯未见子，巳酉丑见午
+
+    Args:
+        bazi: 八字字典
+
+    Returns:
+        dict: {"branches": ["酉"], "description": str}
+    """
+    XIANCHI_MAP = {
+        "申": ["酉"],
+        "子": ["酉"],
+        "辰": ["酉"],
+        "寅": ["卯"],
+        "午": ["卯"],
+        "戌": ["卯"],
+        "亥": ["子"],
+        "卯": ["子"],
+        "未": ["子"],
+        "巳": ["午"],
+        "酉": ["午"],
+        "丑": ["午"],
+    }
+    year_branch = bazi["year"]["branch"]
+    branches = XIANCHI_MAP.get(year_branch, [])
+    return {
+        "branches": branches,
+        "description": f"咸池在{'、'.join(branches)}" if branches else "无咸池",
+    }
+
+
+def get_jiaosha(year_branch_idx: int) -> Dict[str, Any]:
+    """
+    绞煞（破耗之神，主孤克）
+
+    口诀: 子午酉卯（年支）见酉
+
+    Args:
+        year_branch_idx: 年支索引 (0-11)
+
+    Returns:
+        dict: {"branch": "酉" or "", "description": str}
+    """
+    JIAOSHA = {
+        0: "酉",  # 子
+        6: "酉",  # 午
+        3: "酉",  # 卯
+        9: "酉",  # 酉
+    }
+    branch = JIAOSHA.get(year_branch_idx, "")
+    return {
+        "branch": branch,
+        "description": f"绞煞在{branch}" if branch else "无绞煞",
+    }
+
+
+def get_shiwu_dabai(bazi: Dict) -> Dict[str, Any]:
+    """
+    十恶大败（凶日，忌嫁娶远行）
+
+    十恶日: 甲辰、乙巳、丙申、丁酉、壬戌、癸亥、辛丑、庚辰、戊戌、己未
+
+    Args:
+        bazi: 八字字典
+
+    Returns:
+        dict: {"is_shiwu": True/False, "description": str}
+    """
+    SHIWU_DAYS = {
+        "甲辰", "乙巳", "丙申", "丁酉", "壬戌",
+        "癸亥", "辛丑", "庚辰", "戊戌", "己未"
+    }
+    day_ganzhi = bazi["day"]["stem"] + bazi["day"]["branch"]
+    is_shiwu = day_ganzhi in SHIWU_DAYS
+    return {
+        "is_shiwu": is_shiwu,
+        "day_ganzhi": day_ganzhi if is_shiwu else "",
+        "description": f"十恶大败日（{day_ganzhi}）" if is_shiwu else "非十恶大败日",
+    }
+
+
+def get_yuanchen(year_branch_idx: int) -> Dict[str, Any]:
+    """
+    元辰（大耗之同类，破财之神）
+
+    阳男阴女/阴男阳女查法不同，此处简化为与年支相冲者
+
+    Args:
+        year_branch_idx: 年支索引 (0-11)
+
+    Returns:
+        dict: {"branch": "午" or "", "description": str}
+    """
+    YUANCHEN_MAP = {
+        0: "午",   # 子→午
+        1: "未",   # 丑→未
+        2: "申",   # 寅→申
+        3: "酉",   # 卯→酉
+        4: "戌",   # 辰→戌
+        5: "亥",   # 巳→亥
+        6: "子",   # 午→子
+        7: "丑",   # 未→丑
+        8: "寅",   # 申→寅
+        9: "卯",   # 酉→卯
+        10: "辰",  # 戌→辰
+        11: "巳",  # 亥→巳
+    }
+    branch = YUANCHEN_MAP.get(year_branch_idx, "")
+    return {
+        "branch": branch,
+        "description": f"元辰在{branch}" if branch else "无元辰",
+    }
+
+
+def get_dahao(year_branch_idx: int) -> Dict[str, Any]:
+    """
+    大耗（破耗之星，主破财官非）
+
+    与年支相冲者为大耗
+
+    Args:
+        year_branch_idx: 年支索引 (0-11)
+
+    Returns:
+        dict: {"branch": "午" or "", "description": str}
+    """
+    DAHAO_MAP = {
+        0: "午",   # 子→午
+        1: "未",   # 丑→未
+        2: "申",   # 寅→申
+        3: "酉",   # 卯→酉
+        4: "戌",   # 辰→戌
+        5: "亥",   # 巳→亥
+        6: "子",   # 午→子
+        7: "丑",   # 未→丑
+        8: "寅",   # 申→寅
+        9: "卯",   # 酉→卯
+        10: "辰",  # 戌→辰
+        11: "巳",  # 亥→巳
+    }
+    branch = DAHAO_MAP.get(year_branch_idx, "")
+    return {
+        "branch": branch,
+        "description": f"大耗在{branch}" if branch else "无大耗",
+    }
+
+
+def get_taiyang_guiren(year_stem_idx: int, year_branch_idx: int) -> Dict[str, Any]:
+    """
+    太阳贵人（太阳星的贵人，配合太阳使用）
+
+    Args:
+        year_stem_idx: 年干索引
+        year_branch_idx: 年支索引
+
+    Returns:
+        dict: {"branch": str, "description": str}
+    """
+    # 太阳贵人随年支变迁
+    TAIYANG_GUIREN = {
+        0: "丑", 1: "子", 2: "寅", 3: "卯",
+        4: "辰", 5: "巳", 6: "午", 7: "未",
+        8: "申", 9: "酉", 10: "戌", 11: "亥",
+    }
+    branch = TAIYANG_GUIREN.get(year_branch_idx, "")
+    return {
+        "branch": branch,
+        "description": f"太阳贵人在{branch}" if branch else "无太阳贵人",
+    }
+
+
+# ============================================================
+# 胎元神煞
+# ============================================================
+
+def get_taiyuan_shen_sha(bazi: Dict) -> Dict[str, Any]:
+    """
+    胎元神煞（从胎元地支查神煞）
+
+    胎元 = 月柱地支+1（部分流派用月柱天干+1地支）
+    胎元神煞基于胎元地支单独查，主要有：
+    - 胎元纳音（用于长生判断）
+    - 胎元神煞（本处简化：基于胎元地支查驿马/桃花等）
+
+    Args:
+        bazi: 八字字典
+
+    Returns:
+        dict: {"taiyuan_branch": str, "taiyuan_stem": str, "description": str}
+    """
+    month_branch_idx = bazi["month"]["branch_idx"]
+    # 胎元 = 月支+1
+    taiyuan_branch_idx = (month_branch_idx + 1) % 12
+    # 胎元天干：与年干同阴阳（简化处理）
+    year_stem_idx = bazi["year"]["stem_idx"]
+    # 胎元天干按阴阳配
+    year_stem_yang = year_stem_idx % 2 == 0
+    taiyuan_stem_idx = year_stem_idx if year_stem_yang else (year_stem_idx + 1) % 10
+
+    taiyuan_branch = EARTHLY_BRANCHES[taiyuan_branch_idx]
+    taiyuan_stem = HEAVENLY_STEMS[taiyuan_stem_idx]
+
+    # 胎元驿马（与胎元地支相关）
+    taiyuan_yima = get_yima(taiyuan_branch_idx)
+    taiyuan_taohua = get_taohua(taiyuan_branch_idx)
+
+    return {
+        "taiyuan_branch": taiyuan_branch,
+        "taiyuan_branch_idx": taiyuan_branch_idx,
+        "taiyuan_stem": taiyuan_stem,
+        "taiyuan_stem_idx": taiyuan_stem_idx,
+        "taiyuan_yima": taiyuan_yima.get("description", ""),
+        "taiyuan_taohua": taiyuan_taohua.get("description", ""),
+        "description": f"胎元{taiyuan_stem}{taiyuan_branch}，{taiyuan_yima.get('description', '')}，{taiyuan_taohua.get('description', '')}",
+    }
+
+
+# ============================================================
+# 命宫神煞
+# ============================================================
+
+def get_minggong(bazi: Dict) -> Dict[str, Any]:
+    """
+    命宫计算及神煞
+
+    命宫口诀：寅起正月，顺数至生月，再逆数至生时
+    公式：(14 - 月支索引 + 时支索引) % 12
+    （正月=寅=2, 二月=卯=3, ...，或用 (14 - 月 + 时) % 12 + 2 修正）
+
+    简化版：命宫 = (14 - 月支 + 时支) % 12
+    验证：正月寅(2)生寅时(2)→(14-2+2)%12=2→寅 ✓
+
+    Args:
+        bazi: 八字字典
+
+    Returns:
+        dict: {"minggong_branch": str, "minggong_stem": str, "description": str}
+    """
+    month_branch_idx = bazi["month"]["branch_idx"]
+    hour_branch_idx = bazi["hour"]["branch_idx"]
+
+    # 命宫地支计算：正月起寅，顺数至生月，再逆数至生时
+    # 简化公式：(14 - 月支 + 时支) % 12
+    minggong_idx = (14 - month_branch_idx + hour_branch_idx) % 12
+    minggong_branch = EARTHLY_BRANCHES[minggong_idx]
+
+    # 命宫天干：与年干同阴阳，按月令起
+    # 简化：命宫天干 = 年干 + (命宫地支 - 月支) % 12，取正数
+    year_stem_idx = bazi["year"]["stem_idx"]
+    diff = (minggong_idx - month_branch_idx) % 12
+    minggong_stem_idx = (year_stem_idx + diff) % 10
+    minggong_stem = HEAVENLY_STEMS[minggong_stem_idx]
+
+    # 命宫神煞
+    minggong_yima = get_yima(minggong_idx)
+    minggong_taohua = get_taohua(minggong_idx)
+    minggong_huagai = get_huagai(minggong_idx)
+
+    return {
+        "minggong_branch": minggong_branch,
+        "minggong_branch_idx": minggong_idx,
+        "minggong_stem": minggong_stem,
+        "minggong_stem_idx": minggong_stem_idx,
+        "minggong_yima": minggong_yima.get("description", ""),
+        "minggong_taohua": minggong_taohua.get("description", ""),
+        "minggong_huagai": minggong_huagai.get("description", ""),
+        "description": f"命宫{minggong_stem}{minggong_branch}，{minggong_yima.get('description', '')}，{minggong_taohua.get('description', '')}，{minggong_huagai.get('description', '')}",
+    }
+
+
+# ============================================================
 # P2 神煞
 # ============================================================
 
@@ -775,7 +1085,21 @@ def get_shen_sha_summary(bazi_info: Dict[str, Any]) -> Dict[str, Any]:
     sangmen = get_sangmen(year_branch_idx)
     diaoke = get_diaoke(year_branch_idx)
     liujia = get_liujia_guishen(year_stem_idx, year_branch_idx)
-    
+
+    # ===== 新增 P1 神煞（太极贵人、咸池、绞煞、十恶大败、元辰、大耗）=====
+    taiyi = get_taiyi_guiren_p1(year_stem_idx)
+    xianchi = get_xianchi(bazi)
+    jiaosha = get_jiaosha(year_branch_idx)
+    shiwu = get_shiwu_dabai(bazi)
+    yuanchen = get_yuanchen(year_branch_idx)
+    dahao = get_dahao(year_branch_idx)
+
+    # ===== 胎元神煞 =====
+    taiyuan = get_taiyuan_shen_sha(bazi)
+
+    # ===== 命宫神煞 =====
+    minggong = get_minggong(bazi)
+
     return {
         # P0（最重要）
         "P0": {
@@ -793,6 +1117,12 @@ def get_shen_sha_summary(bazi_info: Dict[str, Any]) -> Dict[str, Any]:
             "三奇": sanqi,
             "将星": jiangxing,
             "亡神": wangshen,
+            "太极贵人": taiyi,
+            "咸池": xianchi,
+            "绞煞": jiaosha,
+            "十恶大败": shiwu,
+            "元辰": yuanchen,
+            "大耗": dahao,
         },
         # P2（次要）
         "P2": {
@@ -802,6 +1132,10 @@ def get_shen_sha_summary(bazi_info: Dict[str, Any]) -> Dict[str, Any]:
             "吊客": diaoke,
             "六甲贵神": liujia,
         },
+        # 胎元神煞（独立section）
+        "胎元": taiyuan,
+        # 命宫神煞（独立section）
+        "命宫": minggong,
         # 便捷摘要
         "summary": {
             "tianyi_guiren": tianyi.get("description", ""),
@@ -815,11 +1149,19 @@ def get_shen_sha_summary(bazi_info: Dict[str, Any]) -> Dict[str, Any]:
             "sanqi": sanqi.get("description", ""),
             "jiangxing": jiangxing.get("description", ""),
             "wangshen": wangshen.get("description", ""),
+            "taiyi": taiyi.get("description", ""),
+            "xianchi": xianchi.get("description", ""),
+            "jiaosha": jiaosha.get("description", ""),
+            "shiwu": shiwu.get("description", ""),
+            "yuanchen": yuanchen.get("description", ""),
+            "dahao": dahao.get("description", ""),
             "jiesha": jiesha.get("description", ""),
             "zaisha": zaisha.get("description", ""),
             "sangmen": sangmen.get("description", ""),
             "diaoke": diaoke.get("description", ""),
             "liujia_guishen": liujia.get("description", ""),
+            "taiyuan": taiyuan.get("description", ""),
+            "minggong": minggong.get("description", ""),
         },
     }
 

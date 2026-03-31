@@ -821,6 +821,7 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int,
         "shierzhang": shierzhang,
         "xiyongshen": xiyong_v2,          # V2 判定结果
         "_xiyongshen_v1": xiyong_v1,      # V1 判定结果（保留对比）
+        "_xiyongshen_v2_debug": xiyong_v2.get("_debug", {}),  # V2 _debug 信息
         "year_nayin": nayin,
         "zodiac": bazi_result["zodiac"],
         "lunar": bazi_result["lunar"],

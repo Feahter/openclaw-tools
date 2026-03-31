@@ -280,12 +280,18 @@ def _get_local_bazi(year: int, month: int, day: int, hour: int,
             "confidence": bazi["xiyongshen"].get("confidence"),
             # v1 结果（对比用）
             "_v1": bazi.get("_xiyongshen_v1", {}),
+            # v2 扩展字段（调候优先级/寒热燥湿/通关用神）
+            "_debug": bazi["xiyongshen"].get("_debug", {}),
+            "huanre_zagan": bazi["xiyongshen"].get("huanre_zagan", {}),
+            "tongguan": bazi["xiyongshen"].get("tongguan", {}),
         },
         # 新增：穷通宝鉴调候 + 月令藏干 + 格局
         "tiao_hou": bazi.get("tiao_hou", {}),
         "yueling_canggan": bazi.get("yueling_canggan", {}),
         "pattern": bazi.get("pattern", {}),
         "pattern_cheng": bazi.get("pattern_cheng", {}),
+        # 神煞（包含胎元/命宫/P0/P1/P2）
+        "shen_sha": bazi.get("shen_sha", {}),
     }
 
 

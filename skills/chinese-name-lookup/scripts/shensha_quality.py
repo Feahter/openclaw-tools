@@ -248,37 +248,35 @@ def assess_all_shensha(bazi_dict: Dict) -> List[Dict]:
     # 天乙贵人
     from shen_sha import get_tianyi_guiren
     tianyi = get_tianyi_guiren(year_stem_idx, year_branch_idx)
-    for branch_name in tianyi.get('贵人', []):
-        if branch_name in BRANCHES:
-            idx = BRANCHES.index(branch_name)
-            assessments.append(assess_shen_sha_quality(bazi_dict, "天乙贵人", idx))
+    if tianyi.get('has_guiren'):
+        for branch_name in tianyi.get('guiren_branches', []):
+            if branch_name in BRANCHES:
+                idx = BRANCHES.index(branch_name)
+                assessments.append(assess_shen_sha_quality(bazi_dict, "天乙贵人", idx))
 
     # 文昌
     from shen_sha import get_wenchang
     wenchang = get_wenchang(year_stem_idx)
-    if wenchang.get('has'):
-        branch_name = wenchang.get('文昌', '')
-        if branch_name and branch_name in BRANCHES:
-            idx = BRANCHES.index(branch_name)
-            assessments.append(assess_shen_sha_quality(bazi_dict, "文昌贵人", idx))
+    branch_name = wenchang.get('wenchang_branch', '')
+    if branch_name and branch_name in BRANCHES:
+        idx = BRANCHES.index(branch_name)
+        assessments.append(assess_shen_sha_quality(bazi_dict, "文昌贵人", idx))
 
     # 驿马
     from shen_sha import get_yima
     yima = get_yima(year_branch_idx)
-    if yima.get('has'):
-        for bn in yima.get('驿马', []):
-            if bn in BRANCHES:
-                idx = BRANCHES.index(bn)
-                assessments.append(assess_shen_sha_quality(bazi_dict, "驿马", idx))
+    branch_name = yima.get('yima_branch', '')
+    if branch_name and branch_name in BRANCHES:
+        idx = BRANCHES.index(branch_name)
+        assessments.append(assess_shen_sha_quality(bazi_dict, "驿马", idx))
 
     # 桃花
     from shen_sha import get_taohua
     taohua = get_taohua(year_branch_idx)
-    if taohua.get('has'):
-        for bn in taohua.get('桃花', []):
-            if bn in BRANCHES:
-                idx = BRANCHES.index(bn)
-                assessments.append(assess_shen_sha_quality(bazi_dict, "桃花", idx))
+    branch_name = taohua.get('taohua_branch', '')
+    if branch_name and branch_name in BRANCHES:
+        idx = BRANCHES.index(branch_name)
+        assessments.append(assess_shen_sha_quality(bazi_dict, "桃花", idx))
 
     return assessments
 

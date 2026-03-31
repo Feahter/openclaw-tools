@@ -1,7 +1,7 @@
 ---
 name: chinese-name-lookup
-description: Chinese name analysis and recommendation based on Eight Characters (八字喜用神) + zodiac (生肖属相) + Ten Gods (十神) + Twelve Changsheng (十二长生) + ShenSha (神煞) + Dayun/Liunian (大运流年). True Chinese traditional name analysis - no Japanese 五格剖象法. Uses dual-method system: (1)千里命稿派-权重法(month-lord+通根+临宫+比劫,适合常规命盘), (2)任铁樵·滴天髓阐微派-计数法(全藏干五行数量,适合特殊命盘). Auto-selects primary method based on命盘类型. Use when user wants to: analyze a name's fortune, get name recommendations for a newborn based on八字, check喜用神 for a birth chart, evaluate a name's命理特质, or get a full八字报告. Triggers: "分析名字", "八字起名", "根据八字取名", "帮我起个名字", "喜用神", "五行缺什么", "姓名推荐", "姓X名Y", "帮我起个姓X的宝宝名字", "名字测试", "八字排盘", "八字报告", "帮我做个八字分析", "生成八字命盘", "分析下这个名字", "八字神煞", "大运流年".
-compatibility: Python 3.8+; no external API required (fully local); optional八字API for precise喜用神.
+description: 分析名字 / 八字起名 / 八字报告。触发词：分析名字, 八字起名, 根据八字取名, 帮我起个名字, 喜用神, 五行缺什么, 姓名推荐, 姓X名Y, 帮我起个姓X的宝宝名字, 名字测试, 八字排盘, 八字报告, 帮我做个八字分析, 生成八字命盘, 分析下这个名字, 八字神煞, 大运流年, 女命婚姻, 婚姻格局, 神煞质量, 空亡, 子息, 配偶星, 孤鸾煞, 八字喜用神, 八字分析报告, 姓名八字分析, 子息运, 婚姻配偶星, 这个八字有没有孤鸾煞, 帮我看看神煞质量. 本地八字引擎(无需API)：八字排盘 + 喜用神双轨法(千里命稿权重法/滴天髓计数法,自动选主推) + 十神/十二长生 + 神煞(含空亡/死绝/刑冲质量评级) + 大运流年 + 纳音五行 + 刑冲害合 + 女命婚姻格局贵贱(15富贵18贫贱) + 子息数量 + 配偶星 + 孤鸾煞/阴错阳差 + 三维姓名推荐评分(喜用神40%/生肖30%/十神长生20%/字义10%). 不使用日本五格剖象法。
+compatibility: Python 3.8+; fully local (no API required); optional八字API for precise喜用神.
 ---
 
 # Chinese Name Fortune Analysis & Recommendation
@@ -243,12 +243,37 @@ score_by_wuge(name_chars)                           # 0-10（参考）
 
 ---
 
-## 神煞一览
-- **天乙贵人**：天乙贵人落在丑、未
-- **文昌**：文昌在巳
-- **驿马**：驿马在寅
-- **华盖**：华盖在辰
-- **桃花**：桃花在酉
+## 神煞一览（含质量评级 P2-b）
+
+神煞现在带有质量标注，基于《渊海子平》激活原则：
+- 神煞落**长生/临官/帝旺/冠带** → ★ 强力
+- 神煞落**沐浴/胎/养** → ★★★ 有效
+- 神煞落**病/衰** 或 被刑冲 → ★★ 弱效
+- 神煞落**空亡/死/绝/墓** → ✗ 无效
+
+```
+- **天乙贵人**：丑（弱效★★） 未（无效✗）
+- **文昌**：巳（无效✗）
+- **驿马**：寅（无效✗）
+- **华盖**：辰
+- **桃花**：酉（弱效★★）
+
+> 质量评级说明：★=强力 ★★★=有效 ★★=弱效 ✗=无效
+```
+
+## 女命婚姻格局（P2-a，仅女命显示）
+
+基于《渊海子平》女命篇，15种富贵格 + 18种贫贱格：
+
+```markdown
+## 女命婚姻格局
+**评分**：███░░░░░░░ 30/100
+⚠️ **格局：贫贱**
+**【富贵因素】** - 阳刃有制
+**【不利因素】** - 杀星太重、比肩犯重
+*【富贵因素】阳刃有制；【不利因素】杀星太重、比肩犯重*
+```
+
 
 ---
 
