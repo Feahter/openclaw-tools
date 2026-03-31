@@ -1,6 +1,6 @@
 # MEMORY.md - 重要约定与记录
 
-*Last Updated: 2026-03-30*
+*Last Updated: 2026-04-01*
 
 ---
 
@@ -88,6 +88,27 @@
 
 ## 🛠️ opencode 使用方式
 → 详见 `memory/tasks/opencode-usage.md`
+
+## 🖥️ 本地工具安装（2026-03-31）
+
+### bb-browser + web-access（CDP 浏览器）
+- `bb-browser` skill（v0.6.0）+ `bb-browser-sites` 扩展（106 站点）
+- `web-access` skill（eze-is/web-access，⭐2,146）— Node.js CDP proxy（端口 3456→9222）
+- 实测可用：Wikipedia、B站热门、36氪快讯、雪球、百度搜索、Product Hunt
+- ⚠️ 需登录站点（知乎/GitHub/HackerNews）暂不可用
+- CDP Proxy 手动启动：`node ~/.openclaw/workspace/skills/web-access/scripts/cdp-proxy.mjs &`
+
+### Ghostty 终端（2026-03-31）
+- DMG 安装到 `/Applications/Ghostty.app`，配置 `~/.config/ghostty/config`
+- 参考 Boris Cherny（Claude Code 之父）工作流配置
+- 主题：Catppuccin Mocha/Latte
+
+### Claude Code 源码吸收（2026-03-31/04-01）
+- `instructkr/claude-code` Leak 源码克隆到 `~/project/github/claude-code/`
+- 10 个 Tier 1/2 脚本吸收到 `~/.openclaw/workspace/scripts/claude-code-absorbed/`
+- 最佳可移植：truncation.ts / abort-controller.ts / signal.ts / circular-buffer.ts
+- 技术栈：Bun + TS strict + React/Ink + Commander.js + Zod v4 + MCP
+- 新建薄编排 `skill-repo-research/`：统一入口路由屠夫/猎手
 
 ## 🔧 本地语义搜索
 → 详见 `memory/tasks/vector-search.md`
