@@ -130,9 +130,9 @@ gh search repos "$TOPIC javascript OR typescript OR python" --sort=stars --limit
 
 ### 3.0 输出位置
 
-统一存到 `project/github/reports/[topic]-research-YYYYMMDD.md`
-
-如项目不是 GitHub 项目，存到 `reports/[topic]-research-YYYYMMDD.md`
+- **报告**：统一存到 `~/.openclaw/workspace/reports/[topic]-research-YYYYMMDD.md`
+- **克隆的源码**：统一存到 `~/project/github/[项目名]/`（用户目录）
+- 如项目不是 GitHub 项目，报告存到 `~/.openclaw/workspace/reports/[topic]-research-YYYYMMDD.md`
 
 ### 3.1 研究报告模板
 
@@ -285,8 +285,8 @@ README 声称的 X 项核心价值中：
 
 ### 4.1 输出位置
 
-`project/github/reports/[topic]-best-practices-YYYYMMDD.md`
-（非 GitHub 项目：`reports/[topic]-best-practices-YYYYMMDD.md`）
+`~/.openclaw/workspace/reports/[topic]-best-practices-YYYYMMDD.md`
+（非 GitHub 项目：`~/.openclaw/workspace/reports/[topic]-best-practices-YYYYMMDD.md`）
 
 ### 4.2 最佳实践模板
 
@@ -343,35 +343,42 @@ README 声称的 X 项核心价值中：
 ### 5.1 判断是否已有 remote
 
 ```bash
-cd $WORKSPACE && git remote -v
+cd ~/.openclaw/workspace && git remote -v
 ```
 
 ### 5.2 确保目录存在
 
 ```bash
-# GitHub 项目
-mkdir -p project/github/reports
+# 报告目录
+mkdir -p ~/.openclaw/workspace/reports
 
-# 非 GitHub 项目
-mkdir -p reports
+# 克隆源码目录
+mkdir -p ~/project/github
 ```
 
 ### 5.3 检查 .gitignore
 
 如果目标目录被 `.gitignore` 忽略：
 ```bash
-git add -f project/github/reports/  # 强制添加
+git add -f ~/.openclaw/workspace/reports/  # 强制添加
 ```
 
-### 5.4 提交并推送
+### 5.4 克隆源码（如需要深入分析）
 
 ```bash
-git add project/github/reports/
+# 克隆到用户目录的 project/github/
+git clone https://github.com/[owner]/[repo].git ~/project/github/[repo]/
+```
+
+### 5.5 提交并推送
+
+```bash
+git add ~/.openclaw/workspace/reports/
 git commit -m "feat(reports): [技术名] research
 
-- project/github/reports/[技术名]-research-YYYYMMDD.md: 技术深度研究
-- project/github/reports/[技术名]-best-practices-YYYYMMDD.md: 最佳实践（如有）
-- project/github/[项目名]/: 克隆的源码（如有）"
+- ~/.openclaw/workspace/reports/[技术名]-research-YYYYMMDD.md: 技术深度研究
+- ~/.openclaw/workspace/reports/[技术名]-best-practices-YYYYMMDD.md: 最佳实践（如有）
+- ~/project/github/[项目名]/: 克隆的源码（如有深度分析）"
 
 git push origin main
 ```
@@ -421,7 +428,8 @@ git push origin main
 
 ### Phase 5 完成后（归档）
 
-- [ ] 文件已写入正确目录
+- [ ] 报告已写入 `~/.openclaw/workspace/reports/`
+- [ ] 源码已克隆到 `~/project/github/[项目名]/`
 - [ ] 已 commit（含清晰 commit message）
 - [ ] 已 push（如有 remote）
 
@@ -446,4 +454,4 @@ git push origin main
 5. **Git commit 及时**：写完就 commit，不积压
 6. **核心价值先验证**：GitHub 项目研究时，先验证 README 声称是否属实，再做泛用代码析出
 7. **Tier 1 优先**：泛用代码析出时优先找零依赖可直接铲的模块
-8. **输出路径统一**：GitHub 项目统一存到 `project/github/reports/`
+8. **输出路径统一**：报告存到 `~/.openclaw/workspace/reports/`，源码克隆到 `~/project/github/`
