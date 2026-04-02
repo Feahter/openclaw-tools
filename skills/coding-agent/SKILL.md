@@ -1,274 +1,163 @@
 ---
 name: coding-agent
-description: Run Codex CLI, Claude Code, OpenCode, or Pi Coding Agent via background process for programmatic control.
-metadata: {"clawdbot":{"emoji":"🧩","requires":{"anyBins":["claude","codex","opencode","pi"]}}}
+description: Execute autonomous coding tasks via Claude Code or OpenCode subprocess pipeline. Includes task queue, session management, progress monitoring, and result verification. Use when asked to code, build, refactor, or implement features programmatically.
+metadata: {"clawdbot":{"emoji":"🧩","requires":{"anyBins":["claude","opencode"]}}}
+pipeline:
+  root: pipeline/
+  state: .state/
 ---
 
-# Coding Agent (background-first)
+# Coding Agent — 执行管道
 
-Use **bash background mode** for non-interactive coding work. For interactive coding sessions, use the **tmux** skill (always, except very simple one-shot prompts).
+> 当前支持：**Claude Code**（✅ 已安装 2.1.88）、**OpenCode**（✅ 已安装 1.3.0）
 
-## The Pattern: workdir + background
+## 架构
 
-```bash
-# Create temp space for chats/scratch work
-SCRATCH=$(mktemp -d)
-
-# Start agent in target directory ("little box" - only sees relevant files)
-bash workdir:$SCRATCH background:true command:"<agent command>"
-# Or for project work:
-bash workdir:~/project/folder background:true command:"<agent command>"
-# Returns sessionId for tracking
-
-# Monitor progress
-process action:log sessionId:XXX
-
-# Check if done  
-process action:poll sessionId:XXX
-
-# Send input (if agent asks a question)
-process action:write sessionId:XXX data:"y"
-
-# Kill if needed
-process action:kill sessionId:XXX
+```
+coding-agent/
+├── pipeline/
+│   ├── run-task.sh          # 启动任务（bash + Claude Code CLI）
+│   ├── check-progress.sh     # 监控进度（调用 check-progress.py）
+│   ├── check-progress.py     # Python 版状态解析（处理 JSON）
+│   ├── collect-results.sh    # 收集结果（调用 collect-results.py）
+│   ├── collect-results.py    # Python 版：git diff + JSON 报告
+│   ├── verify.sh            # 验证产出
+│   └── list-sessions.sh    # 列出所有会话
+├── .state/
+│   ├── progress/            # 每个会话的 JSON 状态
+│   ├── results/             # 收集后的完整 JSON 报告
+│   ├── logs/                # 原始 stdout/stderr 日志
+│   ├── pids/                # 进程 PID
+│   ├── context.md            # 管道状态
+│   └── learnings.md          # 执行积累
+└── SKILL.md
 ```
 
-**Why workdir matters:** Agent wakes up in a focused directory, doesn't wander off reading unrelated files (like your soul.md 😅).
+**依赖**：`claude`（Claude Code CLI 2.1.88 ✅）、`opencode`（1.3.0 ✅）
 
----
+## 快速开始
 
-## Codex CLI
-
-**Model:** `gpt-5.2-codex` is the default (set in ~/.codex/config.toml)
-
-### Building/Creating (use --full-auto or --yolo)
-```bash
-# --full-auto: sandboxed but auto-approves in workspace
-bash workdir:~/project background:true command:"codex exec --full-auto \"Build a snake game with dark theme\""
-
-# --yolo: NO sandbox, NO approvals (fastest, most dangerous)
-bash workdir:~/project background:true command:"codex --yolo \"Build a snake game with dark theme\""
-
-# Note: --yolo is a shortcut for --dangerously-bypass-approvals-and-sandbox
-```
-
-### Reviewing PRs (vanilla, no flags)
-
-**⚠️ CRITICAL: Never review PRs in Clawdbot's own project folder!**
-- Either use the project where the PR is submitted (if it's NOT ~/Projects/clawdbot)
-- Or clone to a temp folder first
+### 1. 启动一个编程任务
 
 ```bash
-# Option 1: Review in the actual project (if NOT clawdbot)
-bash workdir:~/Projects/some-other-repo background:true command:"codex review --base main"
+SKILL_DIR=~/.openclaw/workspace/skills/coding-agent
 
-# Option 2: Clone to temp folder for safe review (REQUIRED for clawdbot PRs!)
-REVIEW_DIR=$(mktemp -d)
-git clone https://github.com/clawdbot/clawdbot.git $REVIEW_DIR
-cd $REVIEW_DIR && gh pr checkout 130
-bash workdir:$REVIEW_DIR background:true command:"codex review --base origin/main"
-# Clean up after: rm -rf $REVIEW_DIR
+# 方式 A：exec（推荐，自动处理后台）
+exec bash $SKILL_DIR/pipeline/run-task.sh \
+  "为 ~/project/myapp 添加用户认证模块" \
+  "$HOME/project/myapp"
 
-# Option 3: Use git worktree (keeps main intact)
-git worktree add /tmp/pr-130-review pr-130-branch
-bash workdir:/tmp/pr-130-review background:true command:"codex review --base main"
+# 方式 B：使用 sessions_spawn（OpenClaw 原生子 session）
+# 见下方「子 Session 模式」
 ```
 
-**Why?** Checking out branches in the running Clawdbot repo can break the live instance!
-
-### Batch PR Reviews (parallel army!)
-```bash
-# Fetch all PR refs first
-git fetch origin '+refs/pull/*/head:refs/remotes/origin/pr/*'
-
-# Deploy the army - one Codex per PR!
-bash workdir:~/project background:true command:"codex exec \"Review PR #86. git diff origin/main...origin/pr/86\""
-bash workdir:~/project background:true command:"codex exec \"Review PR #87. git diff origin/main...origin/pr/87\""
-bash workdir:~/project background:true command:"codex exec \"Review PR #95. git diff origin/main...origin/pr/95\""
-# ... repeat for all PRs
-
-# Monitor all
-process action:list
-
-# Get results and post to GitHub
-process action:log sessionId:XXX
-gh pr comment <PR#> --body "<review content>"
-```
-
-### Tips for PR Reviews
-- **Fetch refs first:** `git fetch origin '+refs/pull/*/head:refs/remotes/origin/pr/*'`
-- **Use git diff:** Tell Codex to use `git diff origin/main...origin/pr/XX`
-- **Don't checkout:** Multiple parallel reviews = don't let them change branches
-- **Post results:** Use `gh pr comment` to post reviews to GitHub
-
----
-
-## Claude Code
+### 2. 监控进度
 
 ```bash
-bash workdir:~/project background:true command:"claude \"Your task\""
+bash $SKILL_DIR/pipeline/check-progress.sh <session_id> [tail_lines]
+# 例如
+bash $SKILL_DIR/pipeline/check-progress.sh 1745112345-12345 50
 ```
 
----
-
-## OpenCode
+### 3. 收集结果
 
 ```bash
-bash workdir:~/project background:true command:"opencode run \"Your task\""
+# 会话完成后
+bash $SKILL_DIR/pipeline/collect-results.sh <session_id>
+# 输出：JSON 报告，含 git diff + 完整日志
+cat $SKILL_DIR/.state/results/<session_id>.json
 ```
 
----
-
-## Pi Coding Agent
+### 4. 验证产出
 
 ```bash
-# Install: npm install -g @mariozechner/pi-coding-agent
-bash workdir:~/project background:true command:"pi \"Your task\""
+bash $SKILL_DIR/pipeline/verify.sh <session_id>
+# 自动检查：git diff / package.json / Cargo.toml / Makefile
 ```
 
----
-
-## Pi flags (common)
-
-- `--print` / `-p`: non-interactive; runs prompt and exits.
-- `--provider <name>`: pick provider (default: google).
-- `--model <id>`: pick model (default: gemini-2.5-flash).
-- `--api-key <key>`: override API key (defaults to env vars).
-
-Examples:
+### 5. 列出所有会话
 
 ```bash
-# Set provider + model, non-interactive
-bash workdir:~/project background:true command:"pi --provider openai --model gpt-4o-mini -p \"Summarize src/\""
+bash $SKILL_DIR/pipeline/list-sessions.sh [running|completed|all]
 ```
 
----
+## OpenClaw 原生模式（推荐）
 
-## tmux (interactive sessions)
-
-Use the tmux skill for interactive coding sessions (always, except very simple one-shot prompts). Prefer bash background mode for non-interactive runs.
-
----
-
-## Parallel Issue Fixing with git worktrees + tmux
-
-For fixing multiple issues in parallel, use git worktrees (isolated branches) + tmux sessions:
+用 `exec` 工具直接调用，不需要子 shell：
 
 ```bash
-# 1. Clone repo to temp location
-cd /tmp && git clone git@github.com:user/repo.git repo-worktrees
-cd repo-worktrees
-
-# 2. Create worktrees for each issue (isolated branches!)
-git worktree add -b fix/issue-78 /tmp/issue-78 main
-git worktree add -b fix/issue-99 /tmp/issue-99 main
-
-# 3. Set up tmux sessions
-SOCKET="${TMPDIR:-/tmp}/codex-fixes.sock"
-tmux -S "$SOCKET" new-session -d -s fix-78
-tmux -S "$SOCKET" new-session -d -s fix-99
-
-# 4. Launch Codex in each (after pnpm install!)
-tmux -S "$SOCKET" send-keys -t fix-78 "cd /tmp/issue-78 && pnpm install && codex --yolo 'Fix issue #78: <description>. Commit and push.'" Enter
-tmux -S "$SOCKET" send-keys -t fix-99 "cd /tmp/issue-99 && pnpm install && codex --yolo 'Fix issue #99: <description>. Commit and push.'" Enter
-
-# 5. Monitor progress
-tmux -S "$SOCKET" capture-pane -p -t fix-78 -S -30
-tmux -S "$SOCKET" capture-pane -p -t fix-99 -S -30
-
-# 6. Check if done (prompt returned)
-tmux -S "$SOCKET" capture-pane -p -t fix-78 -S -3 | grep -q "❯" && echo "Done!"
-
-# 7. Create PRs after fixes
-cd /tmp/issue-78 && git push -u origin fix/issue-78
-gh pr create --repo user/repo --head fix/issue-78 --title "fix: ..." --body "..."
-
-# 8. Cleanup
-tmux -S "$SOCKET" kill-server
-git worktree remove /tmp/issue-78
-git worktree remove /tmp/issue-99
+exec workdir:$PROJECT_DIR background:true \
+  command:"claude -p '你的编程任务' --output-format stream-json --no-session-persistence"
 ```
 
-**Why worktrees?** Each Codex works in isolated branch, no conflicts. Can run 5+ parallel fixes!
+**关键参数**：
+- `-p` — 非交互打印模式
+- `--output-format stream-json` — 流式 JSON 输出
+- `--no-session-persistence` — 不保存会话到磁盘
+- `--permission-mode bypassPermissions` — 跳过确认（仅在可信目录）
 
-**Why tmux over bash background?** Codex is interactive — needs TTY for proper output. tmux provides persistent sessions with full history capture.
+## 子 Session 模式（复杂任务）
 
----
+对于需要多轮迭代的复杂任务，用 `sessions_spawn` 启动专用子 session：
 
-## ⚠️ Rules
-
-1. **Respect tool choice** — if user asks for Codex, use Codex. NEVER offer to build it yourself!
-2. **Be patient** — don't kill sessions because they're "slow"
-3. **Monitor with process:log** — check progress without interfering
-4. **--full-auto for building** — auto-approves changes
-5. **vanilla for reviewing** — no special flags needed
-6. **Parallel is OK** — run many Codex processes at once for batch work
-7. **NEVER start Codex in ~/clawd/** — it'll read your soul docs and get weird ideas about the org chart! Use the target project dir or /tmp for blank slate chats
-8. **NEVER checkout branches in ~/Projects/clawdbot/** — that's the LIVE Clawdbot instance! Clone to /tmp or use git worktree for PR reviews
-
----
-
-## PR Template (The Razor Standard)
-
-When submitting PRs to external repos, use this format for quality & maintainer-friendliness:
-
-````markdown
-## Original Prompt
-[Exact request/problem statement]
-
-## What this does
-[High-level description]
-
-**Features:**
-- [Key feature 1]
-- [Key feature 2]
-
-**Example usage:**
 ```bash
-# Example
-command example
+sessions_spawn(
+  task="对 $PROJECT_DIR 进行以下改动：$TASK_DESCRIPTION",
+  runtime="subagent",
+  mode="session"
+)
 ```
 
-## Feature intent (maintainer-friendly)
-[Why useful, how it fits, workflows it enables]
+子 session 有独立上下文，可以：
+- 多次执行 exec 写文件
+- 读取和分析代码
+- 多轮自我修正
 
-## Prompt history (timestamped)
-- YYYY-MM-DD HH:MM UTC: [Step 1]
-- YYYY-MM-DD HH:MM UTC: [Step 2]
+完成后结果通过子 session 完成事件推送。
 
-## How I tested
-**Manual verification:**
-1. [Test step] - Output: `[result]`
-2. [Test step] - Result: [result]
+## Session 状态机
 
-**Files tested:**
-- [Detail]
-- [Edge cases]
+```
+pending → running → completed
+                      ↘ failed
+```
 
-## Session logs (implementation)
-- [What was researched]
-- [What was discovered]
-- [Time spent]
+## 执行参数参考
 
-## Implementation details
-**New files:**
-- `path/file.ts` - [description]
+| 参数 | Claude Code | OpenCode |
+|------|------------|---------|
+| 非交互模式 | `-p "task"` | `opencode run "task"` |
+| 输出格式 | `--output-format json` | 默认 JSON |
+| 禁止持久化 | `--no-session-persistence` | — |
+| 跳过确认 | `--permission-mode bypassPermissions` | — |
+| 指定 model | `--model <id>` | `--provider <name>` |
+| 追加 system prompt | `--append-system-prompt <text>` | — |
 
-**Modified files:**
-- `path/file.ts` - [change]
+## 信任目录规则
 
-**Technical notes:**
-- [Detail 1]
-- [Detail 2]
+| 目录 | 可用工具 |
+|------|---------|
+| `~/project/` | 全部工具 |
+| `/tmp/` | 有限（文件操作）|
+| `~/.openclaw/` | 仅读取 |
+| 工作区根目录 | 不启动（会读取 SOUL/MEMORY）|
 
----
-*Submitted by Razor 🥷 - Mariano's AI agent*
-````
+## 验证结果
 
-**Key principles:**
-1. Human-written description (no AI slop)
-2. Feature intent for maintainers
-3. Timestamped prompt history
-4. Session logs if using Codex/agent
+```bash
+# 自动验证清单
+bash pipeline/verify.sh <session_id>
 
-**Example:** https://github.com/steipete/bird/pull/22
+# 手动验证
+cd $WORKDIR
+git diff --stat
+git diff --name-only
+# 运行测试
+npm test 2>/dev/null || cargo test 2>/dev/null || echo "no test runner"
+```
+
+## Learnings（积累）
+
+每次编程任务后，将结果记录到 learnings：
+
+→ 见 `.state/learnings.md`
