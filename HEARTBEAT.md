@@ -98,6 +98,20 @@
 
 ---
 
+## 🗑️ 回收站清理（每月一次）
+
+*在 heartbeat-state.json 记录 `lastChecks.trashCleanup`，每月触发一次*
+
+**任务**：
+```bash
+find ~/.openclaw/workspace/.trash -maxdepth 1 -type d -mtime +30
+```
+1. 检查是否有超过 30 天的文件
+2. 有 → 汇报文件名和大小，询问是否清理
+3. 无 → 安静
+
+---
+
 ## 📜 GitHub 脚本收集（每小时）
 
 **任务**：收集 GitHub 上好用的脚本，存到 `scripts/` 目录

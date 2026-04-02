@@ -40,3 +40,7 @@ skills/fast-edit/
 
 # Research projects
 project/
+
+# Trash (30-day auto-cleanup)
+.trash/
+.trash/*
