@@ -16,25 +16,26 @@ count=0
 success=0
 failed=0
 
-for line in $installed; do
+# 使用数组避免变量污染和 word-splitting 问题
+while read -r line; do
   slug=$(echo "$line" | awk '{print $1}')
   [ -z "$slug" ] && continue
   
-  ((count++))
+  count=$((count + 1))
   echo "[$count] Checking $slug..."
   
   result=$($CLAWHUB install "$slug" --force 2>&1)
   
   if echo "$result" | grep -q "OK"; then
-    ((success++))
+    success=$((success + 1))
     echo "  ✅ Updated"
   elif echo "$result" | grep -q "not found"; then
     echo "  ⚠️ Not in registry (skip)"
   else
-    ((failed++))
+    failed=$((failed + 1))
     echo "  ❌ Failed: $(echo "$result" | head -1)"
   fi
-done
+done <<< "$installed"
 
 echo ""
 echo "📊 统计:"
