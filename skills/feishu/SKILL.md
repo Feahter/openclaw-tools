@@ -2,12 +2,17 @@
 name: feishu
 description: 飞书 AI 对话机器人集成 - 完整接入方案
 triggers:
-  - "feishu"
-  - "飞书"
-  - "lark"
-  - "飞书机器人"
-  - "连接飞书"
-  - "feishu bot"
+  - keywords: ["feishu", "飞书", "lark", "飞书机器人", "连接飞书", "feishu bot", "飞书连接"]
+    load: true
+    priority: high
+  - keywords: ["飞书日历", "飞书任务", "飞书文档", "飞书多维表格"]
+    load: true
+    priority: medium
+  - keywords: ["发飞书", "发消息到飞书", "飞书发消息"]
+    load: false
+    priority: high
+context_file: memory/skills/feishu/context.md
+learnings_file: memory/skills/feishu/learnings.md
 source:
   project: AlexAnys/feishu-openclaw
   url: https://github.com/AlexAnys/feishu-openclaw
@@ -16,7 +21,17 @@ source:
 
 # 飞书 AI 对话机器人
 
-集成 feishu-openclaw 桥接器，实现飞书与 AI 助手的完整双向对话。
+## Preamble
+
+**执行时机**：Skill 被调用时自动执行
+
+1. 读取 `~/.openclaw/workspace/MEMORY.md`（全局记忆）
+2. 读取 `memory/YYYY-MM-DD.md`（今日 + 昨日 session 日记）
+3. 读取 `memory/skills/feishu/context.md`（飞书 Skill 状态，如存在）
+4. 验证飞书 OAuth 授权状态（调用 `feishu_get_user` 验证连接）
+5. 读取 `memory/skills/feishu/learnings.md`（过往飞书操作偏好）
+
+**合并为 Skill 执行上下文后执行主逻辑**
 
 ## 功能特性
 

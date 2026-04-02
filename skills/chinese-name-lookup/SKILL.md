@@ -1,8 +1,32 @@
 ---
 name: chinese-name-lookup
 description: 分析名字 / 八字起名 / 八字报告。触发词：分析名字, 八字起名, 根据八字取名, 帮我起个名字, 喜用神, 五行缺什么, 姓名推荐, 姓X名Y, 帮我起个姓X的宝宝名字, 名字测试, 八字排盘, 八字报告, 帮我做个八字分析, 生成八字命盘, 分析下这个名字, 八字神煞, 大运流年, 女命婚姻, 婚姻格局, 神煞质量, 空亡, 子息, 配偶星, 孤鸾煞, 八字喜用神, 八字分析报告, 姓名八字分析, 子息运, 婚姻配偶星, 这个八字有没有孤鸾煞, 帮我看看神煞质量. 本地八字引擎(无需API)：八字排盘 + 喜用神双轨法(千里命稿权重法/滴天髓计数法,自动选主推) + 十神/十二长生 + 神煞(含空亡/死绝/刑冲质量评级) + 大运流年 + 纳音五行 + 刑冲害合 + 女命婚姻格局贵贱(15富贵18贫贱) + 子息数量 + 配偶星 + 孤鸾煞/阴错阳差 + 三维姓名推荐评分(喜用神40%/生肖30%/十神长生20%/字义10%). 不使用日本五格剖象法。
+triggers:
+  - keywords: ["八字", "喜用神", "五行", "起名", "取名", "姓名推荐", "八字排盘", "八字报告", "八字分析", "八字神煞", "大运流年", "命盘", "神煞", "空亡", "纳音", "刑冲害合"]
+    load: true
+    priority: high
+  - keywords: ["子息", "婚姻", "配偶星", "孤鸾煞", "阴错阳差", "女命婚姻", "婚姻格局"]
+    load: true
+    priority: medium
+  - keywords: ["帮我起个名字", "姓X名Y", "帮我起个姓X的宝宝名字", "名字测试", "分析下这个名字", "姓名八字分析"]
+    load: true
+    priority: high
+context_file: memory/skills/chinese-name-lookup/context.md
+learnings_file: memory/skills/chinese-name-lookup/learnings.md
 compatibility: Python 3.8+; fully local (no API required); optional八字API for precise喜用神.
 ---
+
+## Preamble
+
+**执行时机**：Skill 被调用时自动执行
+
+1. 读取 `~/.openclaw/workspace/MEMORY.md`（全局记忆）
+2. 读取 `memory/YYYY-MM-DD.md`（今日 + 昨日 session 日记）
+3. 读取 `memory/skills/chinese-name-lookup/context.md`（八字 Skill 状态，如存在）
+4. 读取 `memory/skills/chinese-name-lookup/learnings.md`（过往八字分析偏好/错误，如存在）
+
+**合并为 Skill 执行上下文后执行主逻辑**
+
 
 # Chinese Name Fortune Analysis & Recommendation
 
