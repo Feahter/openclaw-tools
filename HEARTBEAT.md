@@ -144,6 +144,47 @@ find ~/.openclaw/workspace/.trash -maxdepth 1 -type d -mtime +30
 
 ---
 
+## 🔍 Session 模式挖掘（每日心跳执行）
+
+*在 heartbeat-state.json 记录 `lastChecks.sessionMining`，每天首次心跳触发*
+
+**执行逻辑**：
+1. 运行 `~/.openclaw/workspace/scripts/evolution/session-miner.py`（最近7天）
+2. 读取 `.state/evolution/daily-mining.md`，与上周对比
+3. 如发现新的高频模式（出现次数突增 ≥3）→ 生成**技能提案**
+4. 输出：本周新模式 + 技能提案（如有）
+
+**技能提案触发条件**：
+- 某高频短Query（≤15字）连续出现 ≥5次
+- 或某意图领域词（如"八字"、"新闻"、"天气"）连续出现 ≥10次
+
+**技能提案格式**：
+```
+🎯 新技能候选：<skill-name>
+- 触发原因：<具体Query示例>
+- 出现频次：<N>次/7天
+- 建议：调用 skillhub_install install_skill <name>
+```
+
+---
+
+## 🩺 错误自愈循环（心跳执行）
+
+*检测 .learnings/ERRORS.md 中的 pending 条目，尝试自动修复*
+
+**自愈流程**：
+1. 读取 `.learnings/ERRORS.md` 的 pending 条目
+2. 如是已知可修复模式（如路径错误、参数错误）→ 自动修复
+3. 修复后更新状态为 resolved
+4. 如是未知错误 → 保持 pending，提示用户
+
+**已知自愈模式**：
+- skill 路径错误 → 更新 .learnings/ERRORS.md + 修正路径
+- 脚本编码错误 → 用 qclaw-text-file 重写
+- 命令路径变化 → 更新 TOOLS.md
+
+---
+
 ## 状态追踪
 
 在 `memory/heartbeat-state.json` 记录检查状态：
