@@ -1,6 +1,6 @@
 # OpenClaw Skills
 
-> 145+ AI Agent Skills for OpenClaw | Last updated: 2026-03-30
+> 146+ AI Agent Skills for OpenClaw | Last updated: 2026-04-03
 
 ## 📦 安装
 
@@ -145,6 +145,7 @@ git clone https://github.com/Feather/openclaw-tools.git
 ### 🧠 记忆 & 认知 (Memory & Cognition)
 | Skill | 描述 |
 |-------|------|
+| `lobster-evolution` | Skill 自动进化引擎 — 探针→提案→实施→自愈 |
 | `spen-memory` | SPEN 时空记忆系统 |
 | `para-second-brain` | PARA 知识管理 + 语义搜索 |
 | `basal-ganglia-memory` | 习惯形成/程序性学习 |
@@ -281,4 +282,4 @@ git add -A && git commit -m "chore: cleanup and update skills" && git push
 - C 级：<1K，需补充或仅占位
 
 ---
-Generated: 2026-03-30 | Total: 160 Skills
+Generated: 2026-04-03 | Total: 146 Skills
