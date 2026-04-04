@@ -1,6 +1,6 @@
 ---
 name: chinese-name-lookup
-description: 分析名字 / 八字起名 / 八字报告。触发词：分析名字, 八字起名, 根据八字取名, 帮我起个名字, 喜用神, 五行缺什么, 姓名推荐, 姓X名Y, 帮我起个姓X的宝宝名字, 名字测试, 八字排盘, 八字报告, 帮我做个八字分析, 生成八字命盘, 分析下这个名字, 八字神煞, 大运流年, 女命婚姻, 婚姻格局, 神煞质量, 空亡, 子息, 配偶星, 孤鸾煞, 八字喜用神, 八字分析报告, 姓名八字分析, 子息运, 婚姻配偶星, 这个八字有没有孤鸾煞, 帮我看看神煞质量. 本地八字引擎(无需API)：八字排盘 + 喜用神双轨法(千里命稿权重法/滴天髓计数法,自动选主推) + 十神/十二长生 + 神煞(含空亡/死绝/刑冲质量评级) + 大运流年 + 纳音五行 + 刑冲害合 + 女命婚姻格局贵贱(15富贵18贫贱) + 子息数量 + 配偶星 + 孤鸾煞/阴错阳差 + 三维姓名推荐评分(喜用神40%/生肖30%/十神长生20%/字义10%). 不使用日本五格剖象法。
+description: 分析名字 / 八字起名 / 八字报告。触发词：分析名字, 八字起名, 根据八字取名, 帮我起个名字, 喜用神, 五行缺什么, 姓名推荐, 姓X名Y, 帮我起个姓X的宝宝名字, 名字测试, 八字排盘, 八字报告, 帮我做个八字分析, 生成八字命盘, 分析下这个名字, 八字神煞, 大运流年, 女命婚姻, 婚姻格局, 神煞质量, 空亡, 子息, 配偶星, 孤鸾煞, 八字喜用神, 八字分析报告, 姓名八字分析, 子息运, 婚姻配偶星, 这个八字有没有孤鸾煞, 帮我看看神煞质量, 命宫, 身宫, 小儿关煞, 子平格局. 本地八字引擎(无需API)：八字排盘 + 命宫/身宫三坐标 + 喜用神三轨法(千里命稿/滴天髓/子平格局) + 十神/十二长生 + 神煞(含空亡/死绝/刑冲质量评级) + 大运流年 + 纳音五行 + 刑冲害合 + 女命婚姻格局贵贱(15富贵18贫贱) + 子息数量 + 配偶星 + 孤鸾煞/阴错阳差 + 小儿关煞20种 + 子平格局融合 + 三维姓名推荐评分(喜用神40%/生肖30%/十神长生20%/字义10%). 不使用日本五格剖象法。
 triggers:
   - keywords: ["八字", "喜用神", "五行", "起名", "取名", "姓名推荐", "八字排盘", "八字报告", "八字分析", "八字神煞", "大运流年", "命盘", "神煞", "空亡", "纳音", "刑冲害合"]
     load: true
@@ -420,6 +420,61 @@ print(result["markdown"])
 | 笔画数表中无该字 | 使用偏旁推断，默认笔画数8 |
 | 候选字不足3个 | 放宽生肖要求，直至凑满3个 |
 | 农历转换超范围 | 提示超出1900-2100年范围 |
+
+---
+
+## Phase 3 新增模块（2026-04-04）
+
+### 命宫/身宫（Phase 3-a）
+
+八字三坐标体系最后一块。命宫/身宫反映先天禀赋与后天修行的交互影响。
+
+**调用方式**：
+```python
+from scripts.bazi_engine import get_minggong_shengong, full_bazi_analysis
+
+# full_bazi_analysis() 已内置命宫/身宫
+result = full_bazi_analysis(year, month, day, hour)
+minggong = result['minggong_shengong']['minggong']
+shengong = result['minggong_shengong']['shengong']
+# 输出：stem, branch, ganzhi, element, shishen, changsheng
+```
+
+### 小儿关煞（Phase 3-b）
+
+传统起名必备的儿童神煞系统，共20种，涵盖重/中/轻/吉四档。
+
+**调用方式**：
+```python
+from scripts.xiaor_xiansha import check_xiaor_xiansha, check_xiaor_xiansha_from_birthtime
+
+# 方式1：直接输入出生时间
+关煞列表 = check_xiaor_xiansha_from_birthtime(2024, 3, 15, 10)
+
+# 方式2：输入八字字典
+关煞列表 = check_xiaor_xiansha(bazi_info_dict)
+# 输出：[{name, severity, 触发条件, 化解方法}, ...]
+```
+
+### 子平格局法融合（Phase 3-c）
+
+三轨喜用神体系：千里命稿 / 滴天髓 / 子平格局，自动判断主推。
+
+**调用方式**：
+```python
+from scripts.ziping_gefasi import detect_special_pattern, judge_pattern_day_strength, get_xiyong_by_gefasi, merge_gefasi_xys
+
+# 普通格局检测
+特殊格局 = detect_special_pattern(bazi_info)  # 专旺格/化气格/从格
+配合 = judge_pattern_day_strength(bazi_info, 格局名)
+
+# 子平格局喜用神
+格局用神 = get_xiyong_by_gefasi(bazi_info, 格局名, 日主强弱)
+
+# 三轨融合
+融合结果 = merge_gefasi_xys(bazi_info, xiyong_qianli, xiyong_dimanti, xiyong_gefasi)
+# 输出：{共识项, 冲突项, 融合策略, 最终喜用神}
+```
 
 ---
 

@@ -795,6 +795,9 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int,
     # 神煞分析
     shen_sha = _get_shen_sha_summary(bazi)
 
+    # 命宫/身宫
+    minggong_shengong = get_minggong_shengong(bazi_result)
+
     # 十神心性（来自《千里命稿》映射表）
     shishen_xinxing = build_shishen_xinxing_from_bazi(
         {"shishen": shishen}, xiyong_v2
@@ -832,6 +835,103 @@ def full_bazi_analysis(year: int, month: int, day: int, hour: int,
         "pattern_cheng": pattern_result["cheng_info"],
         "shen_sha": shen_sha,
         "xinxing": shishen_xinxing,       # 六神心性速查
+        "minggong_shengong": minggong_shengong,  # Phase 3-a: 命宫/身宫
+    }
+
+
+# ============================================================
+# Phase 3-a: 命宫/身宫系统（渊海子平公式）
+# ============================================================
+
+def get_minggong_shengong(bazi_info: dict) -> dict:
+    """
+    计算命宫和身宫
+
+    【渊海子平】命宫公式：
+      命宫地支 = (生月地支 + 生时地支) % 12
+      命宫天干 = (年干 + 命宫地支 + 1) % 10
+
+    【身宫公式】(通玄鬼料)：
+      身宫地支 = (生月地支 + 生时地支 + 2 - 年支) % 12
+      身宫天干 = (年干 + 身宫地支 + 1) % 10
+
+    参数:
+        bazi_info: get_bazi() 返回的字典，包含 bazi["year/month/day/hour"]["stem_idx/branch_idx"]
+
+    返回:
+        dict: {
+          "命宫": {天干, 地支, 天干索引, 地支索引, 五行, 十神, 长生状态},
+          "身宫": {天干, 地支, 天干索引, 地支索引, 五行, 十神, 长生状态}
+        }
+    """
+    bazi = bazi_info["bazi"]
+
+    year_stem_idx    = bazi["year"]["stem_idx"]
+    year_branch_idx  = bazi["year"]["branch_idx"]
+    month_branch_idx = bazi["month"]["branch_idx"]
+    hour_branch_idx  = bazi["hour"]["branch_idx"]
+    day_stem_idx     = bazi["day"]["stem_idx"]
+
+    # ── 命宫地支 ─────────────────────────────────────────
+    # 命宫 = (生月地支 + 生时地支) % 12
+    minggong_zhi_idx = (month_branch_idx + hour_branch_idx) % 12
+
+    # ── 命宫天干 ─────────────────────────────────────────
+    # 从年干起数，数到命宫地支位（年支=0位起），天干 = (年干 + 命宫地支 + 1) % 10
+    minggong_stem_idx = (year_stem_idx + minggong_zhi_idx + 1) % 10
+
+    # ── 身宫地支 ─────────────────────────────────────────
+    # 身宫 = (生月地支 + 生时地支 + 2 - 年支) % 12
+    shenggong_zhi_idx = (month_branch_idx + hour_branch_idx + 2 - year_branch_idx) % 12
+
+    # ── 身宫天干 ─────────────────────────────────────────
+    shenggong_stem_idx = (year_stem_idx + shenggong_zhi_idx + 1) % 10
+
+    # ── 五行属性 ─────────────────────────────────────────
+    minggong_element_idx  = STEM_ELEMENTS[minggong_stem_idx]
+    shenggong_element_idx = STEM_ELEMENTS[shenggong_stem_idx]
+
+    # ── 十神（以日主为基准）───────────────────────────────
+    minggong_shishen  = get_shishen(day_stem_idx, minggong_stem_idx)
+    shenggong_shishen = get_shishen(day_stem_idx, shenggong_stem_idx)
+
+    # ── 长生状态（命宫/身宫地支相对于日干的长生状态）──────
+    minggong_changsheng  = get_changsheng(day_stem_idx, minggong_zhi_idx)
+    shenggong_changsheng = get_changsheng(day_stem_idx, shenggong_zhi_idx)
+
+    minggong_stem  = HEAVENLY_STEMS[minggong_stem_idx]
+    minggong_zhi   = EARTHLY_BRANCHES[minggong_zhi_idx]
+    shenggong_stem = HEAVENLY_STEMS[shenggong_stem_idx]
+    shenggong_zhi  = EARTHLY_BRANCHES[shenggong_zhi_idx]
+
+    return {
+        "命宫": {
+            "stem":      minggong_stem,
+            "branch":    minggong_zhi,
+            "stem_idx":  minggong_stem_idx,
+            "branch_idx": minggong_zhi_idx,
+            "ganzhi":    minggong_stem + minggong_zhi,
+            "element":   ELEMENT_NAMES[minggong_element_idx],
+            "shishen":   minggong_shishen,
+            "changsheng": minggong_changsheng,
+        },
+        "身宫": {
+            "stem":      shenggong_stem,
+            "branch":    shenggong_zhi,
+            "stem_idx":  shenggong_stem_idx,
+            "branch_idx": shenggong_zhi_idx,
+            "ganzhi":    shenggong_stem + shenggong_zhi,
+            "element":   ELEMENT_NAMES[shenggong_element_idx],
+            "shishen":   shenggong_shishen,
+            "changsheng": shenggong_changsheng,
+        },
+        # 原始输入备份（方便调试）
+        "_debug": {
+            "year_stem_idx":    year_stem_idx,
+            "year_branch_idx":  year_branch_idx,
+            "month_branch_idx": month_branch_idx,
+            "hour_branch_idx":  hour_branch_idx,
+        }
     }
 
 
