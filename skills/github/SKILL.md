@@ -7,6 +7,23 @@ description: "Interact with GitHub using the `gh` CLI. Use `gh issue`, `gh pr`, 
 
 Use the `gh` CLI to interact with GitHub. Always specify `--repo owner/repo` when not in a git directory, or use URLs directly.
 
+## Authentication
+
+```bash
+gh auth status
+```
+
+If unauthenticated, run `gh auth login` and follow the prompts.
+
+## Common Errors
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `gh: command not found` | `gh` not installed | `brew install gh` |
+| `ERROR: HTTP 404` | Repo/issue/PR not found | Verify `--repo owner/repo` spelling |
+| `ERROR: HTTP 403` | Rate limit or no permission | `gh auth refresh` or check token scopes |
+| `GraphQL: Could not resolve to a node` | Wrong owner/repo | Double-check case sensitivity |
+
 ## Pull Requests
 
 Check CI status on a PR:
