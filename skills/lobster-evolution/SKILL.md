@@ -6,26 +6,29 @@ description: >
   self-healer 错误自愈、skill-health-monitor 技能健康度监测、
   user-preference-profile 用户偏好提取，
   实现无需外部训练管道的能力自动增长。
-  
-  触发词（任一匹配即唤醒）：自动进化、龙虾如何进化、lobster-evolution、
-  session挖掘、技能提案、模式发现、自动成长、能力提升、
-  进化诊断、进化状态、检查进化、健康度、技能健康。
 triggers:
   - keywords:
       - "自动进化"
       - "龙虾进化"
-      - "lobster evolution"
       - "session挖掘"
       - "技能提案"
-      - "模式发现"
-      - "能力成长"
       - "进化诊断"
-      - "进化状态"
       - "检查进化"
-      - "健康度"
-      - "技能健康"
+      - "lobster evolution"
     load: true
     priority: high
+  - keywords:
+      - "模式发现"
+      - "能力成长"
+      - "进化状态"
+    load: true
+    priority: medium
+  - keywords:
+      - "健康度"
+      - "技能健康"
+    load: false
+    priority: low
+    note: 与weather-advisor等技能重叠，优先触发其他技能
 ---
 
 # 🦞 Lobster Evolution — 龙虾自动进化引擎
@@ -227,10 +230,9 @@ cat ~/.openclaw/workspace/.state/evolution/evolution-state.json 2>/dev/null || e
 - ❌ **待增强**：LLM无法仅凭规则自动修复未知错误，需要增强为可调用LLM进行推理修复
 - ❌ **待实现**：实际执行修复动作（目前只生成报告，尚无自动写入修复）
 
-**待实现增强方向**：
-1. **LLM增强判断**：对于未知错误模式，调用LLM分析错误原因并给出修复方案
-2. **自动执行修复**：对于高置信度修复方案，自动执行（需安全边界确认）
-3. **自愈学习**：将新修复成功的案例加入 KNOWN_PATTERNS，自动扩充知识库
+**待演进方向**：
+- 🔜 LLM增强判断（调用LLM分析未知错误）+ 自动执行高置信度修复（需安全边界确认）
+- 🔜 自愈学习：将修复成功案例加入 KNOWN_PATTERNS，自动扩充知识库
 
 **输出位置**：`~/.openclaw/workspace/.state/evolution/self-healer.md`
 
@@ -264,11 +266,10 @@ cat ~/.openclaw/workspace/.state/evolution/evolution-state.json 2>/dev/null || e
 - ❌ **待实现**：偏好未在实际对话/任务中自动应用
 - ❌ **待实现**：correction 条目积累不足，模式推断精度有限
 
-**待实现增强方向**：
-1. **实时偏好应用**：在每次回复前检查用户偏好画像，动态调整输出风格
-2. **偏好置信度**：基于更多样本提升模式识别精度，过滤低可信推断
-3. **偏好可视化**：生成用户偏好报告，主动告知用户"我学到了你的哪些偏好"
-4. **偏好时序分析**：区分短期偏好（临时）和长期偏好（稳定），动态调整权重
+**待演进方向**：
+- 🔜 实时偏好应用（在每次回复前检查画像，动态调整输出风格）
+- 🔜 偏好置信度过滤（基于更多样本提升识别精度）
+- 🔜 偏好时序分析（区分短期/长期偏好，动态调整权重）
 
 **输出位置**：`~/.openclaw/workspace/.state/evolution/user-preferences.json`
 
@@ -321,12 +322,10 @@ cat ~/.openclaw/workspace/.state/evolution/evolution-state.json 2>/dev/null || e
 - ❌ **待实现**：提及频率统计依赖 daily-mining.md，无法追踪真实调用次数
 - ❌ **待实现**：缺少"用户显式抱怨"这一维度的数据采集
 
-**待实现增强方向**：
-1. **真实调用追踪**：接入 OpenClaw 内部调用日志，统计真实 skill 调用次数（而非依赖挖掘报告词频）
-2. **自动建议推送**：当低健康度 Skill 超过3个时，主动向用户推送"技能清理"建议
-3. **健康度时序**：记录技能健康度历史，在报告中展示"下滑趋势"预警
-4. **用户反馈采集**：在 Skill 输出后主动询问用户满意度（通过心跳或标记机制）
-5. **自动归档**：对于长期（>3个月）低健康度 Skill，自动归档到 `.archive/` 而非直接删除
+**待演进方向**：
+- 🔜 真实调用追踪（接入OpenClaw内部日志，替代词频统计）
+- 🔜 健康度时序（记录历史，预警下滑趋势）
+- 🔜 自动归档（>3个月低健康度 Skill → `.archive/`，保留30天后悔期）
 
 **输出位置**：`~/.openclaw/workspace/.state/evolution/skill-health.json`
 
@@ -346,17 +345,26 @@ cat ~/.openclaw/workspace/.state/evolution/evolution-state.json 2>/dev/null || e
 
 ---
 
-## 与其他 Skills 的协同
+## 依赖关系
 
-| 组合 | 进化效果 |
-|------|---------|
-| lobster-evolution + session-miner | 观察层自动化 |
-| lobster-evolution + skill-proposer | 判断层自动化 |
-| lobster-evolution + self-healer | 自愈层自动化 |
-| lobster-evolution + skill-evolution-manager | 记忆层自动化 |
-| lobster-evolution + basal-ganglia-memory | 习惯层自动化（长期偏好）|
-| lobster-evolution + skill-health-monitor | 监测层自动化 |
-| lobster-evolution + user-preference-profile | 偏好层自动化 |
+### 脚本组件（内置，执行层工具）
+
+| 脚本 | 路径 | 职责 | 调用方式 |
+|------|------|------|---------|
+| session-miner | `scripts/evolution/session-miner.py` | 跨Session Query挖掘 | 心跳自动调用 |
+| skill-proposer | `scripts/evolution/skill-proposer.py` | 高频模式→技能提案 | 心跳自动调用 |
+| self-healer | `scripts/evolution/self-healer.py` | 已知错误→修复建议 | 心跳自动调用 |
+| skill-health-monitor | `scripts/evolution/skill-health-monitor.py` | 技能健康度打分+预警 | 心跳自动调用 |
+| user-preference-profile | `scripts/evolution/user-preference-profile.py` | 用户偏好提取+画像 | 心跳自动调用 |
+
+### 外部 Skill（按需调用）
+
+| Skill | 触发时机 | 进化效果 |
+|------|---------|---------|
+| `skillhub_install` | 执行层需安装新技能时 | 安装提案中的新 Skill |
+| `skill-creator` | 提案通过，需创建新 Skill 时 | 生成新 Skill 代码 |
+| `basal-ganglia-memory` | 长期偏好沉淀 | 习惯层自动化（跨会话偏好） |
+| `qclaw-openclaw` | 定时任务集成 | 驱动心跳执行进化闭环 |
 
 ---
 
