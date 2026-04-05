@@ -92,6 +92,30 @@
 3. 检查 skill-log.md 最近条目，如果距今 > 30 天 → 提醒用户做季度内省
 
 **洞察捕获原则**：
+
+---
+
+## 📊 Skill 使用追踪（每次心跳）
+
+每次心跳记录主要 skill 调用（自动追踪）：
+
+**追踪方式**：
+```bash
+# 记录 skill 被调用
+python3 ~/.openclaw/workspace/skills/ecology-monitor/scripts/usage_tracker.py record <skill-name> [trigger]
+```
+
+**触发时机**：
+- Skill 被加载时记录
+- 手动调用 skill 时记录
+- Cron/subagent 任务执行时记录
+
+**查看统计**：
+```bash
+python3 ~/.openclaw/workspace/skills/ecology-monitor/scripts/usage_tracker.py
+```
+
+**数据位置**：`~/.openclaw/workspace/.state/skill-usage/usage.jsonl`
 - 不记流水账，只记**违反直觉的发现**
 - 格式：背景 → 改动 → 洞察 → 下次注意
 - 触发条件：**新建 skill**、**重大重构**、**踩坑修复**、**认知升级**
