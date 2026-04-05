@@ -9,6 +9,16 @@ allowed-tools: Bash(infsh *)
 
 Build RAG (Retrieval Augmented Generation) pipelines via [inference.sh](https://inference.sh) CLI.
 
+## Prerequisites
+
+**Required:** `infsh` CLI must be installed and logged in before any pipeline can run.
+
+```bash
+curl -fsSL https://cli.inference.sh | sh && infsh login
+```
+
+> The install script detects your OS/architecture, downloads the matching binary, and verifies SHA-256. No root/admin required. [Manual install](https://dist.inference.sh/cli/checksums.txt) available.
+
 ![AI RAG Pipeline](https://cloud.inference.sh/app/files/u/4mg21r6ta37mpaz6ktzwtt8krr/01kgndqjxd780zm2j3rmada6y8.jpeg)
 
 ## Quick Start
@@ -209,11 +219,14 @@ Format as a professional report with:
 ### Quick Answer with Sources
 
 ```bash
-# Use Exa Answer for direct factual questions
+# Direct factual answer — no separate LLM step needed
 infsh app run exa/answer --input '{
   "question": "What is the current market cap of NVIDIA?"
 }'
+# Output includes the answer + cited source URLs
 ```
+
+> **When to use this vs. Search + LLM:** Use `exa/answer` for single factual queries (definitions, numbers, dates). Use the Search + LLM pattern for complex analysis, synthesis, or multi-source reports.
 
 ## Best Practices
 

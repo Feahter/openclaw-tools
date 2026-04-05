@@ -29,6 +29,40 @@ Then after the skill is done (but again, the order is flexible), you can also ru
 
 Cool? Cool.
 
+## Quick-start example
+
+Here's a complete minimal skill that shows all the pieces working together:
+
+```markdown
+---
+name: my-first-skill
+description: Does X. Use when the user mentions Y or wants to Z. Keywords: X, Y, Z.
+---
+
+# My First Skill
+
+## What it does
+Explain in 1-2 sentences what this skill enables.
+
+## When to trigger
+List the exact contexts where this skill should activate.
+
+## Step 1: [Action name]
+1. Do this first
+2. Then do this
+3. Finally do this
+
+## Output format
+Always produce output in this exact format:
+- Format specification here
+
+## Examples
+**Input:** [example input]
+**Output:** [example output]
+```
+
+The key insight: **the description in frontmatter is the triggering mechanism** — write it like you're pitching to a tired version of yourself who just wants to get things done.
+
 ## Communicating with the user
 
 The skill creator is liable to be used by people across a wide range of familiarity with coding jargon. If you haven't heard (and how could you, it's only very recently that it started), there's a trend now where the power of Claude is inspiring plumbers to open up their terminals, parents and grandparents to google "how to install npm". On the other hand, the bulk of users are probably fairly computer-literate.

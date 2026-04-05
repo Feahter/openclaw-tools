@@ -90,6 +90,21 @@ pipeline:
 
 ---
 
+## 任务路由决策（必读）
+
+根据任务复杂度选择执行方式，**只看这一个表就够了**：
+
+| 任务类型 | 特征 | 执行方式 | 示例 |
+|---------|------|---------|------|
+| **简单** | 单文件、< 60s、无外部依赖 | `exec` 前台 | 写个脚本、修个 bug、生成一个文件 |
+| **中等** | 3-5 文件、1-5 min、可能装依赖 | `exec background:true` | 初始化项目、实现一个模块、自动化脚本 |
+| **复杂** | 5+ 文件、> 5 min、需要多轮迭代 | `sessions_spawn` 子 session | 大型重构、框架迁移、全栈功能开发 |
+| **调试** | 需要读代码+分析+多次尝试 | `sessions_spawn` 子 session | 偶现 bug、性能分析、日志追踪 |
+
+**判断流程**：任务涉及 5+ 文件？→ 子 session。否则需要装依赖或后台跑？→ exec background。否则 → exec 前台。
+
+---
+
 ## 架构
 
 ```
@@ -714,7 +729,7 @@ exec workdir:$HOME \
 
 **处理：**
 ```bash
-exec background:true \
+exec workdir:$HOME/project/myapp background:true \
   command:"claude -p '实现用户认证模块：注册、登录、JWT token 刷新。技术栈：Node.js + Express + MongoDB。包含完整验证、中间件、最小测试。' --output-format stream-json --no-session-persistence --permission-mode bypassPermissions"
 ```
 
@@ -806,7 +821,7 @@ exec workdir:$HOME/project/frontend \
 
 **处理：**
 ```bash
-exec background:true \
+exec workdir:$HOME/project/myapi background:true \
   command:"claude -p 'Initialize a FastAPI project with:
 1. SQLAlchemy + PostgreSQL connection
 2. User authentication (JWT)
@@ -844,16 +859,32 @@ Save as backup.sh and make it executable.' --output-format stream-json --no-sess
 
 → 见 `.state/learnings.md`
 
----
+#### 6. AI 未产生任何文件改动
 
-## 故障排除速查
+```
+症状：git status 无变化，或改动不符合预期
+解决：
+  1. cd $PROJECT_DIR && git diff --stat
+  2. 检查任务描述是否足够具体（AI 可能理解错了）
+  3. 重新描述任务，附加具体文件名和预期行为
+```
 
-| 问题 | 快速检查 | 解决方案 |
-|------|---------|---------|
-| 进程无响应 | `tail -f .state/logs/<id>.log` | kill pid，检查网络 |
-| 权限报错 | `ls -la` 检查目录权限 | 改用信任目录 |
-| 依赖安装失败 | `npm install` 手动运行 | 检查网络/换源 |
-| 测试失败 | `npm test 2>&1` | 分析错误，子 session 修正 |
-| 文件没变化 | `git status` | AI 可能理解错了，重新描述任务 |
-| 内存爆了 | `top` 看进程 | 减少并发/简化任务 |
-| API 超限 | 检查 API key | 等一段时间再试 |
+#### 7. 内存或资源耗尽
+
+```
+症状：进程 OOM killed 或系统变慢
+解决：
+  1. top 查看 CPU/内存占用最高的进程
+  2. kill 掉不必要的进程
+  3. 简化任务描述，减少并发
+```
+
+#### 8. API 速率限制
+
+```
+症状：返回 429 或 API key 被限速
+解决：
+  1. 检查 API key 是否有效
+  2. 等待一段时间（通常 1-5 分钟）
+  3. 如果频繁触发，考虑拆分任务减少单次 token 消耗
+```

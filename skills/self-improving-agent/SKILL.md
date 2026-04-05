@@ -193,8 +193,10 @@ Actual error message or output
 If identifiable, what might resolve this
 
 ### Metadata
+- Source: error | user_feedback | testing
 - Reproducible: yes | no | unknown
 - Related Files: path/to/file.ext
+- Tags: tag1, tag2
 - See Also: ERR-20250110-001 (if recurring)
 
 ---
@@ -225,7 +227,10 @@ simple | medium | complex
 How this could be built, what it might extend
 
 ### Metadata
+- Source: user_feedback | observation
 - Frequency: first_time | recurring
+- Related Files: path/to/file.ext
+- Tags: tag1, tag2
 - Related Features: existing_feature_name
 
 ---
