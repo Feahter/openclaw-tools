@@ -2,9 +2,10 @@
 name: lobster-evolution
 description: >
   龙虾（OpenClaw）自动进化引擎——观察→判断→执行→验证闭环。
-  利用 session-miner 跨Session模式挖掘、skill-proposer 技能提案、
-  self-healer 错误自愈、skill-health-monitor 技能健康度监测、
-  user-preference-profile 用户偏好提取，
+  【单向架构】lobster-evolution 是唯一主控，读取其他组件的数据输出（单向数据流）：
+  session-miner（观察数据）、skill-proposer（提案数据）、self-healer（自愈数据）、
+  skill-health-monitor（健康数据）、user-preference-profile（偏好数据）。
+  不形成循环依赖，每次心跳按顺序执行各层。
   实现无需外部训练管道的能力自动增长。
 triggers:
   - keywords:
@@ -45,23 +46,25 @@ triggers:
 
 ---
 
-## 进化闭环架构
+## 进化闭环架构（单向数据流，无循环依赖）
 
 ```
-[观察层] session日志 + daily-mining
+[观察层] lobster 读取 session-miner 输出（单向）
     ↓
-[判断层] skill-proposer → 模式识别 → 技能提案
+[判断层] lobster 读取 skill-proposer 输出 → 生成技能提案（单向）
     ↓
-[执行层] skillhub_install + skill-evolution-manager + 文件写入
+[执行层] lobster 执行文件写入/skill安装（单向输出）
     ↓
-[验证层] 下次心跳验证效果 → 强化/回滚
+[验证层] 下次心跳读取执行结果验证（单向）
     ↓
-[自愈层] self-healer → 已知错误自动修复
+[自愈层] lobster 读取 self-healer 结果并执行修复（单向）
     ↓
-[偏好层] user-preference-profile → 行为策略动态调整
+[偏好层] lobster 读取 user-preference-profile 并应用策略（单向）
     ↓
-[监测层] skill-health-monitor → 技能健康度追踪
+[监测层] lobster 读取 skill-health-monitor 结果（单向）
 ```
+
+**关键原则**：lobster-evolution 是唯一的主控脚本，其他组件都是**数据生产者**， lobster-evolution 单向读取它们的结果，不形成循环。
 
 ---
 

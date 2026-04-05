@@ -3,7 +3,8 @@ name: ecology-monitor
 description: >
   技能生态系统监测器 — 监控skill群体健康度、识别濒危/入侵物种、检测共生依赖。
   用于：定期评估skill生态、发现孤岛技能、识别技术债、追踪skill演化趋势。
-  核心功能：生态健康度评估、濒危/入侵检测、共生关系发现。
+  核心功能：生态健康度评估、濒危/入侵检测（共2种判断路径：usage频率 + file_size）、共生关系发现。
+  内置 usage_tracker 记录真实调用，配合 ecology_monitor.py 输出准确报告。
 triggers:
   - keywords: ["生态系统", "生态监测", "濒危", "入侵", "共生", "skill健康度", "skill演替", "技术生态", "代谢率"]
     load: true
@@ -70,12 +71,18 @@ triggers:
 
 ## 入侵物种识别
 
-### 入侵信号
+### 入侵信号（2种判断路径）
 
+**路径1：使用频率（更准确）**
+```bash
+python3 ~/.openclaw/workspace/skills/ecology-monitor/scripts/usage_tracker.py stats 30
+```
+调用频率 > 平均3倍 = 潜在入侵
+
+**路径2：文件规模（备用）**
 | 入侵原因 | 表现 | 检测方法 |
 |---------|------|---------|
-| **过度扩张** | 调用频率 >> 平均 | 异常值检测 |
-| **功能膨胀** | 触发词过多 | 触发词重叠分析 |
+| **功能膨胀** | size > 50KB + 有scripts | 触发词重叠分析 |
 | **依赖集中** | 大量skill依赖它 | 反向依赖分析 |
 | **版本落后** | 长期不更新 | git日志 |
 
@@ -87,6 +94,20 @@ triggers:
   ├─ 降低触发优先级 → 缩小触发词范围
   └─ 建立竞争 → 扶持替代skill
 ```
+
+### 使用频率追踪
+
+**记录使用**（建议在每次skill加载时调用）：
+```bash
+python3 ~/.openclaw/workspace/skills/ecology-monitor/scripts/usage_tracker.py record <skill-name> [trigger]
+```
+
+**查看统计**：
+```bash
+python3 ~/.openclaw/workspace/skills/ecology-monitor/scripts/usage_tracker.py
+```
+
+**数据位置**：`~/.openclaw/workspace/.state/skill-usage/usage.jsonl`
 
 ---
 
