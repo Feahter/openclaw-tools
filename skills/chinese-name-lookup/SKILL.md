@@ -517,3 +517,156 @@ from scripts.ziping_gefasi import detect_special_pattern, judge_pattern_day_stre
 | 十神/长生 | ⭐⭐⭐ | 传统方法，本地计算 |
 | 纳音五行 | ⭐⭐ | 参考 |
 | 五格数理 | ⭐ | 仅作参考，不作主要评分依据 |
+
+---
+
+## MCP Server（八字引擎 MCP 化）
+
+八字引擎已封装为 MCP Server，可被 Claude Desktop、Cursor、Cline、Windsurf 等 MCP Client 调用。
+
+### 文件说明
+
+- `mcp_server.py` — MCP Server 主程序（FastMCP, stdio 模式）
+- `skills.json` — MCP Manifest（工具定义）
+
+### 暴露的工具
+
+| 工具名 | 功能 | 输入 |
+|--------|------|------|
+| `bazi_full_analysis` | 完整八字排盘分析 | `birth_time`（YYYY-MM-DD HH:MM）+ `gender`（男/女）+ `province`/`city`（可选，真太阳时矫正） |
+| `bazi_dayun_analysis` | 大运流年分析 | 同上 |
+
+### 安装依赖
+
+```bash
+cd ~/.openclaw/workspace/skills/chinese-name-lookup
+pip install mcp -q
+```
+
+### 配置到 Claude Desktop
+
+#### macOS
+```bash
+# 打开 Claude Desktop 配置
+code ~/Library/Application\ Support/Claude/claude_desktop_config.json
+```
+
+#### Windows
+```bash
+code %APPDATA%\Claude\claude_desktop_config.json
+```
+
+#### Linux
+```bash
+# 取决于安装方式，通常在：
+code ~/.config/Claude/claude_desktop_config.json
+```
+
+#### 添加 MCP Server
+
+在 `mcpServers` 中添加：
+
+```json
+{
+  "mcpServers": {
+    "bazi": {
+      "command": "python",
+      "args": ["/Users/fuzhuo/.openclaw/workspace/skills/chinese-name-lookup/mcp_server.py"],
+      "env": {}
+    }
+  }
+}
+```
+
+> **注意**：路径请根据实际安装位置调整。可以使用绝对路径。
+
+#### 重启 Claude Desktop
+
+配置完成后，**完全退出** Claude Desktop（⌘Q），重新启动即可。
+
+### 验证
+
+Claude Desktop 重启后，在对话中测试：
+
+```
+用 bazi_full_analysis 分析：2024-03-15 10:30，男
+```
+
+或
+
+```
+用 bazi_dayun_analysis 分析：1990-08-15 14:00，女
+```
+
+如果工具没有出现，检查：
+1. Claude Desktop → Settings → MCP — 是否显示 `bazi` server 状态为 Running
+2. 查看 Claude Desktop 日志：`~/Library/Logs/Claude/`
+
+### 手动测试 MCP Server
+
+```bash
+# 进入目录
+cd ~/.openclaw/workspace/skills/chinese-name-lookup
+
+# 直接运行（stdio 交互式测试）
+python mcp_server.py
+
+# 或用 MCP Inspector 测试
+python -m mcp.server.fastmcp inspect mcp_server.py
+```
+
+### 工具输出示例
+
+#### bazi_full_analysis
+
+```markdown
+# 八字命盘分析
+
+**出生时间**: 甲辰年 丁辰月 庚子日 辛巳时
+**性别**: 男
+**生肖**: 龙
+**农历**: 2024年2月6日
+
+## 八字命盘
+| 年柱 | 月柱 | 日柱 | 时柱 |
+|:---:|:---:|:---:|:---:|
+| **甲辰** | **丁辰** | **庚子** | **辛巳** |
+
+## 日主强弱
+- **日主**: 庚金（中）
+- **月令**: 辰（土）
+- **强弱**: 中
+- **主推方法**: 千里命稿法
+
+## 喜用神
+- **喜用神**: 土, 金
+- **忌神**: 木, 火
+```
+
+#### bazi_dayun_analysis
+
+```markdown
+# 大运流年分析
+
+**方向规则**: 阳男阴女顺行，阴男阳女逆行
+
+## 大运序列
+- **0-9岁**: 戊辰 【顺行】
+- **10-19岁**: 己巳 【顺行】
+- **20-29岁**: 庚午 【顺行】
+
+## 近5年流年
+- **2024**（甲辰）: 偏财流年
+- **2025**（乙巳）: 正财流年
+```
+
+### 与 Skill 内函数的区别
+
+| 调用方式 | 适用场景 |
+|---------|---------|
+| Skill 内 `scripts.bazi_engine.full_bazi_analysis()` | OpenClaw Agent 直接调用 |
+| MCP `bazi_full_analysis` | Claude Desktop / 第三方 MCP Client 调用 |
+| Skill 内 `scripts.dayun_liunian.full_dayun_analysis()` | OpenClaw Agent 直接调用 |
+| MCP `bazi_dayun_analysis` | Claude Desktop / 第三方 MCP Client 调用 |
+
+MCP Server 是纯接口封装，底层调用完全相同的本地引擎，无 API 依赖。
