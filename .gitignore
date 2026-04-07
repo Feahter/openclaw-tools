@@ -44,3 +44,8 @@ project/
 # Trash (30-day auto-cleanup)
 .trash/
 .trash/*
+
+# LLM Wiki Agent output (personal knowledge data)
+skills/llm-wiki-agent/wiki/
+skills/llm-wiki-agent/raw/
+skills/llm-wiki-agent/.claude/
