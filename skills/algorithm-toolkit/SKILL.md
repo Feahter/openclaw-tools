@@ -306,3 +306,26 @@ references/
 | O(n) | 10^6 步，可接受 |
 | O(n log n) | ~2×10^7 步，边缘 |
 | O(n²) | 10^12 步，不可行 |
+
+---
+
+## 竞赛算法速查（Kimi OI/ACM 口诀）
+
+*详见 `references/algorithms.md` → 竞赛算法口诀 section*
+
+| 口诀 | 算法 | 复杂度 | 代码位置 |
+|------|------|--------|---------|
+| 区间更新线段树 | 线段树 + 懒标记 | O(log n) | references/algorithms.md |
+| 缩点重建强连通 | Tarjan SCC 缩点 | O(V+E) | references/algorithms.md |
+| 有向无环拓扑排 | Kahn / DFS逆序 | O(V+E) | references/algorithms.md |
+| 大数越界高精度 | 字符串竖式运算 | O(n²) | references/algorithms.md |
+| 递归爆栈改迭代 | 显式栈 / Morris | O(n) | references/algorithms.md |
+| 最长回文马拉车 | Manacher | O(n) | references/algorithms.md |
+| 有序查找平衡树 | AVL/Treap/FHQ | O(log n) | references/algorithms.md |
+
+**竞赛思维**：
+- 遇到区间 → 线段树/前缀和
+- 遇到连通 → 并查集
+- 遇到回文 → Manacher
+- 遇到最值 → 堆/单调栈
+- 遇到有序 → 二分
