@@ -507,7 +507,7 @@ if __name__ == "__main__":
 > "找到以下技能:
 > - xlsx: Excel/CSV 处理
 > - canvas-design: 图表生成
-> - algorithm-toolkit: 数据分析算法
+> - acm-master-skill: 数据分析算法
 > 使用 skillhub_install 工具安装"
 
 ## 触发边界

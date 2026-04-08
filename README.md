@@ -195,7 +195,7 @@ git clone https://github.com/Feather/openclaw-tools.git
 | `dash-cog` | CellCog 交互式 Dashboard |
 | `performance-optimizer` | 性能优化框架 |
 | `perf-profiler` | 火焰图/CPU/内存 profiling |
-| `algorithm-toolkit` | 多语言算法代码库 |
+| `acm-master-skill` | 多语言算法代码库 |
 | `jq-json-processor` | JSON 处理 |
 | `planning-with-files` | Manus 风格文件规划 — 多步骤任务组织与进度追踪 |
 | `remotion-best-practices` | Remotion 视频创作最佳实践 |
