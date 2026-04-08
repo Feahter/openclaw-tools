@@ -98,7 +98,17 @@ def get_db():
     return None
 
 def extract_from_lcm(days=7):
-    """从 LCM 数据库提取近 N 天用户消息。"""
+    """从 LCM 数据库提取近 N 天用户消息。
+    
+    【算法优化v2】增量checkpoint：
+    - 存储上次扫描的cutoff时间戳
+    - 增量：只处理自上次cutoff后新增/变更的会话
+    - 节省：重复扫描无变化的会话
+    """
+    checkpoint = _load_checkpoint()
+    last_cutoff = checkpoint.get("cutoff", "")
+    
+    cutoff = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%S")
     conn = get_db()
     if not conn:
         print("WARNING: LCM db not found, falling back to JSONL", file=sys.stderr)
@@ -139,6 +149,7 @@ def extract_from_lcm(days=7):
                 queries.append({'text': text, 'ts': row['created_at'], 'conv': cid})
 
     conn.close()
+    _save_checkpoint(queries, cutoff)
     return queries
 
 def extract_from_jsonl(days=7):

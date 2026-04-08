@@ -3,6 +3,10 @@
 ecology_monitor.py — 技能生态系统监测器
 
 监控skill群体健康度、识别濒危/入侵物种、检测共生依赖。
+
+【算法优化 v2】增量扫描：
+- 旧：每次全量遍历所有skills目录，O(n*m)文件stat
+- 新：Manifest缓存+增量变更检测+ThreadPool并行stat，O(变化文件数)
 """
 
 import json
@@ -11,6 +15,129 @@ import subprocess
 from pathlib import Path
 from datetime import datetime, timezone
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+# ── Manifest缓存（增量扫描核心）───────────────────────────
+
+MANIFEST_FILE = Path(__file__).parent / "manifest.json"
+MANIFEST_MAX_AGE = 3600  # 1小时内的manifest有效
+
+
+def get_file_key(path: Path) -> str:
+    """获取文件的mtime+size作为缓存key"""
+    try:
+        stat = path.stat()
+        return f"{stat.st_mtime:.0f}_{stat.st_size}"
+    except:
+        return ""
+
+
+def load_manifest() -> dict:
+    """加载manifest缓存"""
+    if not MANIFEST_FILE.exists():
+        return {}
+    try:
+        import time
+        age = time.time() - MANIFEST_FILE.stat().st_mtime
+        if age > MANIFEST_MAX_AGE:
+            return {}
+        return json.loads(MANIFEST_FILE.read_text())
+    except:
+        return {}
+
+
+
+def save_manifest(manifest: dict) -> None:
+    """保存manifest缓存"""
+    MANIFEST_FILE.parent.mkdir(parents=True, exist_ok=True)
+    MANIFEST_FILE.write_text(json.dumps(manifest, ensure_ascii=False))
+
+
+
+def collect_all_skills(skills_dir=None) -> list[dict]:
+    """
+    【算法优化v2】：增量扫描 + ThreadPool并行stat
+    
+    1. 加载manifest缓存
+    2. 对每个skill并行stat文件变更
+    3. 只重新扫描变更的skill
+    4. 更新manifest
+    """
+    if not skills_dir:
+        skills_dir = Path.home() / ".openclaw" / "workspace" / "skills"
+    else:
+        skills_dir = Path(skills_dir)
+
+    manifest = load_manifest()
+    all_skills = []
+    changed, unchanged = 0, 0
+
+    skill_paths = [p for p in skills_dir.iterdir() if p.is_dir() and not p.name.startswith(".")]
+
+    def scan_skill(skill_path: Path) -> dict | None:
+        """并行扫描单个skill（增量：只处理变更的）"""
+        key = get_file_key(skill_path)
+        cached = manifest.get(skill_path.name, {})
+        
+        if cached and cached.get("_key") == key:
+            # 未变更，直接用缓存
+            return None  # None = unchanged
+        
+        # 变更或新skill → 重新扫描
+        try:
+            files = list(skill_path.rglob("*.md"))
+            total_size = sum(f.stat().st_size for f in files if f.is_file())
+            total_lines = 0
+            for f in files:
+                try:
+                    total_lines += len(f.read_text(encoding="utf-8", errors="ignore").splitlines())
+                except:
+                    pass
+            
+            skill_data = {
+                "name": skill_path.name,
+                "path": str(skill_path),
+                "files": len(files),
+                "total_size": total_size,
+                "total_lines": total_lines,
+                "_key": key,
+            }
+            return skill_data
+        except:
+            return None
+
+    # ThreadPool并行扫描所有skill
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        futures = {pool.submit(scan_skill, sp): sp for sp in skill_paths}
+        for future in as_completed(futures):
+            result = future.result()
+            if result:
+                all_skills.append(result)
+                changed += 1
+            else:
+                unchanged += 1
+
+    # 保留未变更skill的缓存数据
+    for sp in skill_paths:
+        name = sp.name
+        if name not in [s["name"] for s in all_skills]:
+            cached = manifest.get(name, {})
+            if cached:
+                all_skills.append({
+                    "name": cached.get("name", name),
+                    "path": cached.get("path", str(sp)),
+                    "files": cached.get("files", 0),
+                    "total_size": cached.get("total_size", 0),
+                    "total_lines": cached.get("total_lines", 0),
+                    "_key": cached.get("_key", ""),
+                    "_cached": True,
+                })
+
+    # 更新manifest
+    new_manifest = {s["name"]: {k: v for k, v in s.items()} for s in all_skills}
+    save_manifest(new_manifest)
+
+    return all_skills
 
 
 # ===== 生态健康评估 =====
