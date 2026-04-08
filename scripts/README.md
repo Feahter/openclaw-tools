@@ -8,6 +8,7 @@
 
 | 脚本 | 来源 | Stars | 作用 |
 |------|------|-------|------|
+| `openclaw-control-cli.py` | 本地开发 | - | OpenClaw gateway 配置与代理管理 CLI |
 | `httpie-wrapper.py` | [httpie/httpie](https://github.com/httpie/httpie) | ⭐ 32K | 人类友好的 HTTP 客户端，curl 替代品 |
 | `bash-functions` | [mathiasbynens/dotfiles](https://github.com/mathiasbynens/dotfiles) | - | Bash 函数库（包含 extract, mem, etc） |
 | `tldr-curl.md` | [tldr-pages/tldr](https://github.com/tldr-pages/tldr) | ⭐ 48K | curl 命令简化示例 |
@@ -170,6 +171,52 @@ prompt pure
 - 显示 git 分支/状态/提交数
 - 显示当前命令执行时间（>5s）
 - 简洁优雅的视觉设计
+
+---
+
+### openclaw-control-cli.py
+**来源**: 本地开发 | **语言**: Python
+
+**作用**：OpenClaw gateway 配置与代理管理 CLI
+
+**用法**：
+```bash
+# 查看配置状态
+python3 openclaw-control-cli.py status
+
+# 设置代理
+python3 openclaw-control-cli.py proxy set http://127.0.0.1:7890
+
+# 查看代理
+python3 openclaw-control-cli.py proxy show
+
+# 清除代理
+python3 openclaw-control-cli.py proxy clear
+
+# 获取配置值
+python3 openclaw-control-cli.py config get gateway.port
+
+# 设置配置值
+python3 openclaw-control-cli.py config set gateway.port 28790
+
+# 编辑配置文件
+python3 openclaw-control-cli.py edit
+```
+
+**快捷命令**：
+```bash
+# 添加到 ~/.local/bin
+ln -sf $(pwd)/openclaw-control-cli.py ~/.local/bin/openclaw-control
+
+# 然后可以直接使用
+openclaw-control status
+openclaw-control proxy set http://127.0.0.1:7890
+```
+
+**注意**：
+- 修改配置后需要重启 QClaw 应用
+- 配置文件路径：`~/.qclaw/openclaw.json`
+- 自动备份为 `.json.bak`
 
 ---
 

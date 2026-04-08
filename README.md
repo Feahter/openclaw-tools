@@ -38,8 +38,8 @@ git clone https://github.com/Feather/openclaw-tools.git
 | `skill-project-butcher` | GitHub 项目深度分析 |
 | `skill-from-masters` | 基于专家方法论创建高质量 Skills |
 | `skill-agent-creator` | Skill 创建与编排 |
-| `skill-algo-researcher` | 算法研究助手 |
-| `skill-algorithm-master` | 算法工具 — 查/实现算法和数据结构 |
+| 
+| `skill-algo-master` | 算法全能工具箱 — LOOKUP/ANALYZE/RESEARCH 三模式
 | `skill-taste-calibrator` | AI 品味校准与判断力进化 |
 | `skill-template-layered-retrieval` | 文档分层检索模板 |
 | `test-driven-development` | TDD — RED-GREEN-REFACTOR 流程 |
