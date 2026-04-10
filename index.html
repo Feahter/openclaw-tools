@@ -78,9 +78,16 @@
   
   <script>
     // ==========================================
-    // MVP - 纯 JS 版本（无需 React）
+    // OpenNoCode - 架构设计
     // ==========================================
+    // 原则:
+    // 1. 单一数据源 (Single State)
+    // 2. 单向数据流 (UI = f(state))
+    // 3. 高内聚低耦合 (相关功能集中)
+    // 4. 组合优于继承
+    // 5. 如无必要勿增实体
     
+    // 状态层 - 单一数据源
     let state = {
   editingRecordId: null,
       apps: [],
@@ -385,7 +392,7 @@
             if (f.type === 'formula') return `<td style="color:var(--primary)">${calculateFormula(val, r.data)}</td>`;
             if (f.type === 'auto_id') return `<td style="color:var(--gray-500)">AUTO</td>`;
             if (f.type === 'reference') return `<td>${val ? val.slice(0,8) : '-'}</td>`;
-            if (f.type === 'file' || f.type === 'image') return `<td>${val ? '📎' : '-'}</td>`;
+            if (f.type === 'file' || f.type === 'image') return `<td><img loading="lazy" src="${val || ''}" style="max-height:20px" onerror="this.style.display='none'">${val ? '📎' : ''}</td>`;
             // 快捷编辑
             return `<td contenteditable="true" onblur="quickEdit('${r.id}', '${f.name}', this.innerText)">${val || '-'}</td>`;
           }).join('');
@@ -428,6 +435,89 @@
         `;
       }
     }
+
+    // 渲染层 - UI = f(state)
+    window.render = function() {
+      const app = document.getElementById('content');
+      if (!app) return;
+      
+      if (state.currentView === 'apps') {
+        app.innerHTML = renderApps();
+      } else if (state.currentView === 'fields') {
+        app.innerHTML = renderFields();
+      } else if (state.currentView === 'data' && state.selectedApp) {
+        app.innerHTML = renderDataView();
+      }
+      updateNavButtons();
+    };
+    
+    function renderApps() {
+      return `<div class="toolbar"><button class="btn btn-primary" onclick="hasPermission('create') ? showModal('app') : alert('无权限')">+ 新建应用</button></div>
+        <div class="card"><table><thead><tr><th>名称</th><th>类型</th><th>字段数</th><th>创建时间</th></tr></thead>
+        <tbody>${state.apps.length ? state.apps.map(a => `<tr><td>${a.name}</td><td><span class="tag">${a.type}</span></td><td>${a.fields?.length||0}</td><td>${new Date(a.created_at).toLocaleDateString()}</td></tr>`).join('') : '<tr><td colspan="4" class="empty">暂无应用</td></tr>'}</tbody></table></div>`;
+    }
+    
+    function renderFields() {
+      return `<div class="toolbar"><button class="btn btn-primary" onclick="hasPermission('create') ? showModal('field') : alert('无权限')">+ 新建字段</button></div>
+        <div class="card"><table><thead><tr><th>标识</th><th>名称</th><th>类型</th><th>创建时间</th></tr></thead>
+        <tbody>${state.fields.length ? state.fields.map(f => `<tr><td>${f.name}</td><td>${f.label}</td><td><span class="tag">${f.type}</span></td><td>${new Date(f.created_at).toLocaleDateString()}</td></tr>`).join('') : '<tr><td colspan="4" class="empty">暂无字段</td></tr>'}</tbody></table></div>`;
+    }
+    
+    function renderDataView() {
+      let records = state.records[state.selectedApp.id] || [];
+      const query = document.getElementById('searchQuery')?.value || '';
+      if (query) records = records.filter(r => JSON.stringify(r.data).toLowerCase().includes(query.toLowerCase()));
+      const appFields = state.fields;
+      const headers = '<th>ID</th>' + appFields.map(f => `<th>${f.label}</th>`).join('') + '<th>创建时间</th><th>操作</th>';
+      const rows = records.length ? records.map(r => {
+        const cells = appFields.map(f => {
+          const val = r.data[f.name];
+          if (f.type === 'boolean') return val ? '<td>✓</td>' : '<td></td>';
+          return `<td>${val || '-'}</td>`;
+        }).join('');
+        return `<tr><td>${r.id.slice(0,8)}</td>${cells}<td>${new Date(r.created_at).toLocaleString()}</td><td>
+          <button class="btn-sm" onclick="hasPermission('update') ? editRecord('${r.id}') : alert('无权限')">编辑</button>
+          <button class="btn-sm" onclick="hasPermission('delete') ? deleteRecord('${r.id}') : alert('无权限')">删除</button></td></tr>`;
+      }).join('') : '<tr><td colspan="' + (appFields.length+3) + '" class="empty">暂无数据</td></tr>';
+      return `<div><button class="btn btn-secondary" onclick="state.currentView='apps';render()">← 返回</button>
+        <span style="margin-left:16px;font-weight:600">${state.selectedApp.name}</span></div>
+        <div class="toolbar">
+          <input class="input" style="width:300px" placeholder="搜索" oninput="render()" id="searchQuery">
+          <button class="btn btn-primary" onclick="hasPermission('create') ? showModal('record') : alert('无权限')">+ 新建</button>
+          <button class="btn btn-secondary" onclick="switchView('table')">表格</button>
+          <button class="btn btn-secondary" onclick="switchView('kanban')">看板</button>
+          <button class="btn btn-secondary" onclick="exportData('json')">导出</button>
+          <button class="btn btn-secondary" onclick="exportData('csv')">CSV</button>
+        </div>
+        <div class="card"><table><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+    
+    // 更新导航按钮状态
+    function updateNavButtons() {
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.view === state.currentView);
+      });
+    }
+    
+    // 视图切换
+    window.currentDataView = 'table';
+    window.switchView = function(view) {
+      window.currentDataView = view;
+      render();
+    };
+    
+    // 动作层 - 请求处理
+    window.handleAction = function(action, payload) {
+      switch(action) {
+        case 'createApp': createApp(payload); break;
+        case 'createField': createField(payload); break;
+        case 'createRecord': createRecord(payload); break;
+        case 'updateRecord': updateRecord(payload); break;
+        case 'deleteRecord': deleteRecord(payload); break;
+        case 'switchView': switchView(payload); break;
+        case 'switchRole': switchRole(payload); break;
+      }
+    };
 
     // 模态框
     window.showModal = function(type) {
