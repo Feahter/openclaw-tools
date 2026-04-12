@@ -46,6 +46,6 @@ NameError: name '_load_checkpoint' is not defined
 
 **原因**: 函数定义顺序问题，`extract_from_lcm` 调用了后面定义的 `_load_checkpoint`
 
-**状态**: pending
+**状态**: resolved
 
-**修复方向**: 将 `_load_checkpoint` 定义移到 `extract_from_lcm` 之前
+**修复**: 在 `extract_from_lcm` 前添加了 `_checkpoint_path`/`_load_checkpoint`/`_save_checkpoint` 三个函数；删除了 line 137 的冗余 cutoff 赋值；所有函数现已通过 compile + exec 验证。

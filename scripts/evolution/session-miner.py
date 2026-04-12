@@ -97,6 +97,27 @@ def get_db():
                 pass
     return None
 
+def _checkpoint_path():
+    return OUTPUT_DIR / "session-miner-checkpoint.json"
+
+def _load_checkpoint():
+    """加载上次扫描的 checkpoint，返回 dict。"""
+    try:
+        p = _checkpoint_path()
+        if p.exists():
+            return json.loads(p.read_text())
+    except Exception:
+        pass
+    return {}
+
+def _save_checkpoint(queries, cutoff):
+    """保存本次扫描的 cutoff，下次增量扫描。"""
+    try:
+        _checkpoint_path().parent.mkdir(parents=True, exist_ok=True)
+        _checkpoint_path().write_text(json.dumps({"cutoff": cutoff, "count": len(queries)}))
+    except Exception:
+        pass
+
 def extract_from_lcm(days=7):
     """从 LCM 数据库提取近 N 天用户消息。
     
@@ -113,8 +134,6 @@ def extract_from_lcm(days=7):
     if not conn:
         print("WARNING: LCM db not found, falling back to JSONL", file=sys.stderr)
         return []
-
-    cutoff = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
     cur = conn.cursor()
 
     # 找主会话（排除 memory/session/cron 子 agent）
