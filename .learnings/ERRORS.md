@@ -33,3 +33,19 @@ Command failures, exceptions, and tool errors captured during development.
 
 ---
 
+
+## [2026-04-11] session-miner.py _load_checkpoint NameError
+
+**文件**: `scripts/evolution/session-miner.py`
+
+**错误**: 
+```
+NameError: name '_load_checkpoint' is not defined
+  at extract_from_lcm() line 108
+```
+
+**原因**: 函数定义顺序问题，`extract_from_lcm` 调用了后面定义的 `_load_checkpoint`
+
+**状态**: pending
+
+**修复方向**: 将 `_load_checkpoint` 定义移到 `extract_from_lcm` 之前
