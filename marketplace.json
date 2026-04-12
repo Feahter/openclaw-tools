@@ -158,13 +158,6 @@
       "path": "skills/apple-notes"
     },
     {
-      "name": "attention-system",
-      "slug": "attention-system",
-      "description": "",
-      "version": "",
-      "path": "skills/attention-system"
-    },
-    {
       "name": "auto-content-creator",
       "slug": "auto-content-creator",
       "description": "基于素材自动生成内容，支持多种创作类型、模板风格管理、一键发布到多平台",
@@ -235,13 +228,6 @@
       "path": "skills/checklist-manager"
     },
     {
-      "name": "chromadb",
-      "slug": "chromadb",
-      "description": "",
-      "version": "1.0.0",
-      "path": "skills/chromadb"
-    },
-    {
       "name": "clawdhub",
       "slug": "clawdhub",
       "description": "Use the ClawdHub CLI to search, install, update, and publish agent skills from clawdhub.com. Use when you need to fetch new skills on the fly, sync installed skills to latest or a specific version, or publish new/updated skill folders with the npm-installed clawdhub CLI.",
@@ -303,13 +289,6 @@
       "description": "上下文管理器 - 智能压缩、摘要和管理对话历史，优化长对话的token使用。用于长对话维护、信息提取、记忆管理。适用场景：长任务跟踪、多轮对话优化、历史会话检索。",
       "version": "",
       "path": "skills/context-manager"
-    },
-    {
-      "name": "context-mode",
-      "slug": "context-mode",
-      "description": "",
-      "version": "",
-      "path": "skills/context-mode"
     },
     {
       "name": "core",
@@ -844,13 +823,6 @@
       "path": "skills/openclaw-token-optimizer"
     },
     {
-      "name": "opencode-usage",
-      "slug": "opencode-usage",
-      "description": "",
-      "version": "",
-      "path": "skills/opencode-usage"
-    },
-    {
       "name": "para-second-brain",
       "slug": "para-second-brain",
       "description": "Organize your agent's knowledge using PARA (Projects, Areas, Resources, Archive) — then make it ALL searchable. The symlink trick enables full semantic search across your entire knowledge base, not just MEMORY.md. Includes session transcript indexing and memory flush protocol. Your agent finally has a real second brain.",
@@ -975,13 +947,6 @@
       "description": "",
       "version": "",
       "path": "skills/project-planning"
-    },
-    {
-      "name": "proxmox-ops",
-      "slug": "proxmox-ops",
-      "description": "|",
-      "version": "1.0.3",
-      "path": "skills/proxmox-ops"
     },
     {
       "name": "puppeteer",
@@ -1222,13 +1187,6 @@
       "path": "skills/svg-card-generator"
     },
     {
-      "name": "sw-data-scientist",
-      "slug": "sw-data-scientist",
-      "description": "",
-      "version": "1.0.0",
-      "path": "skills/sw-data-scientist"
-    },
-    {
       "name": "mobile-debugging",
       "slug": "sw-mobile-debugging",
       "description": "React Native debugging with Flipper, React DevTools, and crash analysis. Use for mobile app debugging or network request issues.",
@@ -1276,13 +1234,6 @@
       "description": "AI-optimized web search via Tavily API. Returns concise, relevant results for AI agents.",
       "version": "1.0.0",
       "path": "skills/tavily-search"
-    },
-    {
-      "name": "technical-roadmaps",
-      "slug": "technical-roadmaps",
-      "description": "",
-      "version": "",
-      "path": "skills/technical-roadmaps"
     },
     {
       "name": "telegraf",
@@ -1339,13 +1290,6 @@
       "description": "高分项目，建议创建 Skill",
       "version": "1.0.0",
       "path": "skills/tools"
-    },
-    {
-      "name": "tools-ui",
-      "slug": "tools-ui",
-      "description": "",
-      "version": "0.1.0",
-      "path": "skills/tools-ui"
     },
     {
       "name": "using-git-worktrees",
@@ -1423,13 +1367,6 @@
       "description": "Fix AI writing patterns that create repetitive and robotic content",
       "version": "1.0.2",
       "path": "skills/writer"
-    },
-    {
-      "name": "x-post-automation",
-      "slug": "x-post-automation",
-      "description": "",
-      "version": "1.0.0",
-      "path": "skills/x-post-automation"
     },
     {
       "name": "xlsx",
