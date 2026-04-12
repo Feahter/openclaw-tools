@@ -1451,6 +1451,22 @@
       "description": "高分项目，建议创建 Skill",
       "version": "1.0.0",
       "path": "skills/zx"
+    },
+    {
+      "name": "autonomous-skill-creator",
+      "description": "自动创建 Skill",
+      "category": "development"
+    },
+    {
+      "name": "aesthetics-master",
+      "description": "代码美学",
+      "category": "development"
+    },
+    {
+      "name": "claude-code-best-practice",
+      "description": "Claude Code 最佳实践",
+      "category": "development"
     }
-  ]
+  ],
+  "updated": "2026-04-12"
 }
