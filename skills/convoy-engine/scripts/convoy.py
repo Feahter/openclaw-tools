@@ -267,6 +267,59 @@ def cmd_kill(args):
     print(f"🚫 Convoy {args.id} 已终止")
 
 
+def cmd_exec(args):
+    """输出待执行的 sessions_spawn 命令，AI 直接复制"""
+    if not args.id:
+        print("错误：必须指定 --id", file=sys.stderr)
+        return
+    state = ConvoyState(args.id).read()
+    pending = [
+        (tid, t) for tid, t in state.get("tasks", {}).items()
+        if t["status"] == "pending"
+        and all(
+            state["tasks"][dep]["status"] == "completed"
+            for dep in t.get("depends_on", [])
+        )
+    ]
+    if not pending:
+        print(f"Convoy {args.id} 没有待执行的任务")
+        return
+    print(f"# Convoy {args.id} — 待执行 {len(pending)} 个任务\n")
+    for tid, t in pending:
+        print(f"# 任务 {tid}:")
+        print(f'sessions_spawn \\')
+        print(f'  --task \'{t["prompt"]}\' \\')
+        print(f'  --label "convoy-{args.id[:8]}-{tid}" \\')
+        print(f'  --mode run\n')
+    if args.json:
+        import json as json_mod
+        print(json_mod.dumps({
+            "convoy_id": args.id,
+            "pending": [{"id": tid, **t} for tid, t in pending]
+        }))
+
+def cmd_result(args):
+    """聚合 Convoy 所有任务结果"""
+    if not args.id:
+        print("错误：必须指定 --id", file=sys.stderr)
+        return
+    state = ConvoyState(args.id).read()
+    results = state.get("results", {})
+    errors = state.get("errors", {})
+    if not results and not errors:
+        print(f"Convoy {args.id} 暂无结果")
+        return
+    print(f"# Convoy {args.id} — 结果聚合\n")
+    for task_id in state.get("tasks", {}):
+        if task_id in results:
+            print(f"## {task_id} ✅")
+            print(results[task_id][:2000])
+            print()
+        elif task_id in errors:
+            print(f"## {task_id} ❌")
+            print(f"错误: {errors[task_id]}")
+            print()
+
 def cmd_clean(args):
     """清理超过 N 天的 convoy 状态文件"""
     import time as time_module
@@ -309,6 +362,15 @@ def main():
     p_kill = sub.add_parser("kill", help="终止 Convoy")
     p_kill.add_argument("--id", required=True)
     p_kill.set_defaults(fn=cmd_kill)
+
+    p_exec = sub.add_parser("exec", help="输出待执行的 sessions_spawn 命令")
+    p_exec.add_argument("--id", required=True)
+    p_exec.add_argument("--json", action="store_true", help="JSON 格式输出")
+    p_exec.set_defaults(fn=cmd_exec)
+
+    p_result = sub.add_parser("result", help="聚合 Convoy 所有任务结果")
+    p_result.add_argument("--id", required=True)
+    p_result.set_defaults(fn=cmd_result)
 
     p_clean = sub.add_parser("clean", help="清理历史 Convoy")
     p_clean.add_argument("--days", type=int, default=7, help="清理 N 天前的 (默认7天)")
