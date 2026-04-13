@@ -9,6 +9,7 @@
 | 脚本 | 来源 | Stars | 作用 |
 |------|------|-------|------|
 | `openclaw-control-cli.py` | 本地开发 | - | OpenClaw gateway 配置与代理管理 CLI |
+| `symphony/` | [junhoyeo/contrabass](https://github.com/junhoyeo/contrabass) | ⭐1.6K | OpenAI Symphony Go 复刻：Issue 追踪/编排器/Team 协作/LocalBoard |
 | `httpie-wrapper.py` | [httpie/httpie](https://github.com/httpie/httpie) | ⭐ 32K | 人类友好的 HTTP 客户端，curl 替代品 |
 | `bash-functions` | [mathiasbynens/dotfiles](https://github.com/mathiasbynens/dotfiles) | - | Bash 函数库（包含 extract, mem, etc） |
 | `tldr-curl.md` | [tldr-pages/tldr](https://github.com/tldr-pages/tldr) | ⭐ 48K | curl 命令简化示例 |
