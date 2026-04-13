@@ -70,13 +70,21 @@
 
 ---
 
-## 🦞 OpenClaw 当前状态（2026-03-24）
+## 🦞 OpenClaw 当前状态（2026-04-13）
 
 - **版本**：2026.3.23-1
 - **飞书插件**：@larksuite/openclaw-lark@2026.3.25
-- **当前模型**：anthropic/MiniMax-M2.7（主），fallbacks: MiniMax-M2.1, Kimi K2.5, MiniMax-M2.5
-- **Provider**：`minimax`（已删除重复的 `anthropic`）
+- **当前模型**：MiniMax-M2.7（主）→ M2.5 → M2.1（兜底）
+- **Provider**：`minimax`
 - **优化**：maxConcurrent=8, memorySearch=enabled, contextPruning=30m
+
+## 🧠 Skills 新增（2026-04-13）
+
+### deep-research skill
+- 融合 hv-analysis（卡兹克横纵分析法）× laconic（上下文压缩架构）
+- 核心：Planner/Synthesizer/Analyzer/Finalizer 四组件
+- 横纵分析框架 + 知识笔记本 + PDF 输出 + 知识传承
+- ⚠️ qwen3.5:8B 模型太大（6.5GB），Ollama 冷启动超时，换用 qwen3:4b 或预热
 
 ## 🔐 凭证配置
 
