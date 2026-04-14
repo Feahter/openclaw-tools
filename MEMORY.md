@@ -78,6 +78,25 @@
 - **Provider**：`minimax`
 - **优化**：maxConcurrent=8, memorySearch=enabled, contextPruning=30m
 
+### 🏗️ 双 Gateway 架构（2026-04-14 部署）
+
+| 实例 | 端口 | 启动方式 | 用途 |
+|------|------|---------|------|
+| QClaw 内置 gateway | 28789 | QClaw Helper (PID 22005) | WeChat 通道 |
+| npm 全局 gateway | 18789 | LaunchAgent (PID 22647) | Feishu 通道 |
+
+**配置路径**：
+- npm 全局版读取 `~/.openclaw/openclaw.json`
+- QClaw 读取 `~/.qclaw/openclaw.json`
+- 环境变量 `OPENCLAW_GATEWAY_PORT` 覆盖 config 里的端口（当前 shell 有 `OPENCLAW_GATEWAY_PORT=28789`）
+
+**飞书 LaunchAgent**：`~/Library/LaunchAgents/ai.openclaw.gateway.feishu.plist`
+- Node: `/usr/local/opt/node@24/bin/node`
+- 入口: `~/.npm-global/lib/node_modules/openclaw/openclaw.mjs`
+- 日志: `~/.openclaw/logs/gateway-feishu.log`
+
+**已知问题**：npm 全局 openclaw 读 `~/.qclaw/openclaw.json` 而非 `~/.openclaw/openclaw.json`（环境变量污染）
+
 ## 🧠 Skills 新增（2026-04-13）
 
 ### deep-research skill
