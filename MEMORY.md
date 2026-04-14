@@ -1,6 +1,6 @@
 # MEMORY.md - 重要约定与记录
 
-*Last Updated: 2026-04-02*
+*Last Updated: 2026-04-14*
 
 ---
 
@@ -70,9 +70,9 @@
 
 ---
 
-## 🦞 OpenClaw 当前状态（2026-04-13）
+## 🦞 OpenClaw 当前状态（2026-04-14）
 
-- **版本**：2026.3.23-1
+- **版本**：2026.4.5
 - **飞书插件**：@larksuite/openclaw-lark@2026.3.25
 - **当前模型**：MiniMax-M2.7（主）→ M2.5 → M2.1（兜底）
 - **Provider**：`minimax`
@@ -195,13 +195,13 @@
 | `skill-creator` + `skill-project-butcher` | 创建 Skill → 分析同类项目参考架构 |
 | `find-skills` + `skill-project-butcher` | 发现有趣项目 → 深度分析 → 决定是否做成 Skill |
 
-### 3. 自动化工作流
+### 4. 自动化工作流
 | 组合 | 功能 |
 |------|------|
 | `cron-mastery` + `workflow-automation` | 定时任务 + 工作流编排 |
 | `automation-workflows` + `feishu` | 自动化 → 飞书通知/任务 |
 
-### 4. 开发闭环
+### 5. 开发闭环
 | 组合 | 功能 |
 |------|------|
 | `coding-agent` + `test-driven-development` + `github` | 编码 → 测试 → 提交 |
@@ -251,11 +251,7 @@
 | Promotion 路径 | 频繁(≥3) → SOUL/TOOLS/AGENTS |
 | Skill 抽取 | 足够通用 → extract-skill.sh → 独立 Skill |
 
-**核心设计**：Pattern-Key + Recurrence-Count 去重，频繁错误自动升级为永久记忆。
-| 组合 | 功能 |
-|------|------|
-| `lightpanda` + `browser` | 替代 OpenClaw 默认浏览器，资源占用更低 |
-| `lightpanda` + `agent-reach` | 社媒平台抓取（配合 CDP） |
+**核心设计**：Pattern-Key + Recurrence-Count 去重，频繁错误自动升级为永久记忆。 |
 
 ## 🚀 chinese-name-lookup 八字命理 skill (2026-03-30)
 
