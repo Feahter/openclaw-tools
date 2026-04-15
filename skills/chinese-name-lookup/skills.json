@@ -1,0 +1,72 @@
+{
+  "skills": [
+    {
+      "name": "bazi_mcp",
+      "description": "八字命盘 + 大运流年 MCP Server。本地化八字分析引擎，无需 API，支持八字排盘、日主强弱、喜用神、十神、十二长生、命宫身宫、神煞、大运流年分析。",
+      "tools": [
+        {
+          "name": "bazi_full_analysis",
+          "description": "完整八字排盘分析。输入出生时间(YYYY-MM-DD HH:MM)和性别，返回八字干支、日主强弱、喜用神、十神、十二长生、命宫身宫、神煞、调候等完整报告。",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "birth_time": {
+                "type": "string",
+                "description": "出生时间，格式为 'YYYY-MM-DD HH:MM'（24小时制），例如 '2024-03-15 10:30'",
+                "examples": ["2024-03-15 10:30", "1990-08-15 14:00"]
+              },
+              "gender": {
+                "type": "string",
+                "description": "性别，'男' 或 '女'",
+                "enum": ["男", "女"],
+                "examples": ["男", "女"]
+              },
+              "province": {
+                "type": "string",
+                "description": "出生省份/直辖市，用于真太阳时矫正，例如 '四川'、'北京'。不填则默认北京时间。"
+              },
+              "city": {
+                "type": "string",
+                "description": "出生城市，用于真太阳时矫正，例如 '成都'、'上海'。不填则默认北京时间。"
+              }
+            },
+            "required": ["birth_time", "gender"]
+          }
+        },
+        {
+          "name": "bazi_dayun_analysis",
+          "description": "大运流年分析。输入出生时间和性别，返回大运序列（每步大运干支、起止年龄、方向）、近5年流年简析、驿马运节点、精确大运起始年龄。",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "birth_time": {
+                "type": "string",
+                "description": "出生时间，格式为 'YYYY-MM-DD HH:MM'（24小时制），例如 '2024-03-15 10:30'",
+                "examples": ["2024-03-15 10:30", "1990-08-15 14:00"]
+              },
+              "gender": {
+                "type": "string",
+                "description": "性别，'男' 或 '女'",
+                "enum": ["男", "女"],
+                "examples": ["男", "女"]
+              },
+              "province": {
+                "type": "string",
+                "description": "出生省份/直辖市，用于真太阳时矫正。"
+              },
+              "city": {
+                "type": "string",
+                "description": "出生城市，用于真太阳时矫正。"
+              }
+            },
+            "required": ["birth_time", "gender"]
+          }
+        }
+      ],
+      "command": "python",
+      "args": ["${SKILL_DIR}/mcp_server.py"],
+      "env": {},
+      "cwd": "${SKILL_DIR}"
+    }
+  ]
+}

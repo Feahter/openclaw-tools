@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { margin: 0; padding: 20px; font-family: system-ui, sans-serif; background: #f8fafc; }
+  .container { max-width: 500px; margin: 0 auto; background: white; padding: 24px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  h3 { text-align: center; margin: 0 0 24px; font-size: 18px; color: #1f2937; }
+  .form-group { margin-bottom: 20px; }
+  label { display: flex; justify-content: space-between; font-size: 14px; color: #374151; margin-bottom: 8px; font-weight: 500; }
+  .range-value { color: #3b82f6; font-weight: 700; }
+  input[type="range"] { width: 100%; height: 6px; -webkit-appearance: none; background: #e2e8f0; border-radius: 3px; outline: none; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: #3b82f6; border-radius: 50%; cursor: pointer; box-shadow: 0 2px 4px rgba(59,130,246,0.4); }
+  .result-card { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: white; padding: 24px; border-radius: 12px; text-align: center; margin-top: 8px; }
+  .result-main { font-size: 36px; font-weight: 800; margin: 8px 0; }
+  .result-label { font-size: 14px; opacity: 0.85; }
+  .result-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .breakdown-item { background: rgba(255,255,255,0.15); padding: 12px; border-radius: 8px; }
+  .breakdown-value { font-size: 18px; font-weight: 700; }
+  .breakdown-label { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+  .growth-bar { margin-top: 16px; }
+  .growth-bar-label { display: flex; justify-content: space-between; font-size: 12px; opacity: 0.8; margin-bottom: 6px; }
+  .growth-bar-track { height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; }
+  .growth-bar-fill { height: 100%; background: white; border-radius: 4px; transition: width 0.5s ease; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h3>💰 复利计算器</h3>
+  
+  <div class="form-group">
+    <label>初始金额 <span class="range-value" id="principalVal">¥10,000</span></label>
+    <input type="range" id="principal" min="1000" max="500000" step="1000" value="10000" oninput="calculate()">
+  </div>
+  
+  <div class="form-group">
+    <label>年化收益率 <span class="range-value" id="rateVal">8%</span></label>
+    <input type="range" id="rate" min="1" max="25" step="0.5" value="8" oninput="calculate()">
+  </div>
+  
+  <div class="form-group">
+    <label>投资年限 <span class="range-value" id="yearsVal">10年</span></label>
+    <input type="range" id="years" min="1" max="40" step="1" value="10" oninput="calculate()">
+  </div>
+  
+  <div class="form-group">
+    <label>每月定投 <span class="range-value" id="monthlyVal">¥500</span></label>
+    <input type="range" id="monthly" min="0" max="20000" step="100" value="500" oninput="calculate()">
+  </div>
+  
+  <div class="result-card">
+    <div class="result-label">最终资产</div>
+    <div class="result-main" id="finalAmount">¥0</div>
+    <div class="result-breakdown">
+      <div class="breakdown-item">
+        <div class="breakdown-value" id="totalInvested">¥0</div>
+        <div class="breakdown-label">累计投入</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-value" id="totalProfit">¥0</div>
+        <div class="breakdown-label">复利收益</div>
+      </div>
+    </div>
+    <div class="growth-bar">
+      <div class="growth-bar-label">
+        <span>本金占比</span>
+        <span id="principalRatio">0%</span>
+      </div>
+      <div class="growth-bar-track">
+        <div class="growth-bar-fill" id="principalBar" style="width:50%"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function fmt(n) { return '¥' + Math.round(n).toLocaleString('zh-CN'); }
+function calculate() {
+  const P = +document.getElementById('principal').value;
+  const r = +document.getElementById('rate').value / 100;
+  const t = +document.getElementById('years').value;
+  const M = +document.getElementById('monthly').value;
+  
+  document.getElementById('principalVal').textContent = fmt(P);
+  document.getElementById('rateVal').textContent = (r*100).toFixed(1) + '%';
+  document.getElementById('yearsVal').textContent = t + '年';
+  document.getElementById('monthlyVal').textContent = fmt(M);
+  
+  const compound = P * Math.pow(1 + r, t);
+  const monthlyRate = r / 12;
+  const months = t * 12;
+  const monthlyCompound = M > 0
+    ? M * (Math.pow(1 + monthlyRate, months) - 1) / monthlyRate * (1 + monthlyRate)
+    : 0;
+  
+  const total = compound + monthlyCompound;
+  const invested = P + M * months;
+  const profit = total - invested;
+  const ratio = Math.round(invested / total * 100);
+  
+  document.getElementById('finalAmount').textContent = fmt(total);
+  document.getElementById('totalInvested').textContent = fmt(invested);
+  document.getElementById('totalProfit').textContent = fmt(profit);
+  document.getElementById('principalRatio').textContent = ratio + '%';
+  document.getElementById('principalBar').style.width = ratio + '%';
+}
+calculate();
+</script>
+</body>
+</html>

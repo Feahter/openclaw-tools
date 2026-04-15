@@ -1,0 +1,23 @@
+{
+  "name": "spen-memory",
+  "version": "1.0.0",
+  "description": "Agent 动态按需记忆系统 - 基于 SPEN 思想的轻量级记忆存储与检索",
+  "main": "spen-memory.js",
+  "type": "module",
+  "bin": {
+    "spen-memory": "./cli.js"
+  },
+  "scripts": {
+    "test": "node test.js",
+    "start": "node cli.js"
+  },
+  "keywords": [
+    "memory",
+    "agent",
+    "spen",
+    "context",
+    "lazy-loading"
+  ],
+  "author": "",
+  "license": "MIT"
+}

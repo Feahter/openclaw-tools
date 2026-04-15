@@ -1,0 +1,227 @@
+{
+  "patterns": [
+    {
+      "name": "content-production-line",
+      "skills": [
+        "agent-reach",
+        "summarize",
+        "xlsx"
+      ],
+      "trigger": "深度研究任务",
+      "emergence": "搜索→摘要→结构化，完整管道",
+      "usage_count": 12
+    },
+    {
+      "name": "github-project-research",
+      "skills": [
+        "skill-project-butcher",
+        "agent-reach"
+      ],
+      "trigger": "GitHub项目深度研究",
+      "emergence": "本地源码分析+网络资料补充",
+      "usage_count": 8
+    },
+    {
+      "name": "article-to-publish",
+      "skills": [
+        "web_fetch",
+        "summarize",
+        "xlsx"
+      ],
+      "trigger": "文章读取→格式化→发布",
+      "emergence": "网页→摘要→多格式输出",
+      "usage_count": 6
+    },
+    {
+      "name": "skill-discovery-workflow",
+      "skills": [
+        "find-skills",
+        "skill-orchestrator",
+        "skillhub_install"
+      ],
+      "trigger": "发现→评估→安装skill",
+      "emergence": "完整skill生命周期管理",
+      "usage_count": 5
+    },
+    {
+      "name": "code-review-loop",
+      "skills": [
+        "code-review-expert",
+        "coding-agent",
+        "github"
+      ],
+      "trigger": "代码审查→修改→提交",
+      "emergence": "自动化代码质量闭环",
+      "usage_count": 4
+    },
+    {
+      "name": "git-github",
+      "skills": [
+        "git",
+        "github"
+      ],
+      "trigger": "auto-detected",
+      "emergence": "needs manual description",
+      "usage_count": 4,
+      "auto_detected": true,
+      "added_at": "2026-04-14T22:51:08.974786"
+    },
+    {
+      "name": "git-talent-mind",
+      "skills": [
+        "git",
+        "talent-mind"
+      ],
+      "trigger": "auto-detected",
+      "emergence": "needs manual description",
+      "usage_count": 3,
+      "auto_detected": true,
+      "added_at": "2026-04-14T22:51:08.974818"
+    },
+    {
+      "name": "creator-git",
+      "skills": [
+        "creator",
+        "git"
+      ],
+      "trigger": "auto-detected",
+      "emergence": "needs manual description",
+      "usage_count": 2,
+      "auto_detected": true,
+      "added_at": "2026-04-14T22:51:08.974826"
+    },
+    {
+      "name": "creator-github",
+      "skills": [
+        "creator",
+        "github"
+      ],
+      "trigger": "auto-detected",
+      "emergence": "needs manual description",
+      "usage_count": 2,
+      "auto_detected": true,
+      "added_at": "2026-04-14T22:51:08.974830"
+    },
+    {
+      "name": "github-talent-mind",
+      "skills": [
+        "github",
+        "talent-mind"
+      ],
+      "trigger": "auto-detected",
+      "emergence": "needs manual description",
+      "usage_count": 2,
+      "auto_detected": true,
+      "added_at": "2026-04-14T22:51:08.974832"
+    },
+    {
+      "name": "autoresearch-skill-git",
+      "skills": [
+        "autoresearch-skill",
+        "git"
+      ],
+      "trigger": "auto-detected",
+      "emergence": "needs manual description",
+      "usage_count": 2,
+      "auto_detected": true,
+      "added_at": "2026-04-14T22:51:08.974835"
+    },
+    {
+      "name": "autoresearch-skill-llm-wiki-agent",
+      "skills": [
+        "autoresearch-skill",
+        "llm-wiki-agent"
+      ],
+      "trigger": "auto-detected",
+      "emergence": "needs manual description",
+      "usage_count": 2,
+      "auto_detected": true,
+      "added_at": "2026-04-14T22:51:08.974837"
+    },
+    {
+      "name": "autoresearch-skill-openclaw-control-cli",
+      "skills": [
+        "autoresearch-skill",
+        "openclaw-control-cli"
+      ],
+      "trigger": "auto-detected",
+      "emergence": "needs manual description",
+      "usage_count": 2,
+      "auto_detected": true,
+      "added_at": "2026-04-14T22:51:08.974842"
+    },
+    {
+      "name": "autoresearch-skill-talent-mind",
+      "skills": [
+        "autoresearch-skill",
+        "talent-mind"
+      ],
+      "trigger": "auto-detected",
+      "emergence": "needs manual description",
+      "usage_count": 2,
+      "auto_detected": true,
+      "added_at": "2026-04-14T22:51:08.974844"
+    },
+    {
+      "name": "git-llm-wiki-agent",
+      "skills": [
+        "git",
+        "llm-wiki-agent"
+      ],
+      "trigger": "auto-detected",
+      "emergence": "needs manual description",
+      "usage_count": 2,
+      "auto_detected": true,
+      "added_at": "2026-04-14T22:51:08.974846"
+    },
+    {
+      "name": "git-openclaw-control-cli",
+      "skills": [
+        "git",
+        "openclaw-control-cli"
+      ],
+      "trigger": "auto-detected",
+      "emergence": "needs manual description",
+      "usage_count": 2,
+      "auto_detected": true,
+      "added_at": "2026-04-14T22:51:08.974849"
+    },
+    {
+      "name": "llm-wiki-agent-openclaw-control-cli",
+      "skills": [
+        "llm-wiki-agent",
+        "openclaw-control-cli"
+      ],
+      "trigger": "auto-detected",
+      "emergence": "needs manual description",
+      "usage_count": 2,
+      "auto_detected": true,
+      "added_at": "2026-04-14T22:51:08.974851"
+    },
+    {
+      "name": "llm-wiki-agent-talent-mind",
+      "skills": [
+        "llm-wiki-agent",
+        "talent-mind"
+      ],
+      "trigger": "auto-detected",
+      "emergence": "needs manual description",
+      "usage_count": 2,
+      "auto_detected": true,
+      "added_at": "2026-04-14T22:51:08.974854"
+    },
+    {
+      "name": "openclaw-control-cli-talent-mind",
+      "skills": [
+        "openclaw-control-cli",
+        "talent-mind"
+      ],
+      "trigger": "auto-detected",
+      "emergence": "needs manual description",
+      "usage_count": 2,
+      "auto_detected": true,
+      "added_at": "2026-04-14T22:51:08.974856"
+    }
+  ],
+  "last_updated": "2026-04-14T22:51:08.974859"
+}

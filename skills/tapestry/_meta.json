@@ -1,0 +1,26 @@
+{
+  "name": "tapestry",
+  "description": "知识图谱构建技能，用于文档关联和知识网络管理",
+  "version": "1.0.0",
+  "author": "OpenClaw",
+  "category": "knowledge",
+  "tags": ["knowledge-graph", "nlp", "document"],
+  "capabilities": [
+    "文档解析",
+    "实体提取",
+    "关系建立",
+    "知识检索",
+    "可视化导出"
+  ],
+  "requirements": [
+    "networkx",
+    "spacy",
+    "PyPDF2",
+    "python-dotenv"
+  ],
+  "scripts": [
+    "tapestry-core.py"
+  ],
+  "created": "2026-02-03",
+  "updated": "2026-02-03"
+}

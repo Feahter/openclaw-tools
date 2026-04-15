@@ -1,0 +1,227 @@
+{
+  "events": [
+    {
+      "id": "1773373653561-igq4awqil",
+      "type": "对话",
+      "content": "用户问：明天天气怎么样",
+      "timestamp": 1773373653561,
+      "metadata": {},
+      "temporalPos": {
+        "timestamp": 1773373653561,
+        "hourSin": 0.258819045102521,
+        "hourCos": -0.9659258262890682,
+        "daySin": -0.9749279121818236,
+        "dayCos": -0.2225209339563146,
+        "hour": 11,
+        "isWorkingHours": true,
+        "isWeekend": false
+      },
+      "spatialPos": {
+        "type": "对话",
+        "keywords": [
+          "天天",
+          "天天气",
+          "户问",
+          "户问明",
+          "明天",
+          "明天天",
+          "用户",
+          "用户问",
+          "问明",
+          "问明天"
+        ],
+        "semanticHash": -667498034,
+        "entities": {
+          "urls": [],
+          "emails": [],
+          "numbers": []
+        },
+        "intent": "unknown"
+      },
+      "importance": 0.7,
+      "accessCount": 0,
+      "lastAccess": 1773373653561
+    },
+    {
+      "id": "1773373653662-9f6s1sgs1",
+      "type": "工具",
+      "content": "调用天气API，返回：北京晴，25度",
+      "timestamp": 1773373653662,
+      "metadata": {},
+      "temporalPos": {
+        "timestamp": 1773373653662,
+        "hourSin": 0.258819045102521,
+        "hourCos": -0.9659258262890682,
+        "daySin": -0.9749279121818236,
+        "dayCos": -0.2225209339563146,
+        "hour": 11,
+        "isWorkingHours": true,
+        "isWeekend": false
+      },
+      "spatialPos": {
+        "type": "工具",
+        "keywords": [
+          "25",
+          "api",
+          "天气",
+          "天气返",
+          "气返",
+          "气返回",
+          "用天",
+          "用天气",
+          "调用",
+          "调用天"
+        ],
+        "semanticHash": -787355232,
+        "entities": {
+          "urls": [],
+          "emails": [],
+          "numbers": [
+            "25"
+          ]
+        },
+        "intent": "unknown"
+      },
+      "importance": 0.8,
+      "accessCount": 0,
+      "lastAccess": 1773373653662
+    },
+    {
+      "id": "1773373653771-otlj3mw4e",
+      "type": "对话",
+      "content": "助手回复：明天北京晴，25度",
+      "timestamp": 1773373653771,
+      "metadata": {},
+      "temporalPos": {
+        "timestamp": 1773373653771,
+        "hourSin": 0.258819045102521,
+        "hourCos": -0.9659258262890682,
+        "daySin": -0.9749279121818236,
+        "dayCos": -0.2225209339563146,
+        "hour": 11,
+        "isWorkingHours": true,
+        "isWeekend": false
+      },
+      "spatialPos": {
+        "type": "对话",
+        "keywords": [
+          "25",
+          "助手",
+          "助手回",
+          "回复",
+          "回复明",
+          "复明",
+          "复明天",
+          "手回",
+          "手回复",
+          "明天"
+        ],
+        "semanticHash": -644434528,
+        "entities": {
+          "urls": [],
+          "emails": [],
+          "numbers": [
+            "25"
+          ]
+        },
+        "intent": "unknown"
+      },
+      "importance": 0.6,
+      "accessCount": 0,
+      "lastAccess": 1773373653771
+    },
+    {
+      "id": "1773373653917-5e9mju2it",
+      "type": "用户",
+      "content": "用户喜欢简洁的设计风格",
+      "timestamp": 1773373653917,
+      "metadata": {},
+      "temporalPos": {
+        "timestamp": 1773373653917,
+        "hourSin": 0.258819045102521,
+        "hourCos": -0.9659258262890682,
+        "daySin": -0.9749279121818236,
+        "dayCos": -0.2225209339563146,
+        "hour": 11,
+        "isWorkingHours": true,
+        "isWeekend": false
+      },
+      "spatialPos": {
+        "type": "用户",
+        "keywords": [
+          "喜欢",
+          "喜欢简",
+          "户喜",
+          "户喜欢",
+          "欢简",
+          "欢简洁",
+          "用户",
+          "用户喜",
+          "简洁",
+          "简洁的"
+        ],
+        "semanticHash": -855786517,
+        "entities": {
+          "urls": [],
+          "emails": [],
+          "numbers": []
+        },
+        "intent": "unknown"
+      },
+      "importance": 0.9,
+      "accessCount": 0,
+      "lastAccess": 1773373653917
+    },
+    {
+      "id": "1773373654025-8dp08olh4",
+      "type": "工具",
+      "content": "用户订了机票：北京飞上海，MU5184",
+      "timestamp": 1773373654025,
+      "metadata": {},
+      "temporalPos": {
+        "timestamp": 1773373654025,
+        "hourSin": 0.258819045102521,
+        "hourCos": -0.9659258262890682,
+        "daySin": -0.9749279121818236,
+        "dayCos": -0.2225209339563146,
+        "hour": 11,
+        "isWorkingHours": true,
+        "isWeekend": false
+      },
+      "spatialPos": {
+        "type": "工具",
+        "keywords": [
+          "mu5184",
+          "了机",
+          "了机票",
+          "户订",
+          "户订了",
+          "机票",
+          "用户",
+          "用户订",
+          "订了",
+          "订了机"
+        ],
+        "semanticHash": -48903452,
+        "entities": {
+          "urls": [],
+          "emails": [],
+          "numbers": [
+            "5184"
+          ]
+        },
+        "intent": "unknown"
+      },
+      "importance": 0.9,
+      "accessCount": 0,
+      "lastAccess": 1773373654025
+    }
+  ],
+  "archive": [],
+  "stats": {
+    "totalEvents": 5,
+    "retrievalCount": 0,
+    "cacheHits": 0,
+    "archiveSize": 0
+  }
+}

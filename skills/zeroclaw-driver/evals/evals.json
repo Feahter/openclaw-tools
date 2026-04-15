@@ -1,0 +1,23 @@
+{
+  "skill_name": "zeroclaw-driver",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "check if zeroclaw is running and show me the status",
+      "expected_output": "ZeroClaw status output showing version, provider, model, channels",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "start zeroclaw as a background daemon service",
+      "expected_output": "ZeroClaw daemon started successfully in background",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "what AI model providers does zeroclaw support?",
+      "expected_output": "List of 38+ supported providers including openrouter, anthropic, ollama, lmstudio",
+      "files": []
+    }
+  ]
+}

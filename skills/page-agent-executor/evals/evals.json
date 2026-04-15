@@ -1,0 +1,55 @@
+{
+  "skill_name": "page-agent-executor",
+  "evals": [
+    {
+      "name": "dom_parsing_basic",
+      "description": "基础 DOM 解析 - 简单表单",
+      "prompt": "Parse a simple HTML form with 3 input fields (email, password, confirm) and 1 submit button. Return the structured DOM text with element indices."
+    },
+    {
+      "name": "dom_parsing_nested",
+      "description": "嵌套 DOM 解析 - 复杂层级",
+      "prompt": "Parse a nested HTML structure with a form inside a modal dialog. The form has 2 input fields and a submit button. Return the DOM text preserving the hierarchy."
+    },
+    {
+      "name": "response_normalization_json_in_content",
+      "description": "响应修复 - JSON 在 content 中",
+      "prompt": "Fix an LLM response where the JSON action is in the message.content field instead of tool_calls. The JSON is: {\"action\": \"click_element\", \"index\": 0}"
+    },
+    {
+      "name": "response_normalization_double_json",
+      "description": "响应修复 - 双层 JSON",
+      "prompt": "Fix an LLM response with double-encoded JSON: {\"action\": \"{\\\"click_element\\\": 0}\"}"
+    },
+    {
+      "name": "response_normalization_nested_function",
+      "description": "响应修复 - 嵌套函数调用",
+      "prompt": "Fix an LLM response with nested function call format: {\"type\": \"function\", \"function\": {\"name\": \"AgentOutput\", \"arguments\": \"{\\\"action\\\": \\\"input_text\\\", \\\"index\\\": 1, \\\"text\\\": \\\"hello\\\"}\"}}"
+    },
+    {
+      "name": "history_reflection_simple",
+      "description": "历史反思 - 简单场景",
+      "prompt": "Generate a reflection from a 3-step execution history: step 1 (click_element, success), step 2 (input_text, success), step 3 (click_element, success). Extract the current state and next goal."
+    },
+    {
+      "name": "history_reflection_with_failures",
+      "description": "历史反思 - 包含失败",
+      "prompt": "Generate a reflection from a 5-step execution history with 2 failures: step 1 (click, success), step 2 (input, failed), step 3 (wait, success), step 4 (input, success), step 5 (click, success). Infer the current state and recovery strategy."
+    },
+    {
+      "name": "history_reflection_sensitive_data",
+      "description": "历史反思 - 敏感信息隐藏",
+      "prompt": "Generate a reflection from a history where step 2 contains input_text with 'password123' and step 3 contains 'user@example.com'. Verify that sensitive information is properly masked in the memory output."
+    },
+    {
+      "name": "tool_execution_click",
+      "description": "工具执行 - 点击操作",
+      "prompt": "Simulate clicking element at index 0. The element is a button with text 'Submit'. Verify that the operation returns success and the observation mentions the button was clicked."
+    },
+    {
+      "name": "tool_execution_input",
+      "description": "工具执行 - 输入操作",
+      "prompt": "Simulate inputting text 'user@example.com' into element at index 1. The element is an email input field. Verify that the operation returns success and the observation mentions the text was entered."
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+# === 只开源 skills 目录 ===
+# 排除一切
+/*
+/.*
+
+
+# 保留这些
+!skills/
+!skills/**
+!marketplace.json
+!README.md
+!LICENSE
+!.gitignore
+!scripts/
+!scripts/generate-marketplace.sh
+
+
+# Skills 中的敏感文件
+skills/**/.clawhub/
+skills/**/credentials.json
+skills/**/config.local.json
+
+
+# 系统文件
+.DS_Store
+node_modules/
+*.log
+*.tmp
+*.bak
+*~
+__pycache__/
+*.pyc
+
+
+
+
+# Nested git repos (not trackable)
+skills/agent-reach/
+skills/fast-edit/
+
+# Research projects
+project/
+
+# Trash (30-day auto-cleanup)
+.trash/
+.trash/*
+
+# LLM Wiki Agent output (personal knowledge data)
+skills/llm-wiki-agent/wiki/
+skills/llm-wiki-agent/raw/
+skills/llm-wiki-agent/.claude/

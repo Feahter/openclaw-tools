@@ -1,0 +1,12 @@
+{
+  "name": "fast-edit",
+  "description": "AI文件编辑工具 - 支持行号寻址、安全编辑、批量操作、备份恢复",
+  "version": "1.0.0",
+  "author": "includewudi",
+  "category": "dev-tools",
+  "tags": ["ai", "editor", "file-edit"],
+  "load_mode": "default",
+  "source_url": "https://github.com/includewudi/fast-edit",
+  "created": "2026-02-27",
+  "updated": "2026-02-27"
+}
