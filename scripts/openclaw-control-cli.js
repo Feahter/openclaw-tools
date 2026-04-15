@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/local/opt/node@24/bin/node
 /**
  * openclaw-control-cli
  * CLI tool for OpenClaw gateway control and proxy connection

@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/local/opt/node@24/bin/node
 
 function usage() {
   console.error(`Usage: extract.mjs "url1" ["url2" ...]`);

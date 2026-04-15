@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/local/opt/node@24/bin/node
 /**
  * Cloudflare Worker Proxy — Fetch 模式（Node.js 实现）
  *

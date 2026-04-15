@@ -536,6 +536,71 @@ if __name__ == "__main__":
 3. **用户明确说"帮我...并...然后..."** → 触发编排
 4. **否则** → 不触发，直接处理
 
+## 组合模式库
+
+### 目录结构
+
+```
+skill-orchestrator/
+├── patterns/
+│   ├── README.md              # 模式库说明
+│   ├── registry.json          # 固化模式注册表
+│   ├── pattern_registry.py    # 模式注册CLI
+│   └── emergence_detector.py  # 涌现检测器
+```
+
+### 模式注册表 (registry.json)
+
+```json
+{
+  "patterns": [
+    {
+      "name": "web-research-pipeline",
+      "skills": ["agent-reach", "summarize", "xlsx"],
+      "trigger": "深度研究任务",
+      "emergence": "搜索→摘要→结构化，完整管道",
+      "usage_count": 12
+    }
+  ],
+  "last_updated": "2026-04-14T22:30:00"
+}
+```
+
+### CLI 用法
+
+```bash
+# 列出已注册模式
+python3 patterns/pattern_registry.py list
+
+# 添加新模式
+python3 patterns/pattern_registry.py add skill-a skill-b --name "模式名"
+
+# 扫描涌现（需3+次使用）
+python3 patterns/emergence_detector.py --min-uses 3 --threshold 0.6
+
+# 主动探索（每周cron）
+python3 ~/.openclaw/workspace/scripts/evolution/skills-combination-explorer.py
+
+# 连接密度分析
+python3 ~/.openclaw/workspace/scripts/evolution/connection-density.py
+```
+
+### 进化机制
+
+| 机制 | 触发 | 负责 |
+|------|------|------|
+| 需求拉动 | 用户任务 | orchestrator |
+| 能力推动 | 新skill安装 | skill-evolution-manager |
+| 主动探索 | 高频≥5次/周 | session-miner + explorer |
+
+### 涌现检测阈值
+
+- **Min uses**: 3次
+- **Threshold**: 0.6
+- **报告位置**: `.state/combination-explorer-report.json`
+
+---
+
 ## 注意事项
 
 1. **权限:** 自动安装需要确认或配置免确认

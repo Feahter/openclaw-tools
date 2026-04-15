@@ -57,7 +57,7 @@ version: 1.0.0
 ### Planning
 ```bash
 # 使用 planning-with-files skill
-bash ~/.openclaw/skills/planning-with-files/scripts/init-session.sh
+bash ~/.openclaw/workspace/skills/planning-with-files/scripts/init-session.sh
 ```
 
 ### Subagent Dispatch

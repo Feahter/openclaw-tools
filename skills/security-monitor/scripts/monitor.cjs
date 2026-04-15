@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/local/opt/node@24/bin/node
 /**
  * security-monitor.cjs - Real-time security monitoring for Clawdbot
  * Usage: node monitor.js [--interval 60] [--daemon] [--threats=...]

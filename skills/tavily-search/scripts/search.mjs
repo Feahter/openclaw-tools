@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/local/opt/node@24/bin/node
 
 function usage() {
   console.error(`Usage: search.mjs "query" [-n 5] [--deep] [--topic general|news] [--days 7]`);

@@ -140,3 +140,26 @@ bb-browser guide
 | Knowledge | Wikipedia, Zhihu, Open Library |
 | Shopping | SMZDM |
 | Tools | Youdao, GSMArena, Product Hunt, Ctrip |
+
+## Page Agent（Alibaba）— 客户端DOM自动化
+
+> 研究归档：`memory/research/page-agent-alibaba-2026-04-14.md`
+
+纯客户端GUI Agent，用自然语言控制网页DOM，无需后端。
+
+**核心区别**：bb-browser走CDP服务端控制，Page Agent走客户端嵌入。互补关系。
+
+| 对比 | bb-browser | Page Agent |
+|------|-----------|------------|
+| 部署 | CDP后端 | 浏览器内嵌（CDN一行） |
+| 跨页面 | ✅ 多标签页 | ❌ 单页面（扩展版可） |
+| 登录态 | 复用已有 | 需要页面内API Key |
+| LLM | 无需（纯提取） | 需要（DOM决策） |
+| 适合 | 数据抓取、信息提取 | 表单填充、AI Copilot |
+
+**集成场景**：
+- bb-browser抓不到的动态内容 → Page Agent客户端补充
+- SaaS产品内嵌AI助手 → Page Agent CDN集成
+- MCP Server模式 → 可接入OpenClaw
+
+**资源**：github.com/alibaba/page-agent（⭐14,371，MIT）
