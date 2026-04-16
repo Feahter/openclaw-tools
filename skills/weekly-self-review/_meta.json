@@ -1,0 +1,9 @@
+{
+  "name": "weekly-self-review",
+  "version": "1.0.0",
+  "created": "2026-04-15",
+  "author": "feZ",
+  "category": "self-evolution",
+  "tags": ["self-evolution", "nudge", "skill-generation", "Hermes-comparable"],
+  "description": "每周自省扫描，对标Hermes nudge机制：识别高频模式并推送skill建议"
+}

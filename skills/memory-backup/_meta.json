@@ -1,0 +1,9 @@
+{
+  "name": "memory-backup",
+  "version": "1.0.0",
+  "created": "2026-04-15",
+  "author": "feZ",
+  "category": "backup",
+  "tags": ["backup", "memory", "safety"],
+  "description": "记忆文件增量备份，7天rolling history，防止记忆丢失"
+}
