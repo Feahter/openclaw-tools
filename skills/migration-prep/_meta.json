@@ -1,0 +1,9 @@
+{
+  "name": "migration-prep",
+  "version": "1.0.0",
+  "created": "2026-04-15",
+  "author": "feZ",
+  "category": "research",
+  "tags": ["migration", "hermes", "openclaw", "risk-assessment"],
+  "description": "OpenClaw→Hermes迁移风险评估，识别已知bug和迁移风险"
+}

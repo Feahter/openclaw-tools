@@ -1,0 +1,9 @@
+{
+  "name": "gateway-health-monitor",
+  "version": "1.0.0",
+  "created": "2026-04-15",
+  "author": "feZ",
+  "category": "monitoring",
+  "tags": ["gateway", "health", "monitoring", "alerting"],
+  "description": "飞书 Gateway 健康检查，检测消息回复率，连续失败触发告警"
+}

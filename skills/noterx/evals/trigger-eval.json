@@ -1,0 +1,23 @@
+[
+  {"query": "帮我看看这篇笔记能不能爆：减脂餐5分钟搞定，西兰花鸡胸肉糙米饭", "should_trigger": true},
+  {"query": "薯医诊断下这个标题：程序员转行AI三个月学习路线", "should_trigger": true},
+  {"query": "这篇小红书笔记有什么问题？标题是女生独居安全指南", "should_trigger": true},
+  {"query": "noterx 分析下我的笔记", "should_trigger": true},
+  {"query": "帮我诊断这篇笔记的爆款概率", "should_trigger": true},
+  {"query": "这篇笔记能火吗？", "should_trigger": true},
+  {"query": "小红书笔记怎么写才能爆？帮我看看这个草稿", "should_trigger": true},
+  {"query": "分析下我的小红书内容，标题是xxx正文是xxx", "should_trigger": true},
+  {"query": "这篇笔记的CES评分大概是多少？", "should_trigger": true},
+  {"query": "帮我优化这个小红书标题：打工人午餐不点外卖", "should_trigger": true},
+
+  {"query": "帮我写一篇小红书笔记关于减脂餐", "should_trigger": false},
+  {"query": "小红书爆款标题有哪些公式？", "should_trigger": false},
+  {"query": "帮我生成小红书标签", "should_trigger": false},
+  {"query": "分析下这个抖音视频能火吗", "should_trigger": false},
+  {"query": "这篇公众号文章怎么样", "should_trigger": false},
+  {"query": "帮我看看这段代码有没有bug", "should_trigger": false},
+  {"query": "CES评分是什么意思？给我科普下", "should_trigger": false},
+  {"query": "小红书怎么运营？有什么技巧？", "should_trigger": false},
+  {"query": "帮我分析下竞品的小红书账号", "should_trigger": false},
+  {"query": "生成10个小红书爆款标题", "should_trigger": false}
+]

@@ -1,0 +1,28 @@
+{
+  "name": "arch-diagram",
+  "version": "1.0.0",
+  "description": "Best-in-class architecture diagram skill — unified Native SVG + draw.io + Kroki engines",
+  "homepage": "https://github.com/Feahter/arch-diagram",
+  "license": "MIT",
+  "compatibility": {
+    "native_svg": "any platform with python3 + rsvg-convert",
+    "drawio": "requires draw.io desktop CLI (optional)",
+    "kroki": "any platform with curl (zero install)"
+  },
+  "metadata": {
+    "openclaw": {
+      "emoji": "🏗️",
+      "os": ["darwin", "linux", "win32"],
+      "requires": {
+        "anyBins": ["python3", "rsvg-convert"],
+        "optionalBins": ["draw.io", "drawio", "curl"]
+      }
+    },
+    "author": "feZ",
+    "synthesized_from": [
+      "fireworks-tech-graph (feZ local, v1.0.4)",
+      "Agents365-ai/drawio-skill (GitHub ⭐928)",
+      "Agents365-ai/excalidraw-skill (GitHub ⭐54)"
+    ]
+  }
+}

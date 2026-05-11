@@ -1,11 +1,11 @@
 # OpenClaw Skills
 
-> 174 AI Agent Skills for OpenClaw | Last updated: 2026-04-14
+> ~196 AI Agent Skills for OpenClaw | Last updated: 2026-05-12
 
 ## 📦 安装
 
 ```bash
-clawdhub install <skill-name>
+npx clawdhub install <skill-name>
 git clone https://github.com/Feahter/openclaw-tools.git
 ```
 
@@ -240,9 +240,5 @@ git clone https://github.com/Feahter/openclaw-tools.git
 
 | 日期 | 更新 |
 |------|------|
-| 2026-04-14 | 质量审计：修复broken路径，清理5个空壳skill |
+| 2026-05-12 | 新增 17 个活跃技能 + 4 个归档技能（arch-diagram, bazi-graph, fireworks-tech-graph, builder-pulse 等） |
 | 2026-04-12 | autonomous-skill-creator + aesthetics-master + talent-mind |
-
-## 🤝 贡献
-
-欢迎 PR！
